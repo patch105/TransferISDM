@@ -72,28 +72,6 @@ image.plot(list(x=x0, y=y0, z=t(gridcov)), main='Covariate', asp=1)
 
 save(lg.s, file = paste0(outpath, "/output/nhpp.rdata"))
 
-#-------------------------------------------------------------------------------
-# Thinning the LGCP to create presence-only points
-#-------------------------------------------------------------------------------
-
-
-#put points on same scale as strata
-pp1 <- as.data.frame(xy)
-names(pp1) <- c("x", "y")
-
-# Thin points using the detection probability
-# Reduces it to presence, absence, not abundance
-pp1$presence <- rbinom(nrow(pp1), 1, prob = 0.015) 
-
-# make it presence only data
-thinpp <- pp1[pp1$presence == 1,]
-
-image.plot(list(x=Lam$xcol, y=Lam$yrow, z=t(rf.s)), main='log-Lambda', asp=1) 
-points(pp1$x, pp1$y, pch = 20, col = "white")
-points(thinpp$x, thinpp$y, pch = 20)#note rescale again - plotting back on original
-
-# save the thinpp
-save(thinpp, file = paste0(outpath, "/output/thinpp.rdata"))
 
 
 ## Save the covariate as a raster (have to flip rows first)
