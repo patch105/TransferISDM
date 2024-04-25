@@ -1,0 +1,567 @@
+---
+title: "Comparison Antarctica Simulated"
+format: html
+editor: visual
+author: "Charlotte R. Patterson"
+---
+
+```{r}
+
+library(tidyverse)
+
+packages <- c("sf", "terra", "ggpubr", "RISDM", "DescTools", "spatstat", "Metrics", "scoringutils")
+
+walk(packages, require, character.only = T)
+
+wd <- getwd()
+
+```
+
+# Load the occurence data
+
+```{r}
+
+PO <- read.csv(paste0(wd,"/output/po_all_no_thin.csv"))
+names(PO) <- c("x", "y")
+
+# Load presence-absence data for model fitting
+PA_fit <- read.csv(paste0(wd,"/output/pa_a.csv"))
+PA_fit <- PA_fit %>% mutate(area = 0.02)
+
+# Load presence-absence data for model validation
+PA_val <- read.csv(paste0(wd,"/output/pa_b.csv"))
+PA_val <- PA_val %>% mutate(area = 0.02)
+
+# Create a raster of the study domain
+PO_vect <- vect(PO, geom = c("x", "y"))
+# PO_vect_buffered <- buffer(PO_vect, width = 0.3)
+
+```
+
+# Load the environmental covariates
+
+```{r}
+
+cov <- rast(paste0(wd,"/output/covariate.tif"))
+crs(cov) <- "epsg:3031"
+names(cov) <- "cov"
+plot(cov)
+
+```
+
+## Mesh construction
+
+Initial mesh assessment will be via: 1. Plotting mesh and looking at triangle shapes 2. Checking number of vertices in mesh to estimate computation time 3. Fitting a simple INLA model and viewing the posterior spatial scale of the range parameter
+
+# 1. RISDM defaults
+
+Still to be decided is the dep.range parameter, the expected range over which spatial autocorrelation is expected to drop to \~0.1 (near zero). Mostly independent.
+
+```{r}
+
+mesh.default <- makeMesh(cov,
+                         max.n = c(5000, 2500), # Default c(500,200)
+                         dep.range = NULL, # In raster projection units, default is 1/3 diagonal length of raster extent
+                         expans.mult = 1.5, # Default, 1.5 x dep.range
+                         max.edge = NULL, # Default c(0.2, 0.5)*dep.range
+                         cutoff = NULL, # Default 0.2*max.edge1
+                         offset = NULL, # Default is dep.range
+                         doPlot = TRUE
+                         )
+
+
+```
+
+# 2. Changing values of dep.range or other parameters as need be
+
+```{r}
+
+```
+
+## Checking mesh with RISDM function
+
+```{r}
+
+checkMesh(mesh.default)
+
+```
+
+## Checking computation time based on rule of thumb from Bakka (2017)
+
+```{r}
+
+(mesh.default$n)^(3/2)
+
+```
+
+## Fitting a simple INLA model for mesh checks
+
+```{r}
+ 
+# m.default$summary.hyperpar$mean # Posterior mean estimate for the range
+
+```
+
+## Checking the mesh for boundary effects
+
+Assessment after model fitting is required to test mesh, to see if boundary effect is avoided that causes variance to be 2x larger at border (Lindgren 2012; Lindgren and Rue 2015).
+
+Do so by plotting the standard deviation of the random effect.
+
+```{r}
+
+
+```
+
+## Model specification
+
+Default is that all covariates are standardised (transformed linearly - subtracting mean and dividing by standard deviation) so covariate will have zero mean and standard deviation of one.
+
+Specification of this formula parallels almost precisely as one would do for any glm-like modelling process – see the details section from ?glm for more information about forms accepted.
+
+```{r}
+
+#linear in variable 1 and 2
+# dist.form <- ~0 + var1 + var2
+
+#Linear with single covariate
+dist.form <- ~0 + cov
+
+```
+
+## Observation bias for PO data
+
+\*Note - could try a negative exponential relationship here like sampbias
+
+```{r}
+
+# Bias variable
+# bias.form <- ~1 + biasvar
+
+#Intercept only
+bias.form <- ~1
+
+```
+
+## Sampling artefacts for PA data
+
+\*Intercept only at the moment
+
+```{r}
+# Intercept only
+artefact.form <- list(PA = ~1)
+
+
+```
+
+## Specifying priors for intercepts and covariates
+
+The priors are specified via the control list argument and describe *Gaussian distributions*.
+
+The *prior.mean* is a single scalar giving the prior expectation of *all the model’s effects*. This includes all intercepts and all covariate effects for all the data types.
+
+Almost always, *prior.mean will be zero, indicating that the effect has a priori equal chance of being positive or negative*.
+
+The prior variation for the *covariate effects* are split into two types: those for *intercepts* and those for *covariate effects*.
+
+Specified through standard deviation.
+
+By default *the sd for the intercepts is very large (1000)* and that for the *covariate effects is large (10)*.
+
+Covariates have been *scaled prior to fitting the model*.
+
+```{r}
+
+# # Default fairly vague priors
+# my.control <- list(coord.names = c("x", "y"),
+#                    prior.mean = 0,
+#                    int.sd = 1000, # Intercept standard deviation
+#                    other.sd = 10) # Covariate effect standard deviation
+
+```
+
+## Specifying priors for GRF parameters
+
+The specification of the distribution of the random effects depends on two parameters: the standard deviation of the effects, and the spatial range of their dependence.
+
+Both these parameters require a prior distribution to be specified, and RISDM, like INLA, *follows Simpson et al. (2017) by using complexity priors*. These priors are defined by *defining the prior chance that the parameter falls above (for prior standard deviation) or below (for spatial range) specified values*.
+
+For the gamba grass example, it may be reasonable that the standard deviation has probability of 0.1 (10% chance) of being above 5. We feel that this is a vague prior for random effects on a log-link scale. Likewise, a vague prior for spatial dependence could be that there is a probability of 0.1 that the range is less than 1km. *For Gamba Grass example dep.range = 3km*.
+
+```{r}
+
+my.control <- list(coord.names = c("x", "y"),
+                   prior.mean = 0,
+                   int.sd = 1000, # Intercept standard deviation
+                   other.sd = 10, # Covariate effect standard deviation
+                   prior.range = c(1, 0.1), # Prior chance 10% that parameter falls below range of 1km
+                   prior.space.sigma = c(5, 0.1)) # Prior chance 10% that parameter falls above SD of 5
+                   
+
+```
+
+## Integrated model fitting
+
+```{r}
+
+m.int <- isdm(observationList = list(POdat = PO,
+                                  PAdat = PA_fit),
+           covars = cov,
+           mesh = mesh.default,
+           responseNames = c(PO = NULL, PA = "presence"),
+           sampleAreaNames = c(PO = NULL, PA = "area"),
+           distributionFormula = dist.form,
+           biasFormula = bias.form,
+           artefactFormulas = artefact.form,
+           control = my.control)
+
+```
+
+## Presence-Only model fitting
+
+```{r}
+
+#PO data only
+fm.PO <- isdm(observationList = list(POdat = PO), 
+              covars = cov,
+              mesh = mesh.default,
+              responseNames = NULL,
+              sampleAreaNames = NULL,
+              distributionFormula = dist.form,
+              biasFormula = bias.form,
+              artefactFormulas = NULL,
+              control = my.control)
+
+```
+
+## Presence-Absence model fitting
+
+*Note - this one is not working at the moment*
+
+```{r}
+
+# #PA data only
+# fm.PA <- isdm(observationList = list(PAdat = PA_fit), 
+#               covars = cov,
+#               mesh = mesh.default,
+#               responseNames = c(PA = "presence"),
+#               sampleAreaNames = c(PA = "area"),
+#               distributionFormula = dist.form,
+#               biasFormula = NULL,
+#               artefactFormulas = artefact.form,
+#               control = my.control)
+
+```
+
+## Stack Models as a List
+
+*Not including PA model as it is not working*
+
+```{r}
+
+mod.list <- list(integrated = m.int,
+                 PO = fm.PO)
+
+```
+
+## Model diagnostics
+
+Diagnostic table.
+
+```{r}
+
+map(mod.list, function(x) {summary(x)})
+
+
+```
+
+## Residual Plots
+
+Interpretation: At lower predicted intensity values the residuals are variable, with more underprediction and overprediction. The residuals aren't spatially autocorrelated which suggests the random field is working?
+
+Our predicted intensity is quite low.
+
+```{r}
+
+map(mod.list, function(x) {
+  
+  plot(x, nFigRow = 2, ask = FALSE)
+  
+})
+
+
+```
+
+## Posteriors of marginal effects
+
+```{r}
+
+map(mod.list, function(x) {
+  
+ggplot(data = as.data.frame(x$mod$marginals.hyperpar$`Range for isdm.spat.XXX`)) + 
+  geom_line(aes(x = x, y = y)) +
+  ylab ("Posterior density")+
+  xlab("GRF Range Parameter")
+
+
+ggplot(data = as.data.frame(x$mod$marginals.hyperpar$`Stdev for isdm.spat.XXX`)) + 
+  geom_line(aes(x = x, y = y)) +
+  ylab ("Posterior density")+
+  xlab("GRF Std. Dev Parameter")  
+
+  
+})
+
+
+```
+
+## Prediction
+
+This method proceeds by taking posterior draws of the parameters, using INLA’s inla.posterior.sample function, and then predicting using the sampled parameters into a user-supplied raster stack. In this routine, the spatial random effects are treated the same as the parameters.
+
+The intensity is the "expected number of individuals within a raster cell at each of the raster's locations"
+
+```{r}
+
+# Run for intensity prediction first
+for(i in 1:length(mod.list)) {
+  
+  mod.list[[i]]$preds <- predict(mod.list[[i]],
+                               covars = cov,
+                               S = 30, 
+                               intercept.terms = "PO_Intercept",
+                               type = "intensity")
+                             
+                          
+  plot(mod.list[[i]]$preds$field[[1:3]], nc = 3)                           
+   
+}
+
+
+```
+
+Now on probability scale. Probability is a non-linear transformation of the intensity, dependent upon the intercept value chosen.
+
+```{r}
+
+for(i in 1:length(mod.list)) {
+  
+ mod.list[[i]]$preds.probs <- predict(mod.list[[i]],
+                                     covars = cov,
+                                     S = 30, 
+                                     intercept.terms = "PO_Intercept", 
+                                     type = "probability")
+                             
+                          
+  plot(mod.list[[i]]$preds.probs$field[[1:3]], nc = 3)                           
+   
+
+}
+
+
+```
+
+## Now projecting values of the random field for plotting
+
+Want to plot the mean and the sd of the spatial random effect. Code from: <https://becarioprecario.bitbucket.io/spde-gitbook/ch-intro.html> (chp 2.4).
+
+Plot it on its own scale (type = "link")
+
+```{r}
+
+for(i in 1:length(mod.list)) {
+  
+  mod.list[[i]]$preds.GRF <- predict(mod.list[[i]],
+                                     covars = cov,
+                                     S = 30, 
+                                     intercept.terms = "PO_Intercept",
+                                     type = "link",
+                                     includeRandom = TRUE,
+                                     includeFixed = FALSE)
+                             
+                          
+  plot(mod.list[[i]]$preds.GRF$field[[1:3]], nc = 3)                           
+   
+}
+
+
+```
+
+## Inference
+
+1.  Create a raster layer with a constant value for the habitatArea offset.
+2.  Predict, specifying which terms should be included.
+3.  Plot
+
+To get the response plot, just pulls the median, lower, and upper from the prediction function and then plots their relationship with cov.
+
+```{r}
+
+# Adding a temporary cell area layer
+cov_inter <- c(cov, cov[[1]]) 
+names(cov_inter) <- c(names(cov), "tmp.habiArea") # Rename the new covariate
+values(cov_inter$tmp.habiArea) <- 1
+
+posterior_plots <- map(mod.list, function(x) {
+  
+  interpPreds <- predict(x, 
+                       covars=cov_inter,
+                       habitatArea= "tmp.habiArea", S=30,
+                       includeFixed="cov",# Include fixed effect
+                       includeRandom=FALSE, 
+                       type="link") # Difference is you use type = "link"
+
+# compile covariate and prediction
+pred.df <- as.data.frame(cbind(cov = values(cov$cov),
+                               values(interpPreds$field[[c("Median", "Lower", "Upper")]]))) 
+
+# Plot
+pred.df <- pred.df[!is.na(pred.df$cov),]
+pred.df <- pred.df[order(pred.df$cov),]
+
+matplot(pred.df[,1], pred.df[,2:4], pch = "", xlab = "cov", ylab = "Effect",
+        main = "Effect plot for cov")
+
+polygon( x=c( pred.df$cov, rev( pred.df$cov)),
+         c(pred.df$Upper, rev(pred.df$Lower)),
+         col=grey(0.95), bor=NA)
+
+lines( pred.df[,c("cov","Median")], type='l', lwd=2)
+
+  
+})
+  
+
+
+
+
+```
+
+# Validate with independent Presence/Absence data
+
+**First, extract predictions from locations of validation data**
+
+**Then calculate prediction accuracy with the Brier Score**
+
+Using the median posterior prediction of probability of presence per cell. Using the Brier score via the package "DescTools".
+
+```{r}
+
+imap(mod.list, function(x, y) {
+  
+
+# Extract the median prediction for each cell that has validation data
+val.med <- extract(x$preds.probs$field$Median, PA_val[,1:2], xy = T)
+
+# Add the validation data P/A into the dataframe
+val.med <- val.med %>% 
+  mutate(presence = PA_val$presence)  
+
+print(paste0("Brier Score for ", y, ": ", DescTools::BrierScore(resp = val.med$presence,
+           pred = val.med$Median)))
+  
+})
+
+
+```
+
+# Validate with 'true' simulated data
+
+**First, extract 'true' intensity values**
+
+Code modified from Simmonds et al. (2020). Will be the intensity of each grid square.
+
+\*\*Note - need to fix so that it's the median intensity, right now I think it's the mean
+
+**Then calculate prediction accuracy with the correlation, mean absolute error of difference, and root mean square error**
+
+**Then calculate the Interval Score** Using the posterior's lower and upper 95% confidence limits.
+
+```{r}
+
+# Load the original intensity values
+mypath <- getwd()
+load(file = paste0(mypath, "/output/nhpp.rdata"))
+
+# Access attribute (Lambda) of lg.s object and create Lam 
+Lam <- attr(lg.s, 'Lambda') 
+# Get the (v) log intensity values (expected number of points per unit area)
+rf.s <- log(Lam$v)
+
+# Extract abundance values by point for truth
+data <- rf.s
+
+grid <- rast(ext(cov), 
+             resolution = res(cov),
+             crs = crs(cov)) 
+
+# Extract raster cell coordinates
+xy <- xyFromCell(grid, 1:ncell(grid))
+
+# Create a data frame with the coordinates
+grid_expand <- data.frame(x = xy[,1], y = xy[,2])
+
+grid_expand$abundance <- data[Reduce('cbind', nearest.pixel(
+  grid_expand[,1], grid_expand[,2],
+  im(data)))] # Converting to an image pixel so it can be processed by the nearest.pixel function
+
+truth_grid <- rast(grid_expand, crs = crs(cov))
+
+plot(truth_grid)
+
+
+
+imap(mod.list, function(x, y) {
+  
+ # Pull out the mean intensity prediction for each cell
+mean.int.pred <- x$preds$field$Mean
+
+differences <- mean.int.pred - truth_grid
+
+plot(differences)
+
+# Metrics from Simmonds et al. 
+# Compare the predicted intensity to the true intensity 
+print(paste0("Correlation:",  cor(as.vector(mean.int.pred), as.vector(truth_grid))))
+
+print(paste0("MAE of difference for ", y, ": ", mean(abs(as.vector(differences)))))
+
+print(paste0("Root Mean Square Error for ", y, ": ", Metrics::rmse(actual = as.vector(truth_grid), 
+     predicted = as.vector(mean.int.pred)))) 
+ 
+### Calculating the Interval Score ###
+
+# Pull out the lower and upper bounds of the prediction
+lower.int.pred <- x$preds$field$Lower
+
+upper.int.pred <- x$preds$field$Upper
+
+## Function to calculate a different quantile
+
+# #Extract posterior samples
+# samples <- m.int$preds$cell.samples %>% 
+#   
+# # Function to calculate x% quantiles of each row
+# calculate_quantiles <- function(row) {
+#   quantiles <- quantile(row, c(0.025, 0.975))
+#   return(quantiles)
+# }
+# 
+# # Apply the function to each row of the matrix
+# quantiles_per_row <- t(apply(samples, 1, calculate_quantiles))  
+
+interval_score <- interval_score(true_values = as.vector(truth_grid), 
+                                 lower = as.vector(lower.int.pred), 
+                                 upper = as.vector(upper.int.pred),
+                                 interval_range = 95,
+                                 weigh = TRUE)
+
+print(paste0("Sum of Interval Score for ",y, ": ", sum(interval_score)))
+print(paste0("Mean of Interval Score for ", y, ": ", mean(interval_score)))
+
+# plot(interval_score)
+
+})
+
+
+```
