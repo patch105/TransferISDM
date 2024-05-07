@@ -10,6 +10,7 @@ library(readr)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 mypath <- getwd()
+
 load(file = paste0(mypath, "/output/nhpp.rdata"))
 
 
@@ -17,7 +18,6 @@ load(file = paste0(mypath, "/output/nhpp.rdata"))
 # presence only data
 #-------------------------------------------------------------------------------
 
-po <- nhpp[,1:2]
 spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
 #-------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ readr::write_csv(pa_b_df, file = paste0(mypath, "/output/pa_b.csv"))
 library(ggplot2)
 
 ggplot() +
-  geom_point(data = data.frame(po), aes(x = x, y = y), color = "black") +
+  geom_point(data = data.frame(spp_process), aes(x = x, y = y), color = "black") +
   geom_point(data = pa_a_df, aes(x = x, y = y), color = "red", size = 2) +
   geom_point(data = pa_b_df, aes(x = x, y = y), color = "blue", size = 2) +
   theme_classic()

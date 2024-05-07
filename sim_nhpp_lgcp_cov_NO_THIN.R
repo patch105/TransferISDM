@@ -20,7 +20,7 @@ dim <- c(300, 300)
 
 beta0 <- -2 # Intercept
 beta1 <- 2 # Coefficient
-sigma2x <- 0.5 # Variance of the Gaussian field     
+sigma2x <- 0.25 # Variance of the Gaussian field (changed  from 0.5)  
 range <- 20 # Scale parameter
 nu <- 1 # Smoothness parameter
 
