@@ -19,6 +19,9 @@ mu_gcov2 <- im(beta0 + beta2*gridcov2, xcol=x0, yrow=y0)
 mu_gcovs <- im(beta0 + beta1*gridcov1 + beta2*gridcov2, xcol=x0, yrow=y0)
 # mu_int <- im(beta0 + beta1*gridcov1 + beta2*gridcov2 + gridcov1*gridcov2*beta3, xcol=x0, yrow=y0)
 
+# Testing a quadratic function
+mu_covs.quad <- im(beta0 + beta1*gridcov1.mat + beta2*gridcov2.mat + beta3*grid2^2, xcol=x0, yrow=y0)
+
 plot(mu_gcov1)
 plot(mu_gcov2)
 plot(mu_gcovs)
@@ -31,6 +34,8 @@ set.seed(seed)
 lg.s <- rLGCP('matern', mu = mu_gcovs,
               var=sigma2x, scale=range, nu=nu)
 plot(lg.s)
+
+
 
 # Mean of process dependent on spatially-varying covariates ----------------------------------
 
@@ -64,3 +69,8 @@ lg.s <- rLGCP('matern', mu = mu_covs,
 plot(lg.s)
 
 
+# TO DOs ------------------------------------------------------------------
+
+# How does virtual species code in a function for the mean??
+# How do we include a habitat covariate and a latent process?
+# Sample presence-only records from the latent process
