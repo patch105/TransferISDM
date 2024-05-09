@@ -1,21 +1,4 @@
 
-
-# Set Parameters Data Generation ----------------------------------------------------------
-
-
-
-
-beta0 <- -2 # Intercept
-beta1 <- 2 # Coefficient
-sigma2x <- 0.25 # Variance of the Gaussian field (changed  from 0.5)  
-range <- 20 # Scale parameter
-nu <- 1 # Smoothness parameter
-
-
-
-# Simulate Continuous Covariates ------------------------------------------
-
-
 library(spatstat)
 library(ggplot2)
 library(dplyr)
@@ -26,14 +9,13 @@ set.seed(42)
 
 outpath <- getwd()
 
+# Simulate Continuous Covariates ------------------------------------------
 
-#-------------------------------------------------------------------------------
-# create a bounded domain on [0, 300] x [0, 300]
-#------------------------------------------------------------------------------
+# Create a bounded domain on [0, 300] x [0, 300]
 
 dim <- c(300, 300)
 
-win <- owin(c(0,dim[1]), c(0,dim[2])) #
+win <- owin(c(0,dim[1]), c(0,dim[2])) 
 
 # set number of pixels
 spatstat.options(npixel=c(dim[1],dim[2]))
@@ -54,7 +36,7 @@ gridcov2 <- outer(y0,x0, function (x,y) multiplier*y + 0*x)
 
 
 c1 <- gridcov1 %>% 
-  reshape2::melt(c("x", "y"), value.name = "cov") %>% 
+  reshape2::melt(c("y", "x"), value.name = "cov") %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = cov)) + 
   scale_fill_viridis() +
@@ -67,7 +49,7 @@ c1 <- gridcov1 %>%
   ggtitle('Covariate 1')
 
 c2 <- gridcov2 %>% 
-  reshape2::melt(c("x", "y"), value.name = "cov") %>% 
+  reshape2::melt(c("y", "x"), value.name = "cov") %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = cov)) + 
   scale_fill_viridis() +
