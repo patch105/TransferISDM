@@ -74,3 +74,5 @@ plot(lg.s)
 # How does virtual species code in a function for the mean??
 # How do we include a habitat covariate and a latent process?
 # Sample presence-only records from the latent process
+# Figuring out sampling strategy for presence-only records
+# To add: A separate realisation was generated from the log-Gaussian Cox process for each sampling process to represent the fact that the individuals sampled by each method were unlikely to be the same i.e. data collection were at different points in time.
