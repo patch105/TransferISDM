@@ -61,8 +61,9 @@ c2 <- gridcov2 %>%
         legend.title = element_blank()) +
   ggtitle('Covariate 2')
 
-ggarrange(c1, c2)
-
+plot1 <- ggarrange(c1, c2)
+plot1
+ggsave(plot = plot1, filename = paste0(outpath, "/output/Covariates_cont.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
 
 
 # Simulate Spatial Covariates ---------------------------------------------
@@ -138,4 +139,6 @@ c2 <- cov2 %>%
         legend.title = element_blank()) +
   ggtitle('Covariate 2')
 
-ggarrange(c1, c2)
+plot2 <- ggarrange(c1, c2)
+plot2 
+ggsave(plot = plot2, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
