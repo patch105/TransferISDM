@@ -8,29 +8,26 @@ xy <- cbind(lg.s$x, lg.s$y)
 # Access attribute (Lambda) of lg.s object and create Lam 
 Lam <- attr(lg.s, 'Lambda') 
 rf.s.vect <- as.vector(log(Lam$v))
-
-
-source('Generate strata levels Lam.R')
-
-#generate a stratification to use for sampling bias
-strata1 <- genStrataLam(dat1$Lam, strata = strata, rows = rows, cols = cols)
-
-biasfield <- addSpatialBias(strata1, maxprob = probs[1], correlated = correlated, rho = rho)
+rf.s <- log(Lam$v)
 
 # dat1$Lam is the lambda attribute as above
 maxprob <- 0.2
 
-minprob = prob/10 # keep the relative difference between maximum and minimum probabilities the same across different scenarios of maxprob (i.e. strength of bias is the same)
+minprob = maxprob/10 # keep the relative difference between maximum and minimum probabilities the same across different scenarios of maxprob (i.e. strength of bias is the same)
 
 probseq <-  exp(seq(log(maxprob), log(minprob), length.out = dim[1])) # Dim if from original code
 
 # Makes a matrix with left to right decreasing probabilities 
 # Remove t() to make it go top to bottom
-biasgrid <- t(outer(y0,x0, function (x,y) probseq + 0*y + 0*x))
+bias.mat <- t(outer(y0,x0, function (x,y) probseq + 0*y + 0*x))
+
+# Turn it into a df (x, y, bias amount)
+bias.df <- bias.mat %>% 
+  reshape2::melt(c("y", "x"), value.name = "bias")
+
 
 # Plot bias grid
-biasgrid %>% 
-  reshape2::melt(c("y", "x"), value.name = "bias") %>% 
+bias.df %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = bias)) + 
   scale_fill_viridis() +
@@ -49,11 +46,27 @@ pp1 <- as.data.frame(xy)
 names(pp1) <- c("x", "y")
 
 # Add spatial bias info to PP data
-pp2 <- merge(round(pp1), bias, by.x = c("x","y"), by.y = c("x","y"))
+pp2 <- merge(round(pp1), bias.df, by.x = c("x","y"), by.y = c("x","y"))
 
-test <- round(pp1)
+# Thin points using the detection probability
+# Reducing also to presence absence here not abundance
+pp2$presence <- rbinom(nrow(pp2),1,pp2$bias)
+
+# Make it presence only data
+thinpp <- pp2[pp2$presence == 1,]
+
+# PLOT
+
 
 # # Archive
+
+
+# source('Generate strata levels Lam.R')
+
+# #generate a stratification to use for sampling bias
+# strata1 <- genStrataLam(dat1$Lam, strata = strata, rows = rows, cols = cols)
+# 
+# biasfield <- addSpatialBias(strata1, maxprob = probs[1], correlated = correlated, rho = rho)
 # lookup <- data.frame(grid = 1:dim[1], probs = probseq)
 # lookup$covariate <- lookup$probs
 # 

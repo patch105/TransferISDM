@@ -33,9 +33,8 @@ set.seed(seed)
 # Create LGCP with environmental covariate
 lg.s <- rLGCP('matern', mu = mu_gcovs,
               var=sigma2x, scale=range, nu=nu)
+
 plot(lg.s)
-
-
 
 # Mean of process dependent on spatially-varying covariates ----------------------------------
 
