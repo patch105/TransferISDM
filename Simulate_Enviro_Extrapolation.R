@@ -3,13 +3,23 @@
 # Version 1. Sample grid continuous covariates ----------------------------
 
 
-# Turn original domain grid into a raster
-domain.grid <- gridcov1 %>% 
-  reshape2::melt(c("y", "x"), value.name = "cov") %>% 
+# Turn original covariate domain into rasters
+gridcov1.rast <- gridcov1 %>% 
+  reshape2::melt(c("y", "x"), value.name = "cov1") %>% 
+  rast() 
+
+crs(gridcov1.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+
+gridcov2.rast <- gridcov2 %>% 
+  reshape2::melt(c("y", "x"), value.name = "cov2") %>% 
   rast()
 
-# Set size of grid 
-rast_size <- c(100,50)
+crs(gridcovs.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+
+# Set size of grid for Site A (Reference)
+rast_sizeA <- c(100,50)
+# Set size of grid for Site B (Target)
+rast_sizeB <- c(100,50)
 
 # Get coords of overall grid domain boundary
 xmin <- min(x0)
@@ -17,27 +27,83 @@ xmax <- max(x0)
 ymin <- min(y0)
 ymax <- max(y0)
 
+# Set the limit for x and y coord so box is completely inside the domain
+rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
+rand.limB <- c(xmax - rast_sizeB[1], ymax - rast_sizeB[2])
 
-rand.x.lim <- c(xmax - rast_size[1], ymax - rast_size[2])
 # Create random coordinate index for top corner of subgrid within grid domain
 # Then use this index on x0 to get the coordinate
-xmin.rand <- x0[round(runif(1, min = xmin, max = rand.x.lim[1]))]
-ymin.rand <- y0[round(runif(1, min = ymin, max = rand.x.lim[2]))]
-xmax.rand <- x0[xmin.rand + rast_size[1]]
-ymax.rand <- y0[ymin.rand + rast_size[2]]
+xmin.randA <- x0[round(runif(1, min = xmin, max = rand.limA[1]))]
+ymin.randA <- y0[round(runif(1, min = ymin, max = rand.limA[2]))]
+xmax.randA <- x0[xmin.randA + rast_sizeA[1]]
+ymax.randA <- y0[ymin.randA + rast_sizeA[2]]
 
-rand.grid <- rast(xmin = xmin.rand, 
-             xmax = xmax.rand, 
-             ymin = ymin.rand, 
-             ymax = ymax.rand, 
-             nrows = rast_size[1], 
-             ncols = rast_size[2],
-             vals = 1:50)
+xmin.randB <- x0[round(runif(1, min = xmin, max = rand.limB[1]))]
+ymin.randB <- y0[round(runif(1, min = ymin, max = rand.limB[2]))]
+xmax.randB <- x0[xmin.randB + rast_sizeB[1]]
+ymax.randB <- y0[ymin.randB + rast_sizeB[2]]
+
+rand.gridA <- rast(xmin = xmin.randA, 
+             xmax = xmax.randA, 
+             ymin = ymin.randA, 
+             ymax = ymax.randA, 
+             nrows = rast_sizeA[1], 
+             ncols = rast_sizeA[2],
+             vals = 1:rast_sizeA[2]) # Just setting values for plotting and for converting to a dataframe
+
+rand.gridB <- rast(xmin = xmin.randB, 
+                   xmax = xmax.randB, 
+                   ymin = ymin.randB, 
+                   ymax = ymax.randB, 
+                   nrows = rast_sizeB[1], 
+                   ncols = rast_sizeB[2],
+                   vals = 1:rast_sizeB[2]) # Just setting values for plotting and for converting to a dataframe
+
+plot(gridcov1.rast)
+lines(ext(rand.gridA), lwd = 2, col = "red")
+lines(ext(rand.gridB), lwd = 2, col = "blue")
 
 
+# Extract covariates for the random grid Site A  --------------------------
 
-plot(domain.grid)
-lines(ext(rand.grid), lwd = 2, col = "red")
+rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
+
+cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T)
+cov2.SiteA <- terra::extract(gridcov2.rast, rand.grid.df, xy = T)
+
+# Join to create one dataframe
+covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
+
+
+# Extract covariates for the random grid Site B ---------------------------
+
+rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
+
+cov1.SiteB <- terra::extract(gridcov1.rast, rand.grid.df, xy = T)
+cov2.SiteB <- terra::extract(gridcov2.rast, rand.grid.df, xy = T)
+
+# Join to create one dataframe
+covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
+
+
+# Calculating Overlap of Environment - Whole Grid -------------------------
+
+library(dsmextra)
+
+# Format for dsmextra
+covs.SiteA <- covs.SiteA[, c("cov1", "cov2")]
+
+# Define projected coordinate system
+crs <- sp::CRS("+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+
+extrap <- compute_extrapolation(
+  samples = covs.SiteA,
+  covariate.names = c("cov1", "cov2"),
+  prediction.grid = covs.SiteB,
+  coordinate.system = crs
+)
+
+
 
 
 
