@@ -88,6 +88,9 @@ covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
 
 # Calculating Overlap of Environment - Whole Grid -------------------------
 
+
+# EXDET approach ----------------------------------------------------------
+
 library(dsmextra)
 
 # Format for dsmextra
@@ -104,6 +107,18 @@ extrap <- compute_extrapolation(
 )
 
 
+# Shape approach ----------------------------------------------------------
 
+# # Install flexsdm
+# remotes::install_github("sjevelazco/flexsdm")
+library(flexsdm)
 
+covs.SiteA <- covs.SiteA %>% 
+  mutate(Presence = 1)
+
+extra_eval(training_data = covs.SiteA,
+           pr_ab = Presence,
+           projection_data = covs.SiteB,
+           metric = "mahalanobis",
+           univar_comb = T)
 
