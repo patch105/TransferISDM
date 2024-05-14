@@ -1,6 +1,11 @@
 
 
 # Version 1. Sample grid continuous covariates ----------------------------
+library(terra)
+
+# Just testing out with other habitat covariates now
+gridcov1.rast <- cov1
+gridcov2.rast <- cov2
 
 
 # Turn original covariate domain into rasters
@@ -14,7 +19,8 @@ gridcov2.rast <- gridcov2 %>%
   reshape2::melt(c("y", "x"), value.name = "cov2") %>% 
   rast()
 
-crs(gridcovs.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+crs(gridcov2.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+
 
 # Set size of grid for Site A (Reference)
 rast_sizeA <- c(100,50)
@@ -68,8 +74,8 @@ lines(ext(rand.gridB), lwd = 2, col = "blue")
 
 rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
 
-cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T)
-cov2.SiteA <- terra::extract(gridcov2.rast, rand.grid.df, xy = T)
+cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = layer)
+cov2.SiteA <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = layer)
 
 # Join to create one dataframe
 covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
@@ -79,11 +85,20 @@ covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
 
 rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
 
-cov1.SiteB <- terra::extract(gridcov1.rast, rand.grid.df, xy = T)
-cov2.SiteB <- terra::extract(gridcov2.rast, rand.grid.df, xy = T)
+cov1.SiteB <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = layer)
+cov2.SiteB <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = layer)
 
 # Join to create one dataframe
 covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
+
+
+
+# Plotting location of data in cov space ----------------------------------
+
+ggplot() + 
+  geom_point(data = covs.SiteA, aes(x = cov1, y = cov2), color = "grey") +
+  geom_point(data = covs.SiteB, aes(x = cov1, y = cov2), color = "purple4") +
+  theme_bw()
 
 
 # Calculating Overlap of Environment - Whole Grid -------------------------
@@ -107,18 +122,54 @@ extrap <- compute_extrapolation(
 )
 
 
+plot(extrap$rasters$ExDet$all)
+
+
 # Shape approach ----------------------------------------------------------
 
 # # Install flexsdm
 # remotes::install_github("sjevelazco/flexsdm")
 library(flexsdm)
 
-covs.SiteA <- covs.SiteA %>% 
-  mutate(Presence = 1)
+# Adding presence column due to extra_eval requirements
+# Trimming so just the covariates
+training <- covs.SiteA %>% 
+  mutate(Presence = 1) %>% 
+  .[,c("cov1", "cov2", "Presence")]
 
-extra_eval(training_data = covs.SiteA,
-           pr_ab = Presence,
-           projection_data = covs.SiteB,
-           metric = "mahalanobis",
-           univar_comb = T)
+projection <- covs.SiteB %>% 
+  .[,c("cov1", "cov2")]
+
+shape_extrap <- extra_eval(training_data = training,
+                           pr_ab = "Presence",
+                           projection_data = projection,
+                           metric = "mahalanobis",
+                           univar_comb = T)
+
+shape_extrap <- cbind(shape_extrap, covs.SiteB[, c("x", "y")])
+
+shape_extrap %>% 
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = extrapolation)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Extrapolation')
+
+mean(shape_extrap$extrapolation)
+median(shape_extrap$extrapolation)
+min(shape_extrap$extrapolation)
+max(shape_extrap$extrapolation)
+
+# Plotting data in covariate space with extrapolation  ------------------------
+
+ggplot() + 
+  geom_point(data = covs.SiteA, aes(x = cov1, y = cov2), color = "grey") +
+  geom_point(data = shape_extrap, aes(x = cov1, y = cov2, color = extrapolation)) +
+  scale_color_viridis(option = "magma", direction = -1) +
+  theme_bw()
 
