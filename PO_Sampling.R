@@ -56,7 +56,11 @@ pp2$presence <- rbinom(nrow(pp2),1,pp2$bias)
 thinpp <- pp2[pp2$presence == 1,]
 
 # PLOT
-
+ggplot() +
+  geom_tile(data = bias.df, aes(x = x, y = y, fill = bias)) +
+  scale_fill_viridis() +
+  geom_point(data = thinpp, aes(x = x, y = y), color = "white", alpha = 0.5)+
+  theme_bw()
 
 # # Archive
 
