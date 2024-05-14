@@ -103,28 +103,6 @@ ggplot() +
 
 # Calculating Overlap of Environment - Whole Grid -------------------------
 
-
-# EXDET approach ----------------------------------------------------------
-
-library(dsmextra)
-
-# Format for dsmextra
-covs.SiteA <- covs.SiteA[, c("cov1", "cov2")]
-
-# Define projected coordinate system
-crs <- sp::CRS("+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
-
-extrap <- compute_extrapolation(
-  samples = covs.SiteA,
-  covariate.names = c("cov1", "cov2"),
-  prediction.grid = covs.SiteB,
-  coordinate.system = crs
-)
-
-
-plot(extrap$rasters$ExDet$all)
-
-
 # Shape approach ----------------------------------------------------------
 
 # # Install flexsdm
@@ -172,4 +150,30 @@ ggplot() +
   geom_point(data = shape_extrap, aes(x = cov1, y = cov2, color = extrapolation)) +
   scale_color_viridis(option = "magma", direction = -1) +
   theme_bw()
+
+
+
+
+# ARCHIVE -----------------------------------------------------------------
+
+# EXDET approach ----------------------------------------------------------
+
+library(dsmextra)
+
+# Format for dsmextra
+covs.SiteA <- covs.SiteA[, c("cov1", "cov2")]
+
+# Define projected coordinate system
+crs <- sp::CRS("+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+
+extrap <- compute_extrapolation(
+  samples = covs.SiteA,
+  covariate.names = c("cov1", "cov2"),
+  prediction.grid = covs.SiteB,
+  coordinate.system = crs
+)
+
+
+plot(extrap$rasters$ExDet$all)
+
 
