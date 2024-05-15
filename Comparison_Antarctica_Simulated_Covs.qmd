@@ -1,8 +1,9 @@
 ---
 title: "Comparison Antarctica Simulated"
-format: html
-editor: visual
-author: "Charlotte R. Patterson"
+author: "Charlotte Patterson"
+format: 
+  html:
+    embed-resources: true
 ---
 
 ```{r}
