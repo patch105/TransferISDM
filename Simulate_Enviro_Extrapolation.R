@@ -293,15 +293,151 @@ ggplot() +
 
 
 
-# Extrapolation for PA datasets -----------------------------------------------
+##### Extrapolation for PA datasets -----------------------------------------------
 
 # Get covariate coverage for Site A PA
 
+cov1.SiteA.PA <- terra::extract(gridcov1.rast, pa_a_df[c("x","y")], xy = T) %>% rename(cov1 = layer)
+cov2.SiteA.PA <- terra::extract(gridcov2.rast, pa_a_df[c("x","y")], xy = T) %>% rename(cov2 = layer)
+
+# Join to create one dataframe
+covs.SiteA.PA <- left_join(cov1.SiteA.PA, cov2.SiteA.PA, by = join_by(ID, x, y))
+
+# Get covariate coverage for Site B PA
+
+cov1.SiteB.PA <- terra::extract(gridcov1.rast, pa_b_df[c("x","y")], xy = T) %>% rename(cov1 = layer)
+cov2.SiteB.PA <- terra::extract(gridcov2.rast, pa_b_df[c("x","y")], xy = T) %>% rename(cov2 = layer)
+
+# Join to create one dataframe
+covs.SiteB.PA <- left_join(cov1.SiteB.PA, cov2.SiteB.PA, by = join_by(ID, x, y))
+
+# Plotting location of data in cov space ----------------------------------
+
+ggplot() + 
+  geom_point(data = covs.SiteA.PA, aes(x = cov1, y = cov2), color = "grey") +
+  geom_point(data = covs.SiteB.PA, aes(x = cov1, y = cov2), color = "purple4") +
+  theme_bw()
+
+
+# Calculating Overlap of Environment - PA Site A to Site B-----------------
+
+# Shape approach ----------------------------------------------------------
+
+# # Install flexsdm
+# remotes::install_github("sjevelazco/flexsdm")
+library(flexsdm)
+
+# Adding presence column due to extra_eval requirements
+# Trimming so just the covariates
+training <- covs.SiteA.PA %>% 
+  mutate(Presence = 1) %>% 
+  .[,c("cov1", "cov2", "Presence")]
+
+projection <- covs.SiteB.PA %>% 
+  .[,c("cov1", "cov2")]
+
+shape_extrap <- extra_eval(training_data = training,
+                           pr_ab = "Presence",
+                           projection_data = projection,
+                           metric = "mahalanobis",
+                           univar_comb = T)
+
+shape_extrap <- cbind(shape_extrap, covs.SiteB.PA[, c("x", "y")])
+
+shape_extrap %>% 
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = extrapolation)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Extrapolation at Site B')
+
+mean(shape_extrap$extrapolation)
+median(shape_extrap$extrapolation)
+min(shape_extrap$extrapolation)
+max(shape_extrap$extrapolation)
+
+# Plotting data in covariate space with extrapolation  ------------------------
+
+plot_extrap.PA.PA <- ggplot() + 
+  geom_point(data = covs.SiteA.PA, aes(x = cov1, y = cov2), color = "grey") +
+  geom_point(data = shape_extrap, aes(x = cov1, y = cov2, color = extrapolation)) +
+  scale_color_viridis(option = "magma", direction = -1) +
+  theme_bw() +
+  theme(legend.ticks = element_blank())
 
 
 
-# Extrapolation for PO + PA datasets --------------------------------------
 
+###### Extrapolation for PO + PA datasets --------------------------------------
+
+# Get covariate coverage for PO data
+# ***TO REMOVE: For illustration we will thin the PO to make it more realistic
+thinpp$presence1 <- rbinom(nrow(thinpp), 1, prob = 0.09)
+thinpp <- thinpp[thinpp$presence1 == 1,]
+
+# Get covariate coverage for PO data
+
+cov1.PO <- terra::extract(gridcov1.rast, thinpp[c("x","y")], xy = T) %>% rename(cov1 = layer)
+cov2.PO <- terra::extract(gridcov2.rast, thinpp[c("x","y")], xy = T) %>% rename(cov2 = layer)
+
+# Join to create one dataframe
+covs.PO <- left_join(cov1.PO, cov2.PO, by = join_by(ID, x, y))
+
+# Calculating Overlap of Environment - PA Site A + PO all to Site B--------
+
+# Shape approach ----------------------------------------------------------
+
+
+# Adding presence column due to extra_eval requirements
+# Trimming so just the covariates
+covs.PO.PA <- rbind(covs.SiteA.PA, covs.PO)
+
+training <- covs.PO.PA %>% 
+  mutate(Presence = 1) %>% 
+  .[,c("cov1", "cov2", "Presence")]
+
+
+projection <- covs.SiteB.PA %>% 
+  .[,c("cov1", "cov2")]
+
+shape_extrap <- extra_eval(training_data = training,
+                           pr_ab = "Presence",
+                           projection_data = projection,
+                           metric = "mahalanobis",
+                           univar_comb = T)
+
+shape_extrap <- cbind(shape_extrap, covs.SiteB.PA[, c("x", "y")])
+
+shape_extrap %>% 
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = extrapolation)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Extrapolation at Site B')
+
+mean(shape_extrap$extrapolation)
+median(shape_extrap$extrapolation)
+min(shape_extrap$extrapolation)
+max(shape_extrap$extrapolation)
+
+# Plotting data in covariate space with extrapolation  ------------------------
+
+plot_extrap.PA_PO.PA <- ggplot() + 
+  geom_point(data = covs.PO.PA, aes(x = cov1, y = cov2), color = "grey") +
+  geom_point(data = shape_extrap, aes(x = cov1, y = cov2, color = extrapolation)) +
+  scale_color_viridis(option = "magma", direction = -1) +
+  theme_bw() +
+  theme(legend.ticks = element_blank())
 
 
 
