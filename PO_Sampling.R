@@ -60,7 +60,8 @@ ggplot() +
   geom_tile(data = bias.df, aes(x = x, y = y, fill = bias)) +
   scale_fill_viridis() +
   geom_point(data = thinpp, aes(x = x, y = y), color = "white", alpha = 0.5)+
-  theme_bw()
+  theme_bw() +
+  theme(legend.ticks = element_blank())
 
 # # Archive
 
