@@ -46,7 +46,7 @@ ggplot() +
   geom_point(data = po_a_df, aes(x = x, y = y), color = "white", alpha = 0.5)+
   theme_bw()
 
-# ## RANDOM SUBSET OF THESE
+# ## RANDOM SUBSET OF THESE * HAVE TO REMOVE THIS (JUST FOR REDUCING NUMBER OF PRESENCES)
 # # Thin points using the detection probability
 # # This was me trying to incorporate imperfect detection. So even if the species is present, it may not be detected
 po_a_df$presence <- rbinom(nrow(po_a_df), 1, prob = 0.005)
