@@ -180,7 +180,7 @@ extrap_func <- function() {
   
 }
 
-# Iterate over the function until you get to the desired nreps
+# Iterate over the function until you get to the desired nreps for low, moderate, high
 while(length(extrap.reps.out$Low) < nreps | length(extrap.reps.out$Moderate) < nreps | length(extrap.reps.out$High) < nreps) {
   extrap.reps.out <- extrap_func()
 }
