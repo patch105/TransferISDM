@@ -2,22 +2,25 @@
 
 # Version 2. Sample grid spatially varying covariates -----------------
 
+gridcov1.rast <- cov1
+gridcov2.rast <- cov2
+
+crs(gridcov1.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+
+crs(gridcov2.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+
+# # Install flexsdm
+# remotes::install_github("sjevelazco/flexsdm")
+library(flexsdm)
+
 # Specify number of replicates per extrapolation type
-nreps <- 2
+nreps <- 1
 
 extrap_out <- list()
 extrap.reps.out <- list(Low = list(), Moderate = list(), High = list())
 
 # Function for generating Site A and Site B and calculating extrapolation
 extrap_func <- function() {
-  
-  gridcov1.rast <- cov1
-  gridcov2.rast <- cov2
-  
-  crs(gridcov1.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
-  
-  crs(gridcov2.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
-  
   
   # Set size of grid for Site A (Reference)
   rast_sizeA <- c(100,50)
@@ -104,10 +107,6 @@ extrap_func <- function() {
   
   # Shape approach ----------------------------------------------------------
   
-  # # Install flexsdm
-  # remotes::install_github("sjevelazco/flexsdm")
-  library(flexsdm)
-  
   # Adding presence column due to extra_eval requirements
   # Trimming so just the covariates
   training <- covs.SiteA %>% 
@@ -159,8 +158,8 @@ extrap_func <- function() {
     theme_bw() +
     theme(legend.ticks = element_blank())
   
-  extrap_out <- c(extrap_out, list(SiteA.rast = rand.gridA,
-                                   SiteB.rast = rand.gridB,
+  extrap_out <- c(extrap_out, list(rand.gridA = rand.gridA,
+                                   rand.gridB = rand.gridB,
                                    covs.SiteA = covs.SiteA,
                                    covs.SiteB = covs.SiteB,
                                    extrap.plot = extrap.plot,
