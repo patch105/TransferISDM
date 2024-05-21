@@ -52,17 +52,8 @@ inbox_idx_a <- which(spp_process[, "x"] >= dom_a_bbox["east_min"] &
 po_a <- spp_process[inbox_idx_a, ]
 po_a_df <- as.data.frame(po_a)
 
-## RANDOM SUBSET OF THESE
-# Thin points using the detection probability
-# Reduces it to presence, absence, not abundance
-po_a_df$presence <- rbinom(nrow(po_a_df), 1, prob = 0.015) 
-
-# make it presence only data
-po_a_df <- po_a_df[po_a_df$presence == 1,]
-
-
 # get cell indices of the species coordinates
-cell_idx <- terra::cellFromXY(pa_a, po_a_df[,1:2])
+cell_idx <- terra::cellFromXY(pa_a, po_a_df)
 
 # fill in the raster with 1 from the cell indices
 pres_idx <- as.numeric(names(table(cell_idx)))
@@ -105,16 +96,8 @@ inbox_idx_b <- which(spp_process[, "x"] >= dom_b_bbox["east_min"] &
 po_b <- spp_process[inbox_idx_b, ]
 po_b_df <- as.data.frame(po_b)
 
-## RANDOM SUBSET OF THESE
-# Thin points using the detection probability
-# Reduce it to presence, absence, not abundance
-po_b_df$presence <- rbinom(nrow(po_b_df), 1, prob = 0.015)
-
-# make it presence only data
-po_b_df <- po_b_df[po_b_df$presence == 1,]
-
 # get cell indices of the species coordinates
-cell_idx <- terra::cellFromXY(pa_b, po_b_df[,1:2])
+cell_idx <- terra::cellFromXY(pa_b, po_b_df)
 
 # fill in the raster with 1 from the cell indices
 pres_idx <- as.numeric(names(table(cell_idx)))

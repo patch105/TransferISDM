@@ -27,11 +27,11 @@ names(PO) <- c("x", "y")
 
 # Load presence-absence data for model fitting
 PA_fit <- read.csv(paste0(wd,"/output/pa_a.csv"))
-PA_fit <- PA_fit %>% mutate(area = 0.02)
+PA_fit <- PA_fit %>% mutate(area = 0.02*0.02)
 
 # Load presence-absence data for model validation
 PA_val <- read.csv(paste0(wd,"/output/pa_b.csv"))
-PA_val <- PA_val %>% mutate(area = 0.02)
+PA_val <- PA_val %>% mutate(area = 0.02*0.02)
 
 # Create a raster of the study domain
 PO_vect <- vect(PO, geom = c("x", "y"))

@@ -6,6 +6,7 @@
 rm(list = ls())
 
 library(spatstat)
+library(terra)
 
 set.seed(42)
 
