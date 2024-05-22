@@ -54,6 +54,8 @@ lg.s <- rLGCP('matern', mu = mu,
 # takes the coordinates of the randomly generated points
 xy <- cbind(lg.s$x, lg.s$y)
 
+length(xy)
+
 # access attribute (Lambda) of lg.s object and create Lam 
 Lam <- attr(lg.s, 'Lambda') 
 summary(as.vector(rf.s <- log(Lam$v)))
@@ -76,8 +78,9 @@ save(lg.s, file = paste0(outpath, "/output/nhpp.rdata"))
 
 
 ## Save the covariate as a raster (have to flip rows first)
-cov <- apply(gridcov, 2, rev)
-cov <- rast(cov)
+# cov <- apply(gridcov, 2, rev)
+# cov <- rast(cov)
+cov <- rast(cov, type = "xyz")
 
 writeRaster(cov, paste0(outpath, "/output/covariate.tif"), overwrite = T)
 
