@@ -1,0 +1,72 @@
+---
+title: "Data_Setup_Case_Study"
+author: "Charlotte Patterson"
+format: 
+  html:
+    embed-resources: true
+---
+
+```{r}
+library(tidyverse)
+
+packages <- c("sf", "terra", "viridis", "here")
+
+walk(packages, require, character.only = T)
+
+here::here() 
+
+```
+
+## Load habitat covariates
+
+```{r}
+
+Bunger.8m.DEM <- rast(here("Data/Clarke_REMA_8M.tif")) 
+names(Bunger.8m.DEM) <- "elev"
+
+Vestfold.8m.DEM <- rast(here("Data/Travers_REMA_8m_wind_exposure.tif"))
+names(Vestfold.8m.DEM) <- "elev"
+
+```
+
+## Load ice-free land
+
+```{r}
+
+ice_free <- st_read(here("Data/Landsat_8_Derived_Outcrop_Dataset_2016.shp"))
+ice_free <- st_transform(ice_free, crs = 3031)
+ice_freeSPVE <- vect(ice_free)
+
+```
+## Mask habitat by ice-free land
+
+```{r}
+
+Bunger.8m.DEM <- mask(Bunger.8m.DEM, ice_freeSPVE, updatevalue = NA)
+Vestfold.8m.DEM <- mask(Vestfold.8m.DEM, ice_freeSPVE, updatevalue = NA)
+
+
+```
+
+## Plot
+
+```{r}
+
+# PLOT - TAKES AGES
+Bunger.8m.DEM %>%
+  as.data.frame(xy = T) %>%
+  ggplot() +
+  geom_tile(aes(x = x, y = y, fill = elev)) +
+  scale_fill_viridis() +
+  theme_bw()
+
+Vestfold.8m.DEM %>%
+  as.data.frame(xy = T) %>%
+  ggplot() +
+  geom_tile(aes(x = x, y = y, fill = elev)) +
+  scale_fill_viridis() +
+  theme_bw()
+
+```
+
+
