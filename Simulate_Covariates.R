@@ -142,3 +142,83 @@ c2 <- cov2 %>%
 plot2 <- ggarrange(c1, c2)
 plot2 
 ggsave(plot = plot2, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+
+
+# Simulate Gaussian covariates ----------------------------------------------
+
+library(RandomFields)
+library(RandomFieldsUtils)
+
+# Create a bounded domain on [0, 1] x [0, 1]
+
+east_min <- 0
+east_max <- 1
+north_min <- 0
+north_max <- 1
+
+# We generate the grid resolution from min, max dimensions and the number of pixels
+
+# Set number of pixels (100 x 100)
+n_bau_east <- 100
+n_bau_north <- 100
+# so now we have n_bau_est x n_bau_north grid cells
+
+# Obtain the cell resolution
+bau_east_step <- (east_max - east_min) / n_bau_east
+bau_north_step <- (north_max - north_min) / n_bau_north 
+
+# Generate grid centroid coordinates
+# We do this so that our centroid begins in the centre of a cell (hence, bau_east_step/2))
+
+eastings <- seq(east_min + bau_east_step/2, east_max - bau_east_step/2, by = bau_east_step)
+northings <- seq(north_min + bau_north_step/2, north_max - bau_north_step/2, by = bau_north_step)
+
+coords <- as.matrix(expand.grid(eastings, northings))
+colnames(coords) <- c("eastings", "northings")
+
+# Simulate the Gaussian covariates
+rand.cov1 <- cbind(x = coords[,1],  y = coords[, 2], rnorm(n_bau_east * n_bau_north))
+colnames(rand.cov1) <- c("x", "y", "cov")
+
+rand.cov2 <- cbind(x = coords[,1],  y = coords[, 2], rnorm(n_bau_east * n_bau_north))
+colnames(rand.cov2) <- c("x", "y", "cov")
+
+c1 <- rand.cov1 %>% 
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Covariate 1')
+
+c2 <- rand.cov2 %>% 
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Covariate 2')
+
+plot3 <- ggarrange(c1, c2)
+plot3 
+ggsave(plot = plot3, filename = paste0(outpath, "/output/Covariates_rand.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+
+
+
+
+
+
+
+
+
+
+
+
