@@ -1,13 +1,13 @@
 
 # Set Parameters Data Generation ----------------------------------------------------------
 
-beta0 <- -2 # Intercept
-beta1 <- 2 # Coefficient for cov 1
-beta2 <- 2 # Coefficient for cov 2
+beta0 <- 5 # Intercept
+beta1 <- 0.5 # Coefficient for cov 1
+beta2 <- 0.5 # Coefficient for cov 2
 # beta3 <- 5 # Coefficient for cov 1*2 interaction
-sigma2x <- 0.25 # Variance of the Gaussian field (changed  from 0.5)  
-range <- 20 # Scale parameter (equivalent to kappa 0.05)
-nu <- 1 # Smoothness parameter
+var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
+scal <- 0.2 # Scale parameter 
+# nu <- 1 # Smoothness parameter - ONLY FOR MATERN
 seed <- 3L
 
 # Mean of process dependent on continuous covariates ----------------------------------
@@ -32,7 +32,7 @@ set.seed(seed)
 
 # Create LGCP with environmental covariate
 lg.s <- rLGCP('matern', mu = mu_gcovs,
-              var=sigma2x, scale=range, nu=nu)
+              var=var, scale=scal, nu=nu)
 
 plot(lg.s)
 
@@ -64,8 +64,28 @@ set.seed(seed)
 
 # Create LGCP with environmental covariate
 lg.s <- rLGCP('matern', mu = mu_covs,
-              var=sigma2x, scale=range, nu=nu)
+              var=var, scale=scal, nu=nu)
 plot(lg.s)
+
+# Mean of process dependent on random covariates - XZ code ----------------
+
+# Fixed effect (intercept + covariate effect)
+
+fe <- beta0 + beta1*rand.cov1[,"cov"]
+
+# fe <- cbind(1, cov[,"cov"]) %*% true_betas
+# fe <- rep(6, n_bau_east * n_bau_north) # here we consider only an intercept, so no covariates
+
+mu <- data.frame(x = coords[,1],  y = coords[, 2], z = fe)
+mu <- spatstat.geom::as.im(mu, W = win)
+
+plot(mu)
+
+# Create LGCP with environmental covariate
+lg.s <- rLGCP('exp', mu = mu,
+              var=var, scale=scal)
+
+plot(lg.s$x, lg.s$y)
 
 
 # TO DOs ------------------------------------------------------------------
