@@ -85,6 +85,8 @@ readr::write_csv(as.data.frame(spp_process), file = paste0(mypath, "/output/po_a
 
 # RUN MODELS------------------------------------------------------------------------
 
+library(tidyverse)
+
 packages <- c("sf", "terra", "ggpubr", "RISDM", "DescTools", "spatstat", "Metrics", "scoringutils")
 
 walk(packages, require, character.only = T)
