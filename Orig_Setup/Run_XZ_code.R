@@ -47,10 +47,12 @@ cov <- cbind(x = coords[,1],  y = coords[, 2], rnorm(n_bau_east * n_bau_north))
 colnames(cov) <- c("x", "y", "cov")
 
 true_betas <- c(5, 0.5)
+beta0 <- 5
+beta1 <- 0.5
 
 # Fixed effect (intercept + covariate effect)
-fe <- cbind(1, cov[,"cov"]) %*% true_betas
-
+# fe <- cbind(1, cov[,"cov"]) %*% true_betas
+fe <- beta0 + beta1*cov[,"cov"]
 # fe <- rep(6, n_bau_east * n_bau_north) # here we consider only an intercept, so no covariates
 
 mu <- data.frame(x = coords[,1],  y = coords[, 2], z = fe)
