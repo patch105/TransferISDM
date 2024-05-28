@@ -148,6 +148,7 @@ ggsave(plot = plot2, filename = paste0(outpath, "/output/Covariates_GRF.png"), w
 
 library(RandomFields)
 library(RandomFieldsUtils)
+library(scales)
 
 # Create a bounded domain on [0, 1] x [0, 1]
 
@@ -183,6 +184,10 @@ colnames(rand.cov1) <- c("x", "y", "cov")
 rand.cov2 <- cbind(x = coords[,1],  y = coords[, 2], rnorm(n_bau_east * n_bau_north))
 colnames(rand.cov2) <- c("x", "y", "cov")
 
+# Rescale them to 0 to 1
+rand.cov1[, "cov"] <- rescale(rand.cov1[, "cov"], to = c(0, 1))
+rand.cov2[, "cov"] <- rescale(rand.cov2[, "cov"], to = c(0, 1))
+
 c1 <- rand.cov1 %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = cov)) + 
@@ -210,15 +215,6 @@ c2 <- rand.cov2 %>%
 plot3 <- ggarrange(c1, c2)
 plot3 
 ggsave(plot = plot3, filename = paste0(outpath, "/output/Covariates_rand.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
-
-
-
-
-
-
-
-
-
 
 
 
