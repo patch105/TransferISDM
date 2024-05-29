@@ -44,14 +44,15 @@ xy <- xyFromCell(grid, 1:ncell(grid))
 grid_expand <- data.frame(x = xy[,1], y = xy[,2])
 
 # Now find the nearest pixel for every lambda in the LGCP
-grid_expand$abundance <- data[Reduce('cbind', nearest.pixel(
+grid_expand$abundance <- true_log_int[Reduce('cbind', nearest.pixel(
   grid_expand[,1], grid_expand[,2],
   im(true_log_int)))] # Converting to an image pixel so it can be processed by the nearest.pixel function
 
 truth_grid <- rast(grid_expand, crs = crs(cov))
 
-### TO FINISH: GET THE FINAL BIT WORKING AND CHECK THAT IT'S DOING THE RIGHT MATCHING OF THE SPATSTAT MATRIX FORMAT TO THE 
-# RIGHT FORMAT FOR THE COVARIATE RASTER EXTENT
+plot(truth_grid)
 
-# Then we want to compare with our median expectation of the log intensity
+### TO FIX: THE grid_expand section isn't working, I think because of the differences in resolution vs. number of cols/rows 
+
+
 
