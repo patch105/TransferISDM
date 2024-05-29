@@ -3,7 +3,7 @@
 
 beta0 <- 5 # Intercept
 beta1 <- 0.5 # Coefficient for cov 1
-beta2 <- 0.5 # Coefficient for cov 2
+beta2 <- 0.1 # Coefficient for cov 2
 # beta3 <- 5 # Coefficient for cov 1*2 interaction
 var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
 scal <- 0.2 # Scale parameter 
@@ -67,7 +67,28 @@ lg.s <- rLGCP('matern', mu = mu_covs,
               var=var, scale=scal, nu=nu)
 plot(lg.s)
 
-# Mean of process dependent on random covariates - XZ code ----------------
+# Mean of process dependent on TWO random covariates - XZ code ----------------
+
+# Fixed effect (intercept + covariate effect)
+
+fe <- beta0 + beta1*rand.cov1[,"cov"] + beta2*rand.cov2[,"cov"]
+
+# fe <- cbind(1, cov[,"cov"]) %*% true_betas
+# fe <- rep(6, n_bau_east * n_bau_north) # here we consider only an intercept, so no covariates
+
+mu <- data.frame(x = coords[,1],  y = coords[, 2], z = fe)
+mu <- spatstat.geom::as.im(mu, W = win)
+
+plot(mu)
+
+# Create LGCP with environmental covariate
+lg.s <- rLGCP('exp', mu = mu,
+              var=var, scale=scal)
+
+plot(lg.s$x, lg.s$y)
+
+
+# Mean of process dependent on ONE random covariates - XZ code ----------------
 
 # Fixed effect (intercept + covariate effect)
 
@@ -86,6 +107,7 @@ lg.s <- rLGCP('exp', mu = mu,
               var=var, scale=scal)
 
 plot(lg.s$x, lg.s$y)
+
 
 
 # TO DOs ------------------------------------------------------------------
