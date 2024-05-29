@@ -1,5 +1,8 @@
 
-# Extract the 'true' intensity values
+# Extract the 'true' intensity (lambda) values from the LGCP model so that they can be compared with the estimated intensity
+
+# The rLGCP function has produced a realisation of the LGCP but also saved the intensity values 
+
 # Code modified from Simmonds et al. (2020).
 # NOTE - Need to fix so I extract the median intensity, right now I think it's the mean
 
@@ -28,18 +31,27 @@ true_log_int %>%
         legend.title = element_blank()) +
   ggtitle('True log intensity')
 
-plot(true_log_int.rast, main = "True log intensity", col = rev(heat.colors(100)))
-plot(true_log_int, main = "True log intensity", col = rev(heat.colors(100)))
+# Extract abundance values by point for truth
+# Set up a blank grid shape of the covariate domain
+grid <- rast(ext(cov),
+             resolution = res(cov),
+             crs = crs(cov))
 
-# QUESTION - HOW DOES RAST MAKE RASTER FROM MATRIX??
-m <- matrix(1:25, nrow=5, ncol=5)
+# Extract raster cell coordinates
+xy <- xyFromCell(grid, 1:ncell(grid))
 
-m %>% reshape2::melt(c("y", "x"), value.name = "int") %>% rast(.) %>% plot(.)
+# Create a data frame with the coordinates
+grid_expand <- data.frame(x = xy[,1], y = xy[,2])
 
-m <- m[nrow(m):1,] %>% rast(.)
+# Now find the nearest pixel for every lambda in the LGCP
+grid_expand$abundance <- data[Reduce('cbind', nearest.pixel(
+  grid_expand[,1], grid_expand[,2],
+  im(true_log_int)))] # Converting to an image pixel so it can be processed by the nearest.pixel function
 
-rm <- rast(m)
-plot(rm)
+truth_grid <- rast(grid_expand, crs = crs(cov))
 
-c1 <- gridcov1 %>% 
-  reshape2::melt(c("y", "x"), value.name = "cov") 
+### TO FINISH: GET THE FINAL BIT WORKING AND CHECK THAT IT'S DOING THE RIGHT MATCHING OF THE SPATSTAT MATRIX FORMAT TO THE 
+# RIGHT FORMAT FOR THE COVARIATE RASTER EXTENT
+
+# Then we want to compare with our median expectation of the log intensity
+
