@@ -34,16 +34,17 @@ rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
 rand.limB <- c(xmax - rast_sizeB[1], ymax - rast_sizeB[2])
 
 # Create random coordinate index for top corner of subgrid within grid domain
+# Do this by generating a random number and finding the nearest eastings/northings value
 # Then use this index on x0 to get the coordinate
-xmin.randA <- x0[round(runif(1, min = xmin, max = rand.limA[1]))]
-ymin.randA <- y0[round(runif(1, min = ymin, max = rand.limA[2]))]
-xmax.randA <- x0[xmin.randA + rast_sizeA[1]]
-ymax.randA <- y0[ymin.randA + rast_sizeA[2]]
+xmin.randA <- x0[which.min(abs(x0 - (runif(1, min = xmin, max = rand.limA[1]))))]
+ymin.randA <- y0[which.min(abs(y0 - (runif(1, min = ymin, max = rand.limA[2]))))]
+xmax.randA <- x0[which.min(abs(x0 - (xmin.randA + rast_sizeA[1])))]
+ymax.randA <- y0[which.min(abs(y0 - (ymin.randA + rast_sizeA[2])))]
 
-xmin.randB <- x0[round(runif(1, min = xmin, max = rand.limB[1]))]
-ymin.randB <- y0[round(runif(1, min = ymin, max = rand.limB[2]))]
-xmax.randB <- x0[xmin.randB + rast_sizeB[1]]
-ymax.randB <- y0[ymin.randB + rast_sizeB[2]]
+xmin.randB <- x0[which.min(abs(x0 - (runif(1, min = xmin, max = rand.limB[1]))))]
+ymin.randB <- y0[which.min(abs(y0 - (runif(1, min = ymin, max = rand.limB[2]))))]
+xmax.randB <- x0[which.min(abs(x0 - (xmin.randB + rast_sizeB[1])))]
+ymax.randB <- y0[which.min(abs(y0 - (ymin.randB + rast_sizeB[2])))]
 
 rand.gridA <- rast(xmin = xmin.randA, 
              xmax = xmax.randA, 
@@ -176,17 +177,19 @@ ymax <- max(y0)
 rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
 rand.limB <- c(xmax - rast_sizeB[1], ymax - rast_sizeB[2])
 
-# Create random coordinate index for top corner of subgrid within grid domain
-# Then use this index on x0 to get the coordinate
-xmin.randA <- x0[round(runif(1, min = xmin, max = rand.limA[1]))]
-ymin.randA <- y0[round(runif(1, min = ymin, max = rand.limA[2]))]
-xmax.randA <- x0[xmin.randA + rast_sizeA[1]]
-ymax.randA <- y0[ymin.randA + rast_sizeA[2]]
 
-xmin.randB <- x0[round(runif(1, min = xmin, max = rand.limB[1]))]
-ymin.randB <- y0[round(runif(1, min = ymin, max = rand.limB[2]))]
-xmax.randB <- x0[xmin.randB + rast_sizeB[1]]
-ymax.randB <- y0[ymin.randB + rast_sizeB[2]]
+# Create random coordinate index for top corner of subgrid within grid domain
+# Do this by generating a random number and finding the nearest eastings/northings value
+# Then use this index on x0 to get the coordinate
+xmin.randA <- x0[which.min(abs(x0 - (runif(1, min = xmin, max = rand.limA[1]))))]
+ymin.randA <- y0[which.min(abs(y0 - (runif(1, min = ymin, max = rand.limA[2]))))]
+xmax.randA <- x0[which.min(abs(x0 - (xmin.randA + rast_sizeA[1])))]
+ymax.randA <- y0[which.min(abs(y0 - (ymin.randA + rast_sizeA[2])))]
+
+xmin.randB <- x0[which.min(abs(x0 - (runif(1, min = xmin, max = rand.limB[1]))))]
+ymin.randB <- y0[which.min(abs(y0 - (runif(1, min = ymin, max = rand.limB[2]))))]
+xmax.randB <- x0[which.min(abs(x0 - (xmin.randB + rast_sizeB[1])))]
+ymax.randB <- y0[which.min(abs(y0 - (ymin.randB + rast_sizeB[2])))]
 
 rand.gridA <- rast(xmin = xmin.randA, 
                    xmax = xmax.randA, 
@@ -438,6 +441,69 @@ plot_extrap.PA_PO.PA <- ggplot() +
   scale_color_viridis(option = "magma", direction = -1) +
   theme_bw() +
   theme(legend.ticks = element_blank())
+
+
+# Version 3. Sample grid random covariates ----------------------------
+
+# Just testing out with other habitat covariates now
+gridcov1.rast <- rast(rand.cov1, type = "xyz") 
+gridcov2.rast <- rast(rand.cov2, type = "xyz")
+
+crs(gridcov1.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+crs(gridcov2.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+
+# Set size of grid (number of cells) for Site A (Reference)
+# NOTE - must be smaller than total cell number in x y directions
+rast_cellsA <- c(30, 20)
+rast_sizeA <- c(rast_cellsA[1]*bau_east_step, rast_cellsA[2]*bau_north_step)
+# Set size of grid (number of cells) for Site B (Target)
+rast_cellsB <- c(30, 20)
+rast_sizeB <- c(rast_cellsB[1]*bau_east_step, rast_cellsB[2]*bau_north_step)
+
+# Get coords of overall grid domain boundary
+xmin <- min(eastings)
+xmax <- max(eastings)
+ymin <- min(northings)
+ymax <- max(northings)
+
+# Set the limit for x and y coord so box is completely inside the domain
+rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
+rand.limB <- c(xmax - rast_sizeB[1], ymax - rast_sizeB[2])
+
+# Create random coordinate index for top corner of subgrid within grid domain
+# Do this by generating a random number and finding the nearest eastings/northings value
+# Then use this index on x0 to get the coordinate
+xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
+ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+
+xmax.randA <- eastings[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
+ymax.randA <- northings[which.min(abs(northings - (ymin.randA + rast_sizeA[2])))]
+
+xmin.randB <- eastings[which.min(abs(eastings - (runif(1, min = xmin, max = rand.limB[1]))))]
+ymin.randB <- northings[which.min(abs(northings - round(runif(1, min = ymin, max = rand.limB[2]))))]
+
+xmax.randB <- eastings[which.min(abs(eastings - (xmin.randB + rast_sizeB[1])))]
+ymax.randB <- northings[which.min(abs(northings - (ymin.randB + rast_sizeB[2])))]
+
+rand.gridA <- rast(xmin = xmin.randA, 
+                   xmax = xmax.randA, 
+                   ymin = ymin.randA, 
+                   ymax = ymax.randA, 
+                   nrows = rast_cellsA[1], 
+                   ncols = rast_cellsA[2],
+                   vals = 1:rast_sizeA[2]) # Just setting values for plotting and for converting to a dataframe
+
+rand.gridB <- rast(xmin = xmin.randB, 
+                   xmax = xmax.randB, 
+                   ymin = ymin.randB, 
+                   ymax = ymax.randB, 
+                   nrows = rast_cellsB[1], 
+                   ncols = rast_cellsB[2],
+                   vals = 1:rast_sizeB[2]) # Just setting values for plotting and for converting to a dataframe
+
+plot(gridcov1.rast)
+lines(ext(rand.gridA), lwd = 2, col = "red")
+lines(ext(rand.gridB), lwd = 2, col = "blue")
 
 
 

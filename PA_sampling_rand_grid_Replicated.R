@@ -20,8 +20,9 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     # Get the domain of region a
     dom_a_bbox <- c(east_min = xmin(rand.gridA), east_max = xmax(rand.gridA), north_min = ymin(rand.gridA), north_max = ymax(rand.gridA))
     
-    # Choose a grid size (for PA sampling)
-    dom_a_res <- 3.5
+    # Choose a grid size number of rows (for PA sampling)
+    PA_a_res <- 30
+    dom_a_res <- (dom_a_bbox["east_max"] - dom_a_bbox["east_min"]) / PA_a_res
     
     # Set centroids of PA sampling grids
     east_seq <- seq(dom_a_bbox["east_min"] + dom_a_res/2, 
@@ -58,10 +59,13 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     # ## RANDOM SUBSET OF THESE * HAVE TO REMOVE THIS (JUST FOR REDUCING NUMBER OF PRESENCES)
     # # Thin points using the detection probability
     # # This was me trying to incorporate imperfect detection. So even if the species is present, it may not be detected
-    po_a_df$presence <- rbinom(nrow(po_a_df), 1, prob = 0.005)
-    #
+    # po_a_df$presence <- rbinom(nrow(po_a_df), 1, prob = 0.005)
+    
     # # make it presence only data
-    po_a_df <- po_a_df[po_a_df$presence == 1,]
+    # po_a_df <- po_a_df[po_a_df$presence == 1,]
+    
+    # Now assuming perfect detection
+    po_a_df$presence <- 1
     
     # Get cell indices of the species coordinates
     cell_idx <- terra::cellFromXY(pa_a, po_a_df[, c("x", "y")])
@@ -82,7 +86,8 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     dom_b_bbox <- c(east_min = xmin(rand.gridB), east_max = xmax(rand.gridB), north_min = ymin(rand.gridB), north_max = ymax(rand.gridB))
     
     # Choose a grid size (for PA sampling)
-    dom_b_res <- 3.5
+    PA_b_res <- 30
+    dom_b_res <- (dom_b_bbox["east_max"] - dom_b_bbox["east_min"]) / PA_b_res
     
     # Set centroids of PA sampling grids
     east_seq <- seq(dom_b_bbox["east_min"] + dom_b_res/2, 
@@ -119,10 +124,13 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     # ## RANDOM SUBSET OF THESE
     # # Thin points using the detection probability
     # # This was me trying to incorporate imperfect detection. So even if the species is present, it may not be detected
-    po_b_df$presence <- rbinom(nrow(po_b_df), 1, prob = 0.005)
-    # 
-    # # make it presence only data
-    po_b_df <- po_b_df[po_b_df$presence == 1,]
+    # po_b_df$presence <- rbinom(nrow(po_b_df), 1, prob = 0.005)
+    # # 
+    # # # make it presence only data
+    # po_b_df <- po_b_df[po_b_df$presence == 1,]
+    
+    # Now assuming perfect detection
+    po_b_df$presence <- 1
     
     # Get cell indices of the species coordinates
     cell_idx <- terra::cellFromXY(pa_b, po_b_df[, c("x", "y")])
@@ -147,7 +155,7 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     #-------------------------------------------------------------------------------
     
     PA_plot <- ggplot() +
-      geom_tile(data = bias.df, aes(x = x, y = y), fill = "white") +
+      # geom_tile(data = bias.df, aes(x = x, y = y), fill = "white") +
       scale_fill_viridis() +
       geom_point(data = thinpp, aes(x = x, y = y), color = "black", alpha = 0.1) +
       geom_point(data = pa_a_df, aes(x = x, y = y, color = as.factor(presence)), size = 2) +

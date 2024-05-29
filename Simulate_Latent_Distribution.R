@@ -7,7 +7,7 @@ beta2 <- 0.5 # Coefficient for cov 2
 # beta3 <- 5 # Coefficient for cov 1*2 interaction
 var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
 scal <- 0.2 # Scale parameter 
-# nu <- 1 # Smoothness parameter - ONLY FOR MATERN
+nu <- 1 # Smoothness parameter - ONLY FOR MATERN
 seed <- 3L
 
 # Mean of process dependent on continuous covariates ----------------------------------
