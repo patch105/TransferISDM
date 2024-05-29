@@ -21,9 +21,11 @@ probseq <-  exp(seq(log(maxprob), log(minprob), length.out = dim[1])) # Dim if f
 # Remove t() to make it go top to bottom
 bias.mat <- t(outer(y0,x0, function (x,y) probseq + 0*y + 0*x))
 
+#### NOTE TO SELF - NEED TO CHECK IF CHANGING MELT XY ORDER HERE CHANGES ANYTHING
+
 # Turn it into a df (x, y, bias amount)
 bias.df <- bias.mat %>% 
-  reshape2::melt(c("y", "x"), value.name = "bias")
+  reshape2::melt(c("x", "y"), value.name = "bias")
 
 
 # Plot bias grid

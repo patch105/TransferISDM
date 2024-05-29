@@ -16,10 +16,10 @@ true_log_int<- log(Lam$v)
 # This code basically reverses the row order from 100 to 1 due to layout in lgcp output
 # For plotting
 true_log_int.rast <- true_log_int %>% 
-  reshape2::melt(c("y", "x"), value.name = "int") %>% rast(.)
+  reshape2::melt(c("x", "y"), value.name = "int") %>% rast(.)
 
 true_log_int %>% 
-  reshape2::melt(c("y", "x"), value.name = "int") %>% 
+  reshape2::melt(c("x", "y"), value.name = "int") %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = int)) + 
   scale_fill_viridis() +
@@ -53,6 +53,7 @@ truth_grid <- rast(grid_expand, crs = crs(cov))
 plot(truth_grid)
 
 ### TO FIX: THE grid_expand section isn't working, I think because of the differences in resolution vs. number of cols/rows 
+### CHECK THE XY CHANGE BECAUSE U UPDATED THE MELT FUNCTION
 
 
 

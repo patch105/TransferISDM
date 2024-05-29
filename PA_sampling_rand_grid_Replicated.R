@@ -3,6 +3,8 @@ spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
 po <- thinpp[, c("x", "y")]
 
+# For random covariate case
+po <- spp_process
 
 
 PA.data <- map(extrap.reps.out, function(extrap.type) {
