@@ -20,7 +20,8 @@ PO_vect <- vect(as.data.frame(PO), geom = c("x", "y"))
 # Load enviro. covs -------------------------------------------------------
 
 # Covariates
-cov <- rast(rand.cov1, type = "xyz")
+# cov <- rast(rand.cov1, type = "xyz")
+cov <- rast(GRF.cov2, type = "xyz")
 crs(cov) <- "epsg:3031"
 
 # Mesh default ------------------------------------------------------------

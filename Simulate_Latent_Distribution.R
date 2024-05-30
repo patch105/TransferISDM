@@ -10,7 +10,7 @@ scal <- 0.2 # Scale parameter
 nu <- 1 # Smoothness parameter - ONLY FOR MATERN
 seed <- 3L
 
-# Mean of process dependent on continuous covariates ----------------------------------
+# Version 1. Mean of process dependent on continuous covariates ----------------------------------
 
 # Note to self - the im inputs the matrix and outputs a pixel image that is the correct xy values (transposes the matrix)
 
@@ -36,7 +36,54 @@ lg.s <- rLGCP('matern', mu = mu_gcovs,
 
 plot(lg.s)
 
-# Mean of process dependent on spatially-varying covariates ----------------------------------
+
+# Version 2. Mean of process dependent on spatially-varying covar - XZ code --------
+
+# Note to self - the im function requires a matrix of a certain input order
+# Terra::as.matrix just converts all cells to a matrix in the same order as they appear in the raster
+
+# The code below therefore: converts the raster to a matrix, retaining the terra ordering
+# We then reshape into long (x, y) format 
+# We extract the coords from the original raster and bind to the covariate matrix
+
+# Get coords of original raster
+coords <- xyFromCell(cov1, 1:ncell(cov1))
+
+# Convert raster to matrix object
+cov1.mat <- terra::as.matrix(cov1, wide = T) 
+
+cov2.mat <- terra::as.matrix(cov2, wide = T) 
+
+cov1.mat2 <- cov1.mat %>% 
+  reshape2::melt(c("x", "y"), value.name = "cov") 
+
+GRF.cov1 <- cbind(x = coords[,1], y = coords[,2], cov = cov1.mat2["cov"]) 
+
+cov2.mat2 <- cov2.mat %>% 
+  reshape2::melt(c("x", "y"), value.name = "cov")
+
+GRF.cov2 <- cbind(x = coords[,1], y = coords[,2], cov = cov2.mat2["cov"])
+
+# Can do with one or two covariates
+fe <- beta0 + beta1*GRF.cov1[, "cov"] + beta2*GRF.cov2[, "cov"]
+# fe <- beta0 + beta2*GRF.cov2[, "cov"]
+
+mu <- data.frame(x = coords[,1], y = coords[, 2], z = fe)
+mu <- spatstat.geom::as.im(mu, W = win)
+
+plot(mu)
+
+
+# Set seed 
+set.seed(seed)
+
+# Create LGCP with environmental covariate
+lg.s <- rLGCP('exp', mu = mu,
+              var=var, scale=scal)
+plot(lg.s)
+
+
+# Version 2. Mean of process dependent on spatially-varying covariates ----------------------------------
 
 # Note to self - the im function requires a matrix of a certain input order
 # Terra::as.matrix just converts all cells to a matrix in the same order as they appear in the raster
@@ -67,7 +114,7 @@ lg.s <- rLGCP('matern', mu = mu_covs,
               var=var, scale=scal, nu=nu)
 plot(lg.s)
 
-# Mean of process dependent on TWO random covariates - XZ code ----------------
+# Version 3. Mean of process dependent on TWO random covariates - XZ code ----------------
 
 # Fixed effect (intercept + covariate effect)
 
