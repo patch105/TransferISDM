@@ -1,7 +1,7 @@
 
 spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
-po <- thinpp[, c("x", "y")]
+# po <- thinpp[, c("x", "y")]
 
 # For random covariate case
 po <- spp_process
@@ -159,7 +159,7 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     PA_plot <- ggplot() +
       # geom_tile(data = bias.df, aes(x = x, y = y), fill = "white") +
       scale_fill_viridis() +
-      geom_point(data = thinpp, aes(x = x, y = y), color = "black", alpha = 0.1) +
+      geom_point(data = po, aes(x = x, y = y), color = "black", alpha = 0.1) +
       geom_point(data = pa_a_df, aes(x = x, y = y, color = as.factor(presence)), size = 2) +
       geom_point(data = pa_b_df, aes(x = x, y = y, color = as.factor(presence)), size = 2) +
       labs(color =  "Presence / Absence") +
