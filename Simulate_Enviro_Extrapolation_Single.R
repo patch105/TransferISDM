@@ -150,7 +150,6 @@ ggplot() +
   theme(legend.ticks = element_blank())
 
 
-
 # Version 2. Sample grid spatially varying covariates -----------------
 
 # Just testing out with other habitat covariates now
