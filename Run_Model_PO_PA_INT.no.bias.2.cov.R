@@ -1,4 +1,4 @@
-ibrary(tidyverse)
+library(tidyverse)
 
 packages <- c("sf", "terra", "ggpubr", "RISDM", "DescTools", "spatstat", "Metrics", "scoringutils")
 
@@ -50,9 +50,10 @@ my.control <- list(coord.names = c("x", "y"),
                    prior.range = c(1, 0.1), # Prior chance 10% that parameter falls below range of 1km
                    prior.space.sigma = c(5, 0.1)) # Prior chance 10% that parameter falls above SD of 5
 
+
 # Load PA data and run models for each extrap type and replicate
 
-mods.reps <- map(reps.merged, function(extrap.type) {
+mods.reps <- map(extrap.reps.out.PA, function(extrap.type) {
   
   map(extrap.type, function(rep) {
     
@@ -93,11 +94,13 @@ mods.reps <- map(reps.merged, function(extrap.type) {
     
     m.PA <- list()
     
-    return(list(models = list(integrated = m.int,
-                integrated.summary = summary(m.int),
-                PO = m.PO,
-                PO.summary = summary(m.PO),
-                PA = m.PA))) ## ADD PA SUMMARY LATER WHEN NOT NULL
+    # Create a data frame for this replicate
+    list(models = tibble(
+      Mod.type = c("Integrated", "PO", "PA"),
+      Model = list(m.int, m.PO, m.PA),
+      Summary = list(summary(m.int), summary(m.PO), NULL) # Update PA summary when available
+      
+    ))
     
   })
   
@@ -105,14 +108,17 @@ mods.reps <- map(reps.merged, function(extrap.type) {
 })
 
 
+
 # Add models to list of extrap type replicates -----------------------------
 
-reps.merged.mods <- map2(reps.merged, mods.reps, ~map2(.x, .y, c))
+extrap.reps.out.mods <- map2(extrap.reps.out.PA, mods.reps, ~map2(.x, .y, c))
 
+rm(extrap.reps.out.PA)
+rm(mods.reps)
 
 # Extract and save summary results ----------------------------------------
 
-# Make a dataframe of the format I want
+# Make a dataframe of the format I want to save the results in
 extrap.scenario.df <- data.frame(extrap.type = character(),
                                  rep = numeric(),
                                  mod.type = character(),
@@ -123,50 +129,91 @@ extrap.scenario.df <- data.frame(extrap.type = character(),
                                  beta2_25 = numeric(),
                                  beta2_975 = numeric())
 
-for(i in seq_along(reps.merged.mods)) {
-  
-  for(rep in seq_along(i)) {
-    
-    print(rep)}
-  
-  }
-  
-  
-  
-test <- reps.merged.mods$Low
 
-for(rep in seq_along(test)) {
-  
-  print(test[[rep]]$models)
-  
-}
+# Get the names of the extrap types for indexing
+extrap_names <- names(extrap.reps.out.mods)
 
-for(extrap.type in names(reps.merged.mods)) {
+# For every level of extrap type (Low, Mod, High)
+for(extrap.type in seq_along(extrap.reps.out.mods)) {
   
+  # Extract the name ("Low") for indexing from the names list
+  name <- extrap_names[extrap.type] 
+  
+  # For every replicate
   for(rep in seq_along(extrap.type)) {
     
-    models_list <- reps.merged.mods[extrap.type][[rep]]
+    # Extract the models dataframe [[name]] double brackets for list extract
+    models_df <- extrap.reps.out.mods[[name]][[rep]]$models
       
-    # Reason I have this is because when you do this, it doesn't extract rep, it keeps it as list[[1]]$models
+    for (i in 1:2) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
+      
+      mod.summary <- models_df[i, "Summary"][[i]]
+      
+      
+      extrap.scenario.df <<- extrap.scenario.df %>% 
+        add_row(extrap.type = name,
+                rep = rep,
+                mod.type = as.character(models_df[i, "Mod.type"]),
+                beta1 = mod.summary[[i]]$DISTRIBUTION$mean[1],
+                beta2 = mod.summary[[i]]$DISTRIBUTION$mean[2],
+                beta1_25 = mod.summary[[i]]$DISTRIBUTION[[3]][1],
+                beta1_975 = mod.summary[[i]]$DISTRIBUTION[[5]][1],
+                beta2_25 = mod.summary[[i]]$DISTRIBUTION[[3]][2],
+                beta2_975 = mod.summary[[i]]$DISTRIBUTION[[5]][2]
+                )
+      
+    }
     
-     for(mod.type in names(models_list[[1]]$models)) {
-       
-       print(mod.type)
-     } 
+    
+         
       
     }}
     
     
-    
-    
+  
 
-    extrap.scenario.df <- extrap_scenario.df %>% add_row(extrap.type = names(reps.merged.mods)[extrap.type],
-                                                         rep = rep,
-                                                         mod.type =  )
+# ARCHIVE -----------------------------------------------------------------
+
     
+    return(list(models = list(integrated = m.int,
+                              integrated.summary = summary(m.int),
+                              PO = m.PO,
+                              PO.summary = summary(m.PO),
+                              PA = m.PA))) ## ADD PA SUMMARY LATER WHEN NOT NULL        
+      
     
+    ########################################################
+    
+    # Example input list structure
+    example_data <- list(
+      group1 = list(
+        rep1 = data.frame(a = rnorm(5), b = runif(5)),
+        rep2 = data.frame(a = rnorm(5), b = runif(5))
+      ),
+      group2 = list(
+        rep1 = data.frame(a = rnorm(5), b = runif(5)),
+        rep2 = data.frame(a = rnorm(5), b = runif(5))
+      )
+    )
+    
+    mods.reps <- map(example_data, function(extrap.type){
       
+      map(extrap.type, function(rep) {
+        
+        # Create a data frame for this replicate
+        list(models = tibble(
+          Mod.type = c("Integrated", "PO"),
+          Model = list("test", "test2"),
+          Summary = list("test3", "test4") # Update PA summary when available
+          
+        ))
+        
+      })
       
+    })
+    
+    ######################################################################
+    
       
       
     
