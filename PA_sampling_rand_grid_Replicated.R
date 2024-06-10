@@ -180,6 +180,6 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
 })
 
 # Add new PA grids to list
-reps.merged <- map2(extrap.reps.out, PA.data, ~map2(.x, .y, c))
+extrap.reps.out.PA <- map2(extrap.reps.out, PA.data, ~map2(.x, .y, c))
 
 
