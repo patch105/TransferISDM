@@ -1,4 +1,4 @@
-# Version 2a. Sample grid random covariates - XZ code -----------------
+# Version 2a. Sample grid GRF covariates - XZ code -----------------
 
 gridcov1.rast <- rast(GRF.cov1, type = "xyz") 
 gridcov2.rast <- rast(GRF.cov2, type = "xyz")

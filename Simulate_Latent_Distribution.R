@@ -37,7 +37,7 @@ lg.s <- rLGCP('matern', mu = mu_gcovs,
 plot(lg.s)
 
 
-# Version 2. Mean of process dependent on spatially-varying covar - XZ code --------
+# Version 2. Mean of process dependent on TWO spatially-varying covar - XZ code --------
 
 # Note to self - the im function requires a matrix of a certain input order
 # Terra::as.matrix just converts all cells to a matrix in the same order as they appear in the raster
@@ -83,7 +83,7 @@ lg.s <- rLGCP('exp', mu = mu,
 plot(lg.s)
 
 
-# Version 2. Mean of process dependent on spatially-varying covariates ----------------------------------
+# Version 2. Mean of process dependent on ONE spatially-varying covariates  ----------------------------------
 
 # Note to self - the im function requires a matrix of a certain input order
 # Terra::as.matrix just converts all cells to a matrix in the same order as they appear in the raster
