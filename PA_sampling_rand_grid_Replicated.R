@@ -1,4 +1,6 @@
 
+library(purrr)
+
 spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
 # po <- thinpp[, c("x", "y")]
