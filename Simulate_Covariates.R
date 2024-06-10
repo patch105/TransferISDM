@@ -68,6 +68,41 @@ ggsave(plot = plot1, filename = paste0(outpath, "/output/Covariates_cont.png"), 
 
 # Version 2. Simulate Spatial Covariates - XZ code ---------------------------------
 
+# START with set up of resolution and north/east step length for later Site A and B grid creation.
+
+# Set ncol
+ncol <- 100
+nrow <- 100
+res <- 0.01
+
+# Create a bounded domain on [0, 1] x [0, 1]
+
+east_min <- 0
+east_max <- 1
+north_min <- 0
+north_max <- 1
+
+# We generate the grid resolution from min, max dimensions and the number of pixels
+
+# Set number of pixels (100 x 100)
+n_bau_east <- ncol
+n_bau_north <- nrow
+# so now we have n_bau_est x n_bau_north grid cells
+
+# Obtain the cell resolution
+bau_east_step <- (east_max - east_min) / n_bau_east
+bau_north_step <- (north_max - north_min) / n_bau_north 
+
+# Generate grid centroid coordinates
+# We do this so that our centroid begins in the centre of a cell (hence, bau_east_step/2))
+
+eastings <- seq(east_min + bau_east_step/2, east_max - bau_east_step/2, by = bau_east_step)
+northings <- seq(north_min + bau_north_step/2, north_max - bau_north_step/2, by = bau_north_step)
+
+coords <- as.matrix(expand.grid(eastings, northings))
+colnames(coords) <- c("eastings", "northings")
+
+
 # library(geoR)
 # 
 # # cov.model is the covariance model, cov.pars is the parameters (partial sill, range parameter)
@@ -88,9 +123,9 @@ library(landscapetools)
 library(RandomFields) # Note that RandomFields is no longer on CRAN. Downloaded archived file.
 library(terra)
 
-cov1 <- nlm_gaussianfield(ncol = 100,
-                          nrow = 100,
-                          resolution = 0.01,
+cov1 <- nlm_gaussianfield(ncol = ncol,
+                          nrow = nrow,
+                          resolution = res,
                           autocorr_range = 50, # Maximum range (raster units) of spatial autocorrelation
                           mag_var = 1, # Magnitude of variation over the landscape
                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
@@ -100,9 +135,9 @@ cov1 <- nlm_gaussianfield(ncol = 100,
 ) %>% 
   rast()
 
-cov2 <- nlm_gaussianfield(ncol = 100,
-                          nrow = 100,
-                          resolution = 0.01,
+cov2 <- nlm_gaussianfield(ncol = ncol,
+                          nrow = nrow,
+                          resolution = res,
                           autocorr_range = 50, # Maximum range (raster units) of spatial autocorrelation
                           mag_var = 1, # Magnitude of variation over the landscape
                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
