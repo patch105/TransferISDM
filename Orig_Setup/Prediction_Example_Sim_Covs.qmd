@@ -8,7 +8,7 @@ format:
 
 ```{r}
 
-#| output: false
+#| #| output: false
 
 library(purrr)
 
@@ -23,6 +23,8 @@ wd <- getwd()
 # Simulate covariates
 
 ```{r}
+
+#| #| cache: true
 
 set.seed(42)
 
@@ -65,6 +67,9 @@ c1
 Also set up resolution and north/east step length for later Site A and B grid creation.
 
 ```{r}
+
+#| #| cache: true
+
 # Create a bounded domain on [0, 1] x [0, 1]
 
 east_min <- 0
@@ -98,6 +103,8 @@ colnames(coords) <- c("eastings", "northings")
 # Simulate latent distribution
 
 ```{r}
+
+#| #| cache: true
 
 # Set Parameters Data Generation ----------------------------------------------------------
 
@@ -146,6 +153,8 @@ plot(lg.s)
 Currently assuming perfect detection. 
 
 ```{r}
+
+#| #| cache: true
 
 spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
@@ -341,6 +350,8 @@ ggplot() +
 
 ```{r}
 
+#| #| cache: true
+
 # Covariates
 cov <- rast(GRF.cov1, type = "xyz")
 
@@ -416,6 +427,8 @@ m.PO <- isdm(observationList = list(POdat = PO),
 
 ```{r}
 
+#| #| cache: true
+
 mod.list <- list(integrated = m.int,
                  PO = m.PO)
 
@@ -427,6 +440,8 @@ Diagnostic table.
 
 ```{r}
 
+#| #| cache: true
+
 map(mod.list, function(x) {summary(x)})
 
 
@@ -435,6 +450,8 @@ map(mod.list, function(x) {summary(x)})
 ## Residual Plots
 
 ```{r}
+
+#| #| cache: true
 
 map(mod.list, function(x) {
   
@@ -445,9 +462,43 @@ map(mod.list, function(x) {
 
 ```
 
+## Plotting true intensity
+
+```{r}
+
+#| #| cache: true
+
+# True intensity
+Lam <- attr(lg.s, "Lambda")
+
+# Get the (v) log intensity values (expected number of points per unit area)
+true_log_int <- log(Lam$v) 
+
+# Reverse the row order
+true_log_int <- apply(true_log_int, 2, rev)
+
+# Transpose the matrix to match the raster layout
+true_log_int <- t(true_log_int)
+
+# Melt into xy dataframe
+true_log_int.melt <- true_log_int %>% 
+  reshape2::melt(c("x", "y"), value.name = "int") 
+
+# Create a raster  
+true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
+
+# Plot the true log intensity
+plot(true_log_int.rast)
+
+
+```
+
+
 ## Prediction
 
 ```{r}
+
+#| #| cache: true
 
 # Run for intensity prediction first
 for(i in 1:length(mod.list)) {
@@ -470,6 +521,8 @@ Now on log-link scale.
 
 ```{r}
 
+#| #| cache: true
+
 for(i in 1:length(mod.list)) {
   
  mod.list[[i]]$preds.probs <- predict(mod.list[[i]],
@@ -491,6 +544,8 @@ for(i in 1:length(mod.list)) {
 ## Now running prediction with Xiaotian Zheng code
 
 ```{r}
+
+#| #| cache: true
 
 #-------------------------------------------------------------------------------
 # Posterior prediction
