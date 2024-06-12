@@ -410,8 +410,6 @@ m.PO <- isdm(observationList = list(POdat = PO),
                   artefactFormulas = NULL,
                   control = my.control)
     
-    
-
 
 ```
 
