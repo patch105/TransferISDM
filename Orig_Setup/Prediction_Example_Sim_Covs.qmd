@@ -7,8 +7,7 @@ format:
 ---
 
 ```{r}
-
-#| #| output: false
+#| output: false
 
 library(purrr)
 
@@ -24,7 +23,6 @@ wd <- getwd()
 
 ```{r}
 
-#| #| cache: true
 
 set.seed(42)
 
@@ -48,6 +46,8 @@ cov1 <- nlm_gaussianfield(ncol = 100,
 ) %>% 
   rast()
 
+crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+
 c1 <- cov1 %>% 
   as.data.frame(xy = T) %>%  
   ggplot() + 
@@ -68,7 +68,6 @@ Also set up resolution and north/east step length for later Site A and B grid cr
 
 ```{r}
 
-#| #| cache: true
 
 # Create a bounded domain on [0, 1] x [0, 1]
 
@@ -94,8 +93,6 @@ bau_north_step <- (north_max - north_min) / n_bau_north
 eastings <- seq(east_min + bau_east_step/2, east_max - bau_east_step/2, by = bau_east_step)
 northings <- seq(north_min + bau_north_step/2, north_max - bau_north_step/2, by = bau_north_step)
 
-coords <- as.matrix(expand.grid(eastings, northings))
-colnames(coords) <- c("eastings", "northings")
 
 ```
 
@@ -104,7 +101,6 @@ colnames(coords) <- c("eastings", "northings")
 
 ```{r}
 
-#| #| cache: true
 
 # Set Parameters Data Generation ----------------------------------------------------------
 
@@ -154,7 +150,6 @@ Currently assuming perfect detection.
 
 ```{r}
 
-#| #| cache: true
 
 spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
@@ -167,7 +162,7 @@ PO <- spp_process
 
 gridcov1.rast <- rast(GRF.cov1, type = "xyz") 
 
-crs(gridcov1.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+crs(gridcov1.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
 # Set size of grid (number of cells) for Site A (Reference)
   # NOTE - must be smaller than total cell number in x y directions
@@ -350,12 +345,9 @@ ggplot() +
 
 ```{r}
 
-#| #| cache: true
 
 # Covariates
-cov <- rast(GRF.cov1, type = "xyz")
-
-crs(cov) <- "epsg:3031"
+cov <- gridcov1.rast
 
 names(cov) <- c("cov1")
 
@@ -427,7 +419,6 @@ m.PO <- isdm(observationList = list(POdat = PO),
 
 ```{r}
 
-#| #| cache: true
 
 mod.list <- list(integrated = m.int,
                  PO = m.PO)
@@ -440,7 +431,6 @@ Diagnostic table.
 
 ```{r}
 
-#| #| cache: true
 
 map(mod.list, function(x) {summary(x)})
 
@@ -451,7 +441,6 @@ map(mod.list, function(x) {summary(x)})
 
 ```{r}
 
-#| #| cache: true
 
 map(mod.list, function(x) {
   
@@ -466,7 +455,6 @@ map(mod.list, function(x) {
 
 ```{r}
 
-#| #| cache: true
 
 # True intensity
 Lam <- attr(lg.s, "Lambda")
@@ -498,7 +486,6 @@ plot(true_log_int.rast)
 
 ```{r}
 
-#| #| cache: true
 
 # Run for intensity prediction first
 for(i in 1:length(mod.list)) {
@@ -521,7 +508,6 @@ Now on log-link scale.
 
 ```{r}
 
-#| #| cache: true
 
 for(i in 1:length(mod.list)) {
   
@@ -545,7 +531,6 @@ for(i in 1:length(mod.list)) {
 
 ```{r}
 
-#| #| cache: true
 
 #-------------------------------------------------------------------------------
 # Posterior prediction
