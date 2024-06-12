@@ -6,18 +6,29 @@
 # Code modified from Simmonds et al. (2020).
 # NOTE - Need to fix so I extract the median intensity, right now I think it's the mean
 
+###################################################
+
 # True intensity
 Lam <- attr(lg.s, "Lambda")
 
 # Get the (v) log intensity values (expected number of points per unit area)
 # NOTE - the format is from the lgcp package, so I need to reverse the order if want to plot
-true_log_int<- log(Lam$v) 
+true_log_int <- log(Lam$v) 
 
-# This code basically reverses the row order from 100 to 1 due to layout in lgcp output
-# For plotting
-true_log_int.rast <- true_log_int %>% 
-  reshape2::melt(c("x", "y"), value.name = "int") %>% rast(.)
+# Reverse the row order
+true_log_int <- apply(true_log_int, 2, rev)
 
+# Transpose the matrix to match the raster layout
+true_log_int <- t(true_log_int)
+
+# Melt into xy dataframe
+true_log_int.melt <- true_log_int %>% 
+  reshape2::melt(c("x", "y"), value.name = "int") 
+
+# Create a raster  
+true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
+
+# Plot the true log intensity
 true_log_int %>% 
   reshape2::melt(c("x", "y"), value.name = "int") %>% 
   ggplot() + 
@@ -30,6 +41,13 @@ true_log_int %>%
         legend.ticks = element_blank(),
         legend.title = element_blank()) +
   ggtitle('True log intensity')
+
+
+
+
+
+
+############## ARCHIVE ##############################
 
 # Extract abundance values by point for truth
 # Set up a blank grid shape of the covariate domain
@@ -53,7 +71,29 @@ truth_grid <- rast(grid_expand, crs = crs(cov))
 plot(truth_grid)
 
 ### TO FIX: THE grid_expand section isn't working, I think because of the differences in resolution vs. number of cols/rows 
-### CHECK THE XY CHANGE BECAUSE U UPDATED THE MELT FUNCTION
 
+###################################################
+# Test code
+test <- matrix(c("A", "B", 
+                 "C", "D"), 
+               nrow = 2, 
+               ncol = 2, 
+               byrow = TRUE)
 
+plot(rast(test))
+
+test <- as.data.frame(test, xy  = T)
+
+# Reverse the row order
+test2 <- apply(test, 2, rev)
+
+# Transpose the matrix to match the raster layout
+test3 <- t(test2)
+
+test4 <- test3 %>% 
+  reshape2::melt(c("x", "y"), value.name = "int") 
+
+true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
+
+true_log_int.rast <- cbind(x = coords[,1], y = coords[,2]) %>% rast(.)
 
