@@ -12,7 +12,6 @@ extrap.scenario.df <- data.frame(extrap.type = character(),
                                  beta2_25 = numeric(),
                                  beta2_975 = numeric())
 
-
 # Get the names of the extrap types for indexing
 extrap_names <- names(extrap.reps.out.mods)
 
