@@ -1,4 +1,7 @@
+library("Metrics")
+
 extrap.reps.out.mods
+extrap.reps.out.mods[[name]][[rep]]$models
 true_log_int
 
 # Make a dataframe of the format I want to save the results in
@@ -12,60 +15,72 @@ true.validation.df <- data.frame(extrap.type = character(),
                                  Mean.Int.Score = numeric())
 
 
+# Get the names of the extrap types for indexing
+extrap_names <- names(extrap.reps.out.mods)
 
+# For every level of extrap type (Low, Mod, High)
+for(extrap.type in seq_along(extrap.reps.out.mods)) {
+  
+  # Extract the name ("Low") for indexing from the names list
+  name <- extrap_names[extrap.type] 
+  
+  # For every replicate
+  for(rep in seq_along(extrap.type)) {
+    
+    # Extract the models dataframe [[name]] double brackets for list extract
+    models_df <- extrap.reps.out.mods[[name]][[rep]]$models
+    
+    for (i in 1:2) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
+      
+      mod <- models_df[i, "Model"][[i]]
+      
+      # Pull out the mean intensity prediction for each cell
+      mean.int.pred <- mod$preds$field$Mean
+      
+      # Pull out the lower and upper bounds of the prediction
+      lower.int.pred <- mod$preds$field$Lower
+      
+      upper.int.pred <- mod$preds$field$Upper
+      
+      # Metrics from Simmonds et al. 
+      # Compare the predicted intensity to the true intensity 
+      cor <- cor(as.vector(mean.int.pred), as.vector(true_log_int))
+      
+      MAE <- mean(abs(as.vector(mean.int.pred - true_log_int)))
+      
+      RMSE <- Metrics::rmse(actual = as.vector(true_log_int), 
+                            predicted = as.vector(mean.int.pred))
+      
+      ### Calculating the Interval Score ###
+      
+      interval_score <- interval_score(true_values = as.vector(true_log_int),
+                                       lower = as.vector(lower.int.pred), 
+                                       upper = as.vector(upper.int.pred),
+                                       interval_range = 95,
+                                       weigh = TRUE)
+      
+      Sum.Int.Score <- sum(interval_score)
+      
+      Mean.Int.Score <- mean(interval_score)
+    
+      # Save results to dataframe
+      true.validation.df <<- true.validation.df %>% 
+        add_row(extrap.type = name,
+                rep = rep,
+                mod.type = as.character(models_df[i, "Mod.type"]),
+                correlation = cor,
+                MAE = MAE,
+                RMSE = RMSE,
+                Sum.Int.Score = Sum.Int.Score,
+                Mean.Int.Score = Mean.Int.Score)
+                
+      
+    }
+    
+  }
+  
+}
 
+#### TO DO
+# SETUP VALIDATION SO IT'S JUST OF THE SITE B PART OF THE PREDICTION
 
-
-
-
-imap(mod.list, function(x, y) {
-  
-  # Pull out the mean intensity prediction for each cell
-  mean.int.pred <- x$preds$field$Mean
-  
-  differences <- mean.int.pred - truth_grid
-  
-  plot(differences)
-  
-  # Metrics from Simmonds et al. 
-  # Compare the predicted intensity to the true intensity 
-  print(paste0("Correlation:",  cor(as.vector(mean.int.pred), as.vector(truth_grid))))
-  
-  print(paste0("MAE of difference for ", y, ": ", mean(abs(as.vector(differences)))))
-  
-  print(paste0("Root Mean Square Error for ", y, ": ", Metrics::rmse(actual = as.vector(truth_grid), 
-                                                                     predicted = as.vector(mean.int.pred)))) 
-  
-  ### Calculating the Interval Score ###
-  
-  # Pull out the lower and upper bounds of the prediction
-  lower.int.pred <- x$preds$field$Lower
-  
-  upper.int.pred <- x$preds$field$Upper
-  
-  ## Function to calculate a different quantile
-  
-  # #Extract posterior samples
-  # samples <- m.int$preds$cell.samples %>% 
-  #   
-  # # Function to calculate x% quantiles of each row
-  # calculate_quantiles <- function(row) {
-  #   quantiles <- quantile(row, c(0.025, 0.975))
-  #   return(quantiles)
-  # }
-  # 
-  # # Apply the function to each row of the matrix
-  # quantiles_per_row <- t(apply(samples, 1, calculate_quantiles))  
-  
-  interval_score <- interval_score(true_values = as.vector(truth_grid), 
-                                   lower = as.vector(lower.int.pred), 
-                                   upper = as.vector(upper.int.pred),
-                                   interval_range = 95,
-                                   weigh = TRUE)
-  
-  print(paste0("Sum of Interval Score for ",y, ": ", sum(interval_score)))
-  print(paste0("Mean of Interval Score for ", y, ": ", mean(interval_score)))
-  
-  # plot(interval_score)
-  
-})
