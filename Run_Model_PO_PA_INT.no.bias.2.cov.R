@@ -20,10 +20,7 @@ PO <- spp_process
 # cov <- c(rast(rand.cov1, type = "xyz"),
 #          rast(rand.cov2,  type = "xyz"))
 
-cov <- c(rast(GRF.cov1, type = "xyz"),
-         rast(GRF.cov2,  type = "xyz"))
-
-crs(cov) <- "epsg:3031"
+cov <- c(cov1, cov2)
 
 names(cov) <- c("cov1", "cov2")
 
