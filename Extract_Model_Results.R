@@ -29,24 +29,21 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
     
     for (i in 1:2) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
       
-      mod.summary <- models_df[i, "Summary"][[i]]
+      mod.summary <- models_df[[i, "Summary"]]
       
-      
+      # Had to add the [[1]] here because the summary is always list of length 1
       extrap.scenario.df <<- extrap.scenario.df %>% 
         add_row(extrap.type = name,
                 rep = rep,
                 mod.type = as.character(models_df[i, "Mod.type"]),
-                beta1 = mod.summary[[i]]$DISTRIBUTION$mean[1],
-                beta2 = mod.summary[[i]]$DISTRIBUTION$mean[2],
-                beta1_25 = mod.summary[[i]]$DISTRIBUTION[[3]][1],
-                beta1_975 = mod.summary[[i]]$DISTRIBUTION[[5]][1],
-                beta2_25 = mod.summary[[i]]$DISTRIBUTION[[3]][2],
-                beta2_975 = mod.summary[[i]]$DISTRIBUTION[[5]][2]
-        )
+                beta1 = mod.summary[[1]]$DISTRIBUTION$mean[1],
+                beta2 = mod.summary[[1]]$DISTRIBUTION$mean[2],
+                beta1_25 = mod.summary[[1]]$DISTRIBUTION[[3]][1],
+                beta1_975 = mod.summary[[1]]$DISTRIBUTION[[5]][1],
+                beta2_25 = mod.summary[[1]]$DISTRIBUTION[[3]][2],
+                beta2_975 = mod.summary[[1]]$DISTRIBUTION[[5]][2])
       
     }
-    
-    
     
     
   }}
