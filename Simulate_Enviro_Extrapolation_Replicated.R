@@ -3,8 +3,8 @@
 gridcov1.rast <- rast(GRF.cov1, type = "xyz") 
 gridcov2.rast <- rast(GRF.cov2, type = "xyz")
 
-crs(gridcov1.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
-crs(gridcov2.rast) <- "epsg:3031" # Arbitrarily setting to a polar projection for later functions requiring a CRS
+crs(gridcov1.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+crs(gridcov2.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
 # # Install flexsdm
 # remotes::install_github("sjevelazco/flexsdm")

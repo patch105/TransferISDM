@@ -135,6 +135,8 @@ cov1 <- nlm_gaussianfield(ncol = ncol,
 ) %>% 
   rast()
 
+crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+
 cov2 <- nlm_gaussianfield(ncol = ncol,
                           nrow = nrow,
                           resolution = res,
@@ -146,6 +148,8 @@ cov2 <- nlm_gaussianfield(ncol = ncol,
                           rescale = T # If T, the values are rescaled between 0 and 1
 ) %>% 
   rast()
+
+crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
 c1 <- cov1 %>% 
   as.data.frame(xy = T) %>%  
