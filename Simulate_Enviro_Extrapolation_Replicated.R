@@ -11,7 +11,7 @@ crs(gridcov2.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projecti
 library(flexsdm)
 
 # Specify number of replicates per extrapolation type
-nreps <- 5
+nreps <- 10
 
 extrap_out <- list()
 extrap.reps.out <- list(Low = list(), Moderate = list(), High = list())
