@@ -5,8 +5,10 @@
 extrap.scenario.df <- data.frame(extrap.type = character(),
                                  rep = numeric(),
                                  mod.type = character(),
-                                 beta1 = numeric(),
-                                 beta2 = numeric(),
+                                 beta1.mean = numeric(),
+                                 beta2.mean = numeric(),
+                                 beta1.median = numeric(),
+                                 beta2.median = numeric(),
                                  beta1_25 = numeric(),
                                  beta1_975 = numeric(),
                                  beta2_25 = numeric(),
@@ -22,7 +24,7 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
   name <- extrap_names[extrap.type] 
   
   # For every replicate
-  for(rep in seq_along(extrap.type)) {
+  for(rep in seq_along(extrap.reps.out.mods[[name]])) {
     
     # Extract the models dataframe [[name]] double brackets for list extract
     models_df <- extrap.reps.out.mods[[name]][[rep]]$models
@@ -36,8 +38,10 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
         add_row(extrap.type = name,
                 rep = rep,
                 mod.type = as.character(models_df[i, "Mod.type"]),
-                beta1 = mod.summary[[1]]$DISTRIBUTION$mean[1],
-                beta2 = mod.summary[[1]]$DISTRIBUTION$mean[2],
+                beta1.mean = mod.summary[[1]]$DISTRIBUTION$mean[1],
+                beta2.mean = mod.summary[[1]]$DISTRIBUTION$mean[2],
+                beta1.median = mod.summary[[1]]$DISTRIBUTION[[4]][1],
+                beta2.median = mod.summary[[1]]$DISTRIBUTION[[4]][2],
                 beta1_25 = mod.summary[[1]]$DISTRIBUTION[[3]][1],
                 beta1_975 = mod.summary[[1]]$DISTRIBUTION[[5]][1],
                 beta2_25 = mod.summary[[1]]$DISTRIBUTION[[3]][2],
