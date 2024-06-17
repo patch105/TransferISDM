@@ -7,7 +7,6 @@ format:
 ---
 
 ```{r}
-
 #| output: false
 
 # bibliography: references.bib
@@ -22,7 +21,7 @@ here::here()
 
 ```
 
-# Load habitat covariates
+# Load 8 m habitat covariates
 
 ```{r}
 
@@ -92,6 +91,33 @@ names(Vestfold.covs.stk) <- c("elev", "TRI", "slope", "aspect")
 
 
 ```
+
+# Downscaling 10 km ERA5-Land variables to 100m
+Code adapted from David Clarke ().
+
+Log transform the positive values (since non-Gaussian...?)
+
+# Load 100 m REMA layers
+Source: https://data.pgc.umn.edu/elev/dem/setsm/REMA/mosaic/latest/100m/
+
+```{r}
+
+
+```
+
+
+# Load 10 km covariates 
+Provided by David Clarke.
+Downloaded from ERA5-Land. Approximate resolution is:
+
+
+```{r}
+
+
+
+```
+
+
 
 
 ### Load ice-free land & ACBRs
