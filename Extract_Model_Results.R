@@ -53,7 +53,7 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
   }}
 
 
-
+write_csv(extrap.scenario.df, paste0(outpath, "/output/Summary_Extrap_Low_PO_INT.no.bias.2.GRF.cov.csv"))
 
 # ARCHIVE -----------------------------------------------------------------
 

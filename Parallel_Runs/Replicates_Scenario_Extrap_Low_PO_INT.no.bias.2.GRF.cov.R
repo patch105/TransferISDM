@@ -907,16 +907,16 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
       
       # Metrics from Simmonds et al. 
       # Compare the predicted intensity to the true intensity 
-      cor <- cor(as.vector(mean.int.pred), as.vector(true_log_int))
+      cor <- cor(as.vector(mean.int.pred), as.vector(true_log_int.rast))
       
-      MAE <- mean(abs(as.vector(mean.int.pred - true_log_int)))
+      MAE <- mean(abs(as.vector(mean.int.pred - true_log_int.rast)))
       
-      RMSE <- Metrics::rmse(actual = as.vector(true_log_int), 
+      RMSE <- Metrics::rmse(actual = as.vector(true_log_int.rast), 
                             predicted = as.vector(mean.int.pred))
       
       ### Calculating the Interval Score ###
       
-      interval_score <- interval_score(true_values = as.vector(true_log_int),
+      interval_score <- interval_score(true_values = as.vector(true_log_int.rast),
                                        lower = as.vector(lower.int.pred), 
                                        upper = as.vector(upper.int.pred),
                                        interval_range = 95,
