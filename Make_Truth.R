@@ -28,9 +28,14 @@ true_log_int.melt <- true_log_int %>%
 # Create a raster  
 true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
 
+# Extract cell size 
+log.cell_size <- log(cellSize(cov))
+
+true_log_int.rast <- true_log_int.rast*log.cell_size
+
 # Plot the true log intensity
-true_log_int %>% 
-  reshape2::melt(c("x", "y"), value.name = "int") %>% 
+true_log_int.rast %>% 
+  as.data.frame(xy = T) %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = int)) + 
   scale_fill_viridis() +
