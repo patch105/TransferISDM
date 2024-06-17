@@ -147,10 +147,12 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     # plot(pa_b)
     
     # pa - region a
-    pa_a_df <- as.data.frame(pa_a, xy = TRUE)
+    pa_a_df <- as.data.frame(pa_a, xy = TRUE) %>% 
+      mutate(area = dom_a_res^2)
     
     # pa - region b
-    pa_b_df <- as.data.frame(pa_b, xy = TRUE)
+    pa_b_df <- as.data.frame(pa_b, xy = TRUE) %>% 
+      mutate(area = dom_b_res^2)
     
     
     

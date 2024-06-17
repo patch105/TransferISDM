@@ -57,10 +57,8 @@ mods.reps <- map(extrap.reps.out.PA, function(extrap.type) {
     # Load PA occurrence data -------------------------------------------------
     
     PA_fit <- rep$pa_a_df
-    PA_fit <- PA_fit %>% mutate(area = 0.02)
-    
+
     PA_val <- rep$pa_b_df
-    PA_val <- PA_val %>% mutate(area = 0.02)
     
     # Integrated Model Fitting
     
