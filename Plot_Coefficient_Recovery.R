@@ -20,29 +20,20 @@ extrap.scenario.df <- data.frame(
 # beta2 <- 0.1 # Coefficient for cov 2
 
 # Plot the coefficients
-extrap.scenario.df %>% 
-  ggplot(aes(x = extrap.type, y = beta1, fill = mod.type))+
-  geom_boxplot() +
-  theme_bw()
-
-  ggplot(aes(x = extrap.type, y = beta1)) +
-  geom_point() +
-  theme_bw()
-
 
 b1 <- extrap.scenario.df %>% 
-  ggplot(aes(x = extrap.type, y = beta1, fill = mod.type)) +
+  ggplot(aes(x = extrap.type, y = beta1.mean, fill = mod.type)) +
   geom_boxplot() +
-  geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
+  # geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
   labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
   scale_x_discrete(labels = c("Low", "Mod", "High")) +
   scale_fill_manual(values = c("Integrated" = "purple", "PO" = "skyblue")) +
   theme_bw()
 
 b2 <- extrap.scenario.df %>% 
-  ggplot(aes(x = extrap.type, y = beta2, fill = mod.type)) +
+  ggplot(aes(x = extrap.type, y = beta2.mean, fill = mod.type)) +
   geom_boxplot() +
-  geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
+  # geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
   labs(x = "Extrapolation", y = expression(beta[2]), fill = "Model Type") +
   scale_x_discrete(labels = c("Low", "Mod", "High")) +
   scale_fill_manual(values = c("Integrated" = "purple", "PO" = "skyblue")) +
@@ -52,6 +43,6 @@ beta_plot <- ggarrange(b1 , b2, common.legend = T,  ncol = 2, nrow = 1)
 
 beta_plot
 
-ggsave(plot = beta_plot, filename = paste0("output/mock_beta_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+ggsave(plot = beta_plot, filename = paste0("output/Extrap_10_rep_PO_ISDM_beta_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
 
 
