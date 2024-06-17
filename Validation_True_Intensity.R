@@ -1,8 +1,5 @@
-library("Metrics")
+library(Metrics)
 
-extrap.reps.out.mods
-extrap.reps.out.mods[[name]][[rep]]$models
-true_log_int
 
 # Make a dataframe of the format I want to save the results in
 true.validation.df <- data.frame(extrap.type = character(),
@@ -25,22 +22,22 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
   name <- extrap_names[extrap.type] 
   
   # For every replicate
-  for(rep in seq_along(extrap.type)) {
+  for(rep in seq_along(extrap.reps.out.mods[[name]])) {
     
     # Extract the models dataframe [[name]] double brackets for list extract
     models_df <- extrap.reps.out.mods[[name]][[rep]]$models
     
     for (i in 1:2) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
       
-      mod <- models_df[i, "Model"][[i]]
+      mod <- models_df[[i, "Model"]]
       
       # Pull out the mean intensity prediction for each cell
-      mean.int.pred <- mod$preds$field$Mean
+      mean.int.pred <- mod[[1]]$preds$field$Mean
       
       # Pull out the lower and upper bounds of the prediction
-      lower.int.pred <- mod$preds$field$Lower
+      lower.int.pred <- mod[[1]]$preds$field$Lower
       
-      upper.int.pred <- mod$preds$field$Upper
+      upper.int.pred <- mod[[1]]$preds$field$Upper
       
       # Metrics from Simmonds et al. 
       # Compare the predicted intensity to the true intensity 
