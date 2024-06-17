@@ -28,12 +28,14 @@ true_log_int.melt <- true_log_int %>%
 # Create a raster  
 true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
 
-# Extract cell size 
+crs(true_log_int.rast) <- crs(cov)
+
+# Extract cell size because RISDM predictions are with reference to cell area
 log.cell_size <- log(cellSize(cov))
 
-true_log_int.rast <- true_log_int.rast*log.cell_size
+# Add intensity + log(cell area)
+true_log_int.rast <- true_log_int.rast+log.cell_size
 
-# Plot the true log intensity
 true_log_int.rast %>% 
   as.data.frame(xy = T) %>% 
   ggplot() + 
