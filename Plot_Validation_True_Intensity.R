@@ -54,5 +54,6 @@ cor
 
 true_val__plot
 
-ggsave(plot = true_val_plot, filename = paste0("output/Extrap_10_rep_PO_ISDM_beta_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+ggsave(plot = p1, filename = paste0("output/Extrap_10_rep_PO_ISDM_RMSE_MAE_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
 
+ggsave(plot = p2, filename = paste0("output/Extrap_10_rep_PO_ISDM_Int_Score_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
