@@ -23,21 +23,19 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
       mod <- models_df[[i, "Model"]]
       
       # Had to add the [[1]] here because the summary is always list of length 1
-      mod$preds <- predict(mod[[1]],
+      mod[[1]]$preds <- predict(mod[[1]],
                            covars = cov,
                            S = 1, 
                            intercept.terms = "PO_Intercept",
                            type = "link")
       
-      mod <- mod[-2]
-      
       # Save the updated model back to the dataframe
-      models_df[[i, "Model"]] <- mod[1]
+      models_df[[i, "Model"]] <- mod
       
     }
     
     # Save the updated models dataframe back to the original list
-    extrap.reps.out.mods[[name]][[rep]]$models <<- models_df
+    extrap.reps.out.mods[[name]][[rep]]$models <- models_df
     
     
   }

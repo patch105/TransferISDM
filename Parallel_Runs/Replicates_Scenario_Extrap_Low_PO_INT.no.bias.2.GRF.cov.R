@@ -559,10 +559,12 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     # plot(pa_b)
     
     # pa - region a
-    pa_a_df <- as.data.frame(pa_a, xy = TRUE)
+    pa_a_df <- as.data.frame(pa_a, xy = TRUE) %>% 
+      mutate(area = dom_a_res^2)
     
     # pa - region b
-    pa_b_df <- as.data.frame(pa_b, xy = TRUE)
+    pa_b_df <- as.data.frame(pa_b, xy = TRUE) %>% 
+      mutate(area = dom_b_res^2)
     
     
     
@@ -657,10 +659,8 @@ mods.reps <- map(extrap.reps.out.PA, function(extrap.type) {
     # Load PA occurrence data -------------------------------------------------
     
     PA_fit <- rep$pa_a_df
-    PA_fit <- PA_fit %>% mutate(area = 0.02)
     
     PA_val <- rep$pa_b_df
-    PA_val <- PA_val %>% mutate(area = 0.02)
     
     # Integrated Model Fitting
     
@@ -808,14 +808,18 @@ true_log_int.melt <- true_log_int %>%
 # Create a raster  
 true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
 
+crs(true_log_int.rast) <- crs(cov)
+
+# Extract cell size because RISDM predictions are with reference to cell area
+log.cell_size <- log(cellSize(cov))
+
+# Add intensity + log(cell area)
+true_log_int.rast <- true_log_int.rast+log.cell_size
+
 
 #########################################################################
 ###################### PREDICT FROM FITTED ###############################
 #########################################################################
-
-#### PREDICT for every extrap type, for every rep, for every model type
-# Save prediction to the model list
-####
 
 # Get the names of the extrap types for indexing
 extrap_names <- names(extrap.reps.out.mods)
@@ -837,13 +841,11 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
       mod <- models_df[[i, "Model"]]
       
       # Had to add the [[1]] here because the summary is always list of length 1
-      mod$preds <- predict(mod[[1]],
-                           covars = cov,
-                           S = 500, 
-                           intercept.terms = "PO_Intercept",
-                           type = "link")
-      
-      mod <- mod[1]
+      mod[[1]]$preds <- predict(mod[[1]],
+                                covars = cov,
+                                S = 1, 
+                                intercept.terms = "PO_Intercept",
+                                type = "link")
       
       # Save the updated model back to the dataframe
       models_df[[i, "Model"]] <- mod
@@ -851,7 +853,7 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
     }
     
     # Save the updated models dataframe back to the original list
-    extrap.reps.out.mods[[name]][[rep]]$models <<- models_df
+    extrap.reps.out.mods[[name]][[rep]]$models <- models_df
     
     
   }

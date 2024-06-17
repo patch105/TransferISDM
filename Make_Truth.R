@@ -51,7 +51,6 @@ true_log_int.rast %>%
 
 
 
-
 ############## ARCHIVE ##############################
 
 # Extract abundance values by point for truth
