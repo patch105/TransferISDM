@@ -9,9 +9,14 @@ spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 po <- spp_process
 
 
-PA.data <- map(extrap.reps.out, function(extrap.type) {
+PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
   
-  map(extrap.type, function(rep) {
+  
+  imap(extrap.type, function(rep, rep_index) {
+    
+    print(paste("Processing extrap.type:", extrap.name))
+    
+    print(paste("Processing rep:", rep_index))
     
     rand.gridA <- rep$rand.gridA
     rand.gridB <- rep$rand.gridB
@@ -51,8 +56,31 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     
     
     po_a <- spp_process[inbox_idx_a, ]
+    
+    # If there are no presences from the presence-only data in the PA grid
+    # Halt the computation and move to next replicate
+    if(length(po_a) == 0) {
+      return("No PO in PA grid A")
+      
+      
+    }
+    
+    # If there's only one PO location, have to adjust so that it formats into dataframe correctly
+    if(length(po_a) == 2) {
+      po_a_df <- data.frame(x = po_a[[1]], y = po_a[[2]])
+      
+    } else {
+      
+      po_a_df <- as.data.frame(po_a)
+      
+    }
+    
     po_a_df <- as.data.frame(po_a)
     
+    # Debugging output for po_a_df
+    print("po_a_df column names:")
+    print(colnames(po_a_df))
+    print(head(po_a_df))
     
     # ggplot() +
     #   geom_tile(data = bias.df, aes(x = x, y = y, fill = bias)) +
@@ -116,8 +144,29 @@ PA.data <- map(extrap.reps.out, function(extrap.type) {
     
     
     po_b <- spp_process[inbox_idx_b, ]
-    po_b_df <- as.data.frame(po_b)
     
+    # If there are no presences from the presence-only data in the PA grid
+    # Halt the computation and move to next replicate
+    if(length(po_b) == 0) {
+      return("No PO in PA grid B")
+    }
+    
+    # If there's only one PO location, have to adjust so that it formats into dataframe correctly
+    if(length(po_b) == 2) {
+      po_b_df <- data.frame(x = po_b[[1]], y = po_b[[2]])
+      
+    } else {
+      
+      po_b_df <- as.data.frame(po_b)
+      
+    }
+    
+    
+    
+    # Debugging output for po_b_df
+    print("po_b_df column names:")
+    print(colnames(po_b_df))
+    print(head(po_b_df))
     
     # ggplot() +
     #   geom_tile(data = bias.df, aes(x = x, y = y, fill = bias)) +
