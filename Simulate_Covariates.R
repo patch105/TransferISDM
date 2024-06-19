@@ -81,6 +81,7 @@ east_min <- 0
 east_max <- 1
 north_min <- 0
 north_max <- 1
+# dom <- spatstat.geom::owin(c(east_min, east_max), c(north_min, north_max))
 
 # We generate the grid resolution from min, max dimensions and the number of pixels
 
@@ -137,6 +138,8 @@ cov1 <- nlm_gaussianfield(ncol = ncol,
 
 crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
+names(cov1) <- "cov"
+
 cov2 <- nlm_gaussianfield(ncol = ncol,
                           nrow = nrow,
                           resolution = res,
@@ -151,10 +154,12 @@ cov2 <- nlm_gaussianfield(ncol = ncol,
 
 crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
+names(cov2) <- "cov"
+
 c1 <- cov1 %>% 
   as.data.frame(xy = T) %>%  
   ggplot() + 
-  geom_tile(aes(x = x, y = y, fill = layer)) + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
   scale_fill_viridis() +
   coord_fixed() + 
   theme_bw() + 
@@ -167,7 +172,7 @@ c1 <- cov1 %>%
 c2 <- cov2 %>% 
   as.data.frame(xy = T) %>%  
   ggplot() + 
-  geom_tile(aes(x = x, y = y, fill = layer)) + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
   scale_fill_viridis() +
   coord_fixed() + 
   theme_bw() + 

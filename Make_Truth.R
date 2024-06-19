@@ -36,7 +36,7 @@ log.cell_size <- log(cellSize(cov))
 # Add intensity + log(cell area)
 true_log_int.rast <- true_log_int.rast+log.cell_size
 
-true_log_int.rast %>% 
+true.int.plot <- true_log_int.rast %>% 
   as.data.frame(xy = T) %>% 
   ggplot() + 
   geom_tile(aes(x = x, y = y, fill = int)) + 
@@ -50,6 +50,13 @@ true_log_int.rast %>%
   ggtitle('True log intensity')
 
 
+# Convert the point pattern to a data frame for ggplot
+points_df <- as.data.frame(cbind(lg.s$x, lg.s$y)[, 1:2]) %>% 
+  rename(x = V1, y = V2)
+
+# Add the points to the intensity plot
+true.int.plot +
+  geom_point(data=points_df, aes(x=x, y=y), color='black', size=1.5) 
 
 ############## ARCHIVE ##############################
 

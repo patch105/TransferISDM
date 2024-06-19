@@ -119,6 +119,8 @@ cov1 <- nlm_gaussianfield(ncol = ncol,
 
 crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
+names(cov1) <- "cov"
+
 cov2 <- nlm_gaussianfield(ncol = ncol,
                           nrow = nrow,
                           resolution = res,
@@ -133,10 +135,12 @@ cov2 <- nlm_gaussianfield(ncol = ncol,
 
 crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
+names(cov2) <- "cov"
+
 c1 <- cov1 %>% 
   as.data.frame(xy = T) %>%  
   ggplot() + 
-  geom_tile(aes(x = x, y = y, fill = layer)) + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
   scale_fill_viridis() +
   coord_fixed() + 
   theme_bw() + 
@@ -149,7 +153,7 @@ c1 <- cov1 %>%
 c2 <- cov2 %>% 
   as.data.frame(xy = T) %>%  
   ggplot() + 
-  geom_tile(aes(x = x, y = y, fill = layer)) + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
   scale_fill_viridis() +
   coord_fixed() + 
   theme_bw() + 
@@ -187,30 +191,29 @@ nu <- 1 # Smoothness parameter - ONLY FOR MATERN
 # We then reshape into long (x, y) format 
 # We extract the coords from the original raster and bind to the covariate matrix
 
-# Get coords of original raster
+# # Get coords of original raster
 coords <- xyFromCell(cov1, 1:ncell(cov1))
 
 # Convert raster to matrix object
-cov1.mat <- terra::as.matrix(cov1, wide = T) 
+cov1.df <- as.data.frame(cov1, xy = T)
+cov1.mat <- as.matrix(cov1.df)
+colnames(cov1.df) <- c("x", "y", "cov")
+colnames(cov1.mat) <- c("x", "y", "cov")
 
-cov2.mat <- terra::as.matrix(cov2, wide = T) 
-
-cov1.mat2 <- cov1.mat %>% 
-  reshape2::melt(c("x", "y"), value.name = "cov") 
-
-GRF.cov1 <- cbind(x = coords[,1], y = coords[,2], cov = cov1.mat2["cov"]) 
-
-cov2.mat2 <- cov2.mat %>% 
-  reshape2::melt(c("x", "y"), value.name = "cov")
-
-GRF.cov2 <- cbind(x = coords[,1], y = coords[,2], cov = cov2.mat2["cov"])
+cov2.df <- as.data.frame(cov2, xy = T)
+cov2.mat <- as.matrix(cov2.df)
+colnames(cov2.df) <- c("x", "y", "cov")
+colnames(cov2.mat) <- c("x", "y", "cov")
 
 # Can do with one or two covariates
-fe <- beta0 + beta1*GRF.cov1[, "cov"] + beta2*GRF.cov2[, "cov"]
-# fe <- beta0 + beta2*GRF.cov2[, "cov"]
 
-mu <- data.frame(x = coords[,1], y = coords[, 2], z = fe)
-mu <- spatstat.geom::as.im(mu, W = win)
+fe <- beta0 + beta1*cov1.mat[, "cov"] + beta2*cov2.mat[, "cov"]
+
+mu <- cov1.df %>% mutate(cov = fe)
+mu <- spatstat.geom::as.im(mu)
+
+# Set seed 
+set.seed(seed)
 
 # Create LGCP with environmental covariate
 lg.s <- rLGCP('exp', mu = mu,
@@ -221,12 +224,6 @@ lg.s <- rLGCP('exp', mu = mu,
 #####################################################################
 
 # Version 2a. Sample grid GRF covariates - XZ code -----------------
-
-gridcov1.rast <- rast(GRF.cov1, type = "xyz") 
-gridcov2.rast <- rast(GRF.cov2, type = "xyz")
-
-crs(gridcov1.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
-crs(gridcov2.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
 # Specify number of replicates per extrapolation type
 nreps <- 1
@@ -295,8 +292,8 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
   
-  cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = cov)
-  cov2.SiteA <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = cov)
+  cov1.SiteA <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
+  cov2.SiteA <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
   # Join to create one dataframe
   covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
@@ -306,8 +303,8 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
   
-  cov1.SiteB <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = cov)
-  cov2.SiteB <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = cov)
+  cov1.SiteB <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
+  cov2.SiteB <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
   # Join to create one dataframe
   covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))

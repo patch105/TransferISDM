@@ -1,11 +1,5 @@
 # Version 2a. Sample grid GRF covariates - XZ code -----------------
 
-gridcov1.rast <- rast(GRF.cov1, type = "xyz") 
-gridcov2.rast <- rast(GRF.cov2, type = "xyz")
-
-crs(gridcov1.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
-crs(gridcov2.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
-
 # # Install flexsdm
 # remotes::install_github("sjevelazco/flexsdm")
 library(flexsdm)
@@ -70,7 +64,7 @@ extrap_func <- function() {
                      vals = 1:rast_sizeB[2]) # Just setting values for plotting and for converting to a dataframe
   
   
-  plot(gridcov1.rast)
+  plot(cov1)
   lines(ext(rand.gridA), lwd = 2, col = "red")
   lines(ext(rand.gridB), lwd = 2, col = "blue")
   
@@ -82,7 +76,7 @@ extrap_func <- function() {
   rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
   
   cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = cov)
-  cov2.SiteA <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = cov)
+  cov2.SiteA <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
   # Join to create one dataframe
   covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
@@ -92,8 +86,8 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
   
-  cov1.SiteB <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = cov)
-  cov2.SiteB <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = cov)
+  cov1.SiteB <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
+  cov2.SiteB <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
   # Join to create one dataframe
   covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
