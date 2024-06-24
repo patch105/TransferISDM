@@ -27,7 +27,7 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
                            covars = cov,
                            S = 1, 
                            intercept.terms = "PO_Intercept",
-                           type = "link")
+                           type = "link ")
       
       # Save the updated model back to the dataframe
       models_df[[i, "Model"]] <- mod

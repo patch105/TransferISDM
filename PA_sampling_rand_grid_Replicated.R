@@ -75,8 +75,6 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
       
     }
     
-    po_a_df <- as.data.frame(po_a)
-    
     # Debugging output for po_a_df
     print("po_a_df column names:")
     print(colnames(po_a_df))
@@ -236,3 +234,7 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
 extrap.reps.out.PA <- map2(extrap.reps.out, PA.data, ~map2(.x, .y, c))
 
 
+############ TO DO
+
+# Need to set up so that if there are no presences in the PA grid, it doesn't run the rest of the code
+# Then it returns and re-runs the extrapolation so that there's enough reps.

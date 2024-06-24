@@ -75,7 +75,7 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
   
-  cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = cov)
+  cov1.SiteA <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
   cov2.SiteA <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
   # Join to create one dataframe
@@ -254,7 +254,7 @@ extrap_func <- function() {
                      ncols = rast_sizeB[2],
                      vals = 1:rast_sizeB[2]) # Just setting values for plotting and for converting to a dataframe
   
-  plot(gridcov1.rast)
+  plot(cov1)
   lines(ext(rand.gridA), lwd = 2, col = "red")
   lines(ext(rand.gridB), lwd = 2, col = "blue")
   
@@ -265,7 +265,7 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
   
-  cov1.SiteA <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = layer)
+  cov1.SiteA <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = layer)
   cov2.SiteA <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = layer)
   
   # Join to create one dataframe
@@ -276,7 +276,7 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
   
-  cov1.SiteB <- terra::extract(gridcov1.rast, rand.grid.df, xy = T) %>% rename(cov1 = layer)
+  cov1.SiteB <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = layer)
   cov2.SiteB <- terra::extract(gridcov2.rast, rand.grid.df, xy = T) %>% rename(cov2 = layer)
   
   # Join to create one dataframe
