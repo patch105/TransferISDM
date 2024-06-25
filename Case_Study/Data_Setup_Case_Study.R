@@ -19,9 +19,16 @@ ice_freeSPVE <- vect(ice_free)
 ACBRS <- st_read(here("Data/ACBRs_v2_2016.shp"), crs = 3031) %>% filter(ACBR_Name == "East Antarctica")
 ACBRS_SPVE <- vect(ACBRS)
 
-# Also trim ice-free land to East Antarctica
-ice_freeSPVE.EastAnt <- terra::crop(ice_freeSPVE, ACBRS_SPVE)
+# Load the North East Antarctica extent box
+north_east_ant <- st_read(here("Data/North_East_Ant_Box.shp"), crs = 3031)
 
+# # Also trim ice-free land to East Antarctica
+# ice_freeSPVE.EastAnt <- terra::crop(ice_freeSPVE, ACBRS_SPVE)
+
+# Also trim ice-free land to just NORTH East Antarctica
+ice_freeSPVE.NorthEastAnt <- terra::crop(ice_freeSPVE, north_east_ant)
+# Do the same for the ACBRs for the mesh creation
+ACBRS.NorthEastAnt <- terra::crop(ACBRS_SPVE, north_east_ant)
 
 # Load 100m rema layer ----------------------------------------------------
 
@@ -51,17 +58,30 @@ names(predictors) <- c("elev", "slope", "aspect")
 
 # Trim predictors to ice-free land ----------------------------------------
 
-predictors.icefree <- terra::project(predictors, "EPSG:3031")
+predictors <- terra::project(predictors, "EPSG:3031")
 
 predictors.icefree <- terra::mask(predictors, ice_freeSPVE)
 
+# # Also masking predictors by a 200m buffered ice-free area for mesh creation
+# ice_freeSPVE.EastAnt.buffered <- buffer(ice_freeSPVE.EastAnt, 200)
+# ice_freeSPVE.NorthEastAnt.buffered <- buffer(ice_freeSPVE.NorthEastAnt, 200)
+# 
+# predictors.icefree.buffered <- terra::mask(predictors, ice_freeSPVE.EastAnt.buffered)
+
+predictors.icefree.NorthEastAnt <- terra::mask(predictors, ice_freeSPVE.NorthEastAnt)
+predictors.icefree.NorthEastAnt <- terra::crop(predictors.icefree.NorthEastAnt, ext(north_east_ant))
+
+
 # Set all predictors to NA if NA in any
-predictors.icefree <- ENMTools::check.env(predictors.icefree)
+predictors.icefree.NorthEastAnt <- ENMTools::check.env(predictors.icefree.NorthEastAnt)
 
 # Load Vestfold Hills polygon
 Vestfold.landsat <- st_read(here("Data/Vestfold_Landsat_Polygon.shp")) %>% 
   st_transform(3031) %>% 
   vect()
+
+Vestfold.landsat.sf <- st_read(here("Data/Vestfold_Landsat_Polygon.shp")) %>% 
+  st_transform(3031) 
 
 # Load Bunger Hills polygon
 Bunger.landsat <- st_read(here("Data/Bunger_Landsat_Polygon.shp")) %>% 
@@ -73,7 +93,6 @@ predictors.icefree.Bunger.crop <- terra::crop(predictors.icefree.Bunger, ext(Bun
 
 predictors.icefree.Vestfold <-terra::mask(predictors.icefree, Vestfold.landsat)
 predictors.icefree.Vestfold.crop <- terra::crop(predictors.icefree.Vestfold, ext(Vestfold.landsat))
-
 
 
 # Load biodiversity data --------------------------------------------------
@@ -111,14 +130,25 @@ GBIF_sf <- st_as_sf(GBIF_df,
 SCAR_GBIF_bio.vect <- vect(rbind(Ant_bio, GBIF_sf))
 
 
-bio_east_ant_df <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.EastAnt) %>% as.data.frame(geom = "XY")
-bio_east_ant_sf <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.EastAnt) %>% st_as_sf()
+# bio_east_ant_df <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.EastAnt) %>% as.data.frame(geom = "XY")
+# bio_east_ant_sf <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.EastAnt) %>% st_as_sf()
+# 
+# bio_east_ant <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.EastAnt)
+# 
+# bio_east_ant.no.Bunger.df <- terra::mask(bio_east_ant, Bunger.landsat, inverse = T) %>% as.data.frame(geom = "XY")
+# bio_east_ant.no.Bunger.sf <- terra::mask(bio_east_ant, Bunger.landsat, inverse = T) %>% st_as_sf()
 
-bio_east_ant <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.EastAnt)
+# TAKE 2 WITH NORTH EAST ANT
+bio_north_east_ant.df <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.NorthEastAnt) %>% as.data.frame(geom = "XY")
+bio_north_east_ant.sf <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.NorthEastAnt) %>% st_as_sf()
 
-bio_east_ant.no.Bunger.df <- terra::mask(bio_east_ant, Bunger.landsat, inverse = T) %>% as.data.frame(geom = "XY")
-bio_east_ant.no.Bunger.sf <- terra::mask(bio_east_ant, Bunger.landsat, inverse = T) %>% st_as_sf()
+bio_north_east_ant <- terra::mask(SCAR_GBIF_bio.vect, ice_freeSPVE.NorthEastAnt)
 
+# bio_east_ant.no.Bunger.df <- terra::mask(bio_east_ant, Bunger.landsat, inverse = T) %>% as.data.frame(geom = "XY")
+# bio_east_ant.no.Bunger.sf <- terra::mask(bio_east_ant, Bunger.landsat, inverse = T) %>% st_as_sf()
+
+
+count(bio_north_east_ant.df, class)
 
 # Load presence-absence data Bunger ---------------------------------------
 
@@ -165,17 +195,20 @@ travers_df <- travers_sf %>%
 
 # Format  -----------------------------------------------------------------
 
-PO <- bio_east_ant.no.Bunger.df %>% 
+PO <- bio_north_east_ant.df %>% 
   filter(class == "Bryopsida") %>% 
   dplyr::select(x, y) 
 
-PA_fit <- leishman_df %>% 
-  filter(species == "Moss") %>% 
-  dplyr::select(x, y, presence)
+PO.sf <- bio_north_east_ant.sf %>% 
+  filter(class == "Bryopsida")
 
-PA_val <- travers_df %>% 
+PA_fit <- travers_df %>% 
   dplyr::select(x, y, surface_moss) %>% 
   rename(presence = surface_moss)
+
+PA_val <- leishman_df %>% 
+  filter(species == "Moss") %>% 
+  dplyr::select(x, y, presence)
 
 
 # # Calculating extrapolation -----------------------------------------------
