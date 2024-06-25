@@ -185,7 +185,7 @@ coarse_field <- coarse_field[, c(1,2,4,5,6,3,7)]
 ```{r}
 
 hist(coarse_field$w.speed)
-# hist(log(coarse_field$w.speed))
+hist(log(coarse_field$w.speed))
 hist(coarse_field$w.speed^2)
 
 ```
@@ -199,8 +199,9 @@ mod_list <- list()
 # 
 # nms <- names(coarse_field[,3]) # Names of ERA5-Land variables
 
+
 # Just for when running just wind
-nms <- colnames(coarse_field)[7:8]
+nms <- colnames(coarse_field)[7]
 
 for(name in nms){
 
@@ -214,7 +215,7 @@ for(name in nms){
 
 }
 
-# NOW RUNNING WITHA GAMMA DISTRIBUTION
+# NOW RUNNING WITH A GAMMA DISTRIBUTION
  runtime <- system.time(tps <- gam(coarse_field$w.speed ~ elev + aspect + slope +
                                       s(long, lat, bs="tp", k = kk),
                                     method = "REML",
