@@ -218,53 +218,6 @@ PA_val <- leishman_df %>%
   dplyr::select(x, y, presence)
 
 
-# Calculating extrapolation -----------------------------------------------
-
-# Convert covarites to a dataframe
-Bunger.covs.df <- as.data.frame(predictors.icefree.Bunger.crop, xy = T)
-Vestfold.covs.df <- as.data.frame(predictors.icefree.Vestfold.crop, xy = T)
-
-# Adding presence column due to extra_eval requirements
-# Trimming so just the covariates
-training <- Vestfold.covs.df %>%
-  mutate(Presence = 1) %>%
-  .[,c("elev", "slope", "aspect", "Presence")]
-
-projection <- Bunger.covs.df %>%
-  .[,c("elev", "slope", "aspect")]
-
-
-## NOTE - TAKES A WHILE
-shape_extrap <- extra_eval(training_data = training,
-                           pr_ab = "Presence",
-                           projection_data = projection,
-                           metric = "mahalanobis",
-                           univar_comb = F)
-
-shape_extrap <- cbind(shape_extrap, Bunger.covs.df[, c("x", "y")])
-
-extrap.plot <- shape_extrap %>%
-  ggplot() +
-  geom_tile(aes(x = x, y = y, fill = extrapolation)) +
-  scale_fill_viridis() +
-  coord_fixed() +
-  theme_bw() +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.ticks = element_blank(),
-        legend.title = element_blank()) +
-  ggtitle('Extrapolation - Vestfold to Bunger')
-
-mean(shape_extrap$extrapolation, na.rm = T)
-median(shape_extrap$extrapolation, na.rm = T)
-min(shape_extrap$extrapolation, na.rm = T)
-max(shape_extrap$extrapolation, na.rm = T)
-
-
-
-# Save plot
-ggsave(plot = extrap.plot, filename = here("AntarcticISDM/Case_Study/Figures/Extrapolation_Vestfold_to_Bunger.png"), width = 10, height = 10, units = "in", dpi = 300)
-
 
 # 1. MODEL FITTING --------------------------------------------------------
 
@@ -334,17 +287,17 @@ mesh.range.10km.cutoff.50 <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf
 # ggsave(plot = p2, filename = here("AntarcticISDM/Case_Study/Figures/mesh_range_10km_cutoff_50_ALL.png"), width = 10, height = 10, dpi = 300)
 
 # Integrated Model Fitting ------------------------------------------------
-
-m.int.no.GRF <- isdm(observationList = list(POdat = PO,
-                                            PAdat = PA_fit),
-                     covars = East.Ant.covs.stk,
-                     mesh = mesh.range.10km.cutoff.50,
-                     responseNames = c(PO = NULL, PA = "presence"),
-                     sampleAreaNames = c(PO = NULL, PA = "area"),
-                     distributionFormula = ~0 + elev + slope + aspect, # Linear w covs
-                     biasFormula = ~1, #Intercept only
-                     artefactFormulas = list(PA = ~1), # Intercept only
-                     control = my.control)    
+# 
+# m.int.no.GRF <- isdm(observationList = list(POdat = PO,
+#                                             PAdat = PA_fit),
+#                      covars = East.Ant.covs.stk,
+#                      mesh = mesh.range.10km.cutoff.50,
+#                      responseNames = c(PO = NULL, PA = "presence"),
+#                      sampleAreaNames = c(PO = NULL, PA = "area"),
+#                      distributionFormula = ~0 + elev + slope + aspect, # Linear w covs
+#                      biasFormula = ~1, #Intercept only
+#                      artefactFormulas = list(PA = ~1), # Intercept only
+#                      control = my.control)    
 
 
 m.int.GRF <- isdm(observationList = list(POdat = PO,
@@ -358,18 +311,20 @@ m.int.GRF <- isdm(observationList = list(POdat = PO,
                   artefactFormulas = list(PA = ~1), # Intercept only
                   control = my.control.GRF)    
 
+print("Integrated Model Fitted")
+
 # Presence-Only Model Fitting ---------------------------------------------
 
-
-m.PO.no.GRF <- isdm(observationList = list(POdat = PO), 
-                    covars = East.Ant.covs.stk,
-                    mesh = mesh.range.10km.cutoff.50,
-                    responseNames = NULL,
-                    sampleAreaNames = NULL,
-                    distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
-                    biasFormula = ~1, #Intercept only
-                    artefactFormulas = NULL,
-                    control = my.control)
+# 
+# m.PO.no.GRF <- isdm(observationList = list(POdat = PO), 
+#                     covars = East.Ant.covs.stk,
+#                     mesh = mesh.range.10km.cutoff.50,
+#                     responseNames = NULL,
+#                     sampleAreaNames = NULL,
+#                     distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
+#                     biasFormula = ~1, #Intercept only
+#                     artefactFormulas = NULL,
+#                     control = my.control)
 
 m.PO.GRF <- isdm(observationList = list(POdat = PO), 
                  covars = East.Ant.covs.stk,
@@ -381,47 +336,53 @@ m.PO.GRF <- isdm(observationList = list(POdat = PO),
                  artefactFormulas = NULL,
                  control = my.control.GRF)
 
+print("PO Model Fitted")
 
 # Presence-Absence Model Fitting ------------------------------------------
 
 #Intercept only
+# 
+# m.PA.no.GRF <- isdm(observationList = list(PAdat = PA_fit),
+#                     covars = East.Ant.covs.stk,
+#                     mesh = mesh.range.10km.cutoff.50,
+#                     responseNames = c(PA = "presence"),
+#                     sampleAreaNames = c(PA = "area"),
+#                     distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
+#                     biasFormula = NULL, #Intercept only
+#                     artefactFormulas = list(PA = ~1), # Intercept only
+#                     control = my.control)
 
-m.PA.no.GRF <- isdm(observationList = list(PAdat = PA_fit),
-                    covars = East.Ant.covs.stk,
-                    mesh = mesh.range.10km.cutoff.50,
-                    responseNames = c(PA = "presence"),
-                    sampleAreaNames = c(PA = "area"),
-                    distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
-                    biasFormula = NULL, #Intercept only
-                    artefactFormulas = list(PA = ~1), # Intercept only
-                    control = my.control)
-
-m.PA.GRF <- isdm(observationList = list(PAdat = PA_fit),
-                 covars = East.Ant.covs.stk,
-                 mesh = mesh.range.10km.cutoff.50,
-                 responseNames = c(PA = "presence"),
-                 sampleAreaNames = c(PA = "area"),
-                 distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
-                 biasFormula = NULL, #Intercept only
-                 artefactFormulas = list(PA = ~1), # Intercept only
-                 control = my.control)
+# m.PA.GRF <- isdm(observationList = list(PAdat = PA_fit),
+#                  covars = East.Ant.covs.stk,
+#                  mesh = mesh.range.10km.cutoff.50,
+#                  responseNames = c(PA = "presence"),
+#                  sampleAreaNames = c(PA = "area"),
+#                  distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
+#                  biasFormula = NULL, #Intercept only
+#                  artefactFormulas = list(PA = ~1), # Intercept only
+#                  control = my.control)
 
 # Stack models as a list
-mod.list <- list(integrated.no.GRF = m.int.no.GRF,
-                 integrated.GRF = m.int.GRF,
-                 PO.no.GRF = m.PO.no.GRF,
-                 PO.GRF = m.PO.GRF,
-                 PA.no.GRF = m.PA.no.GRF,
-                 PA.GRF = m.PA.GRF)
+# mod.list <- list(integrated.no.GRF = m.int.no.GRF,
+#                  integrated.GRF = m.int.GRF,
+#                  PO.no.GRF = m.PO.no.GRF,
+#                  PO.GRF = m.PO.GRF,
+#                  PA.no.GRF = m.PA.no.GRF)
 
+# mod.list <- list(integrated.GRF = m.int.GRF,
+#                  PO.GRF = m.PO.GRF,
+#                  PA.GRF = m.PA.GRF)
 
+mod.list <- list(integrated.GRF = m.int.GRF,
+                 PO.GRF = m.PO.GRF)
+                 
 
 # 3. MODEL EVALUATION -----------------------------------------------------
 
-output.path <- here("AntarcticISDM/Case_Study/Figures")
-
-# Summary
+## Summary
 map(mod.list, function(x) { summary(x)})
+  
+output.path <- here("AntarcticISDM/Case_Study/Figures")
 
 ## Residual plots
 for(i in seq_along(mod.list)) {
@@ -533,17 +494,17 @@ png(paste0(output.path, "/GRF.plot_m.PO.GRF.png"))
 plot(m.PO.GRF$preds.GRF$field[[1:3]], nc = 3)
 dev.off()
 
-m.PA.GRF$preds.GRF <- predict(m.PA.GRF, 
-                              covars = East.Ant.covs.stk,
-                              S = 30,
-                              intercept.terms = "PA_Intercept",
-                              type = "link",
-                              includeRandom = T,
-                              includeFixed = F)
-
-png(paste0(output.path, "/GRF.plot_m.PA.GRF.png"),width = 10, height = 10, units = "in", res = 300)
-plot(m.PO.GRF$preds.GRF$field[[1:3]], nc = 3)
-dev.off()
+# m.PA.GRF$preds.GRF <- predict(m.PA.GRF, 
+#                               covars = East.Ant.covs.stk,
+#                               S = 30,
+#                               intercept.terms = "PA_Intercept",
+#                               type = "link",
+#                               includeRandom = T,
+#                               includeFixed = F)
+# 
+# png(paste0(output.path, "/GRF.plot_m.PA.GRF.png"),width = 10, height = 10, units = "in", res = 300)
+# plot(m.PO.GRF$preds.GRF$field[[1:3]], nc = 3)
+# dev.off()
 
 ## Another set of plots for GRF 
 png(here("output", "GRF.plot.ZOOMED.m.int.GRF.png"), width = 10, height = 10, units = "in", res = 300)
@@ -574,19 +535,19 @@ ggplot() +
 
 dev.off()
 
-png(here("output", "GRF.plot.ZOOMED.m.PA.GRF.png"), width = 10, height = 10, units = "in", res = 300)
-
-pred.GRF.df <- as.data.frame(m.PA.GRF$preds.GRF$field$Median, xy = T)
-
-ggplot() +
-  geom_tile(data = pred.GRF.df, aes(x = x, y = y, fill = Median)) +
-  scale_fill_viridis() +
-  coord_sf(
-    xlim = c(st_bbox(Vestfold.landsat.sf)$xmin, st_bbox(Vestfold.landsat.sf)$xmax), 
-    ylim = c(st_bbox(Vestfold.landsat.sf)$ymin, st_bbox(Vestfold.landsat.sf)$ymax)) +
-  theme_bw()
-
-dev.off()
+# png(here("output", "GRF.plot.ZOOMED.m.PA.GRF.png"), width = 10, height = 10, units = "in", res = 300)
+# 
+# pred.GRF.df <- as.data.frame(m.PA.GRF$preds.GRF$field$Median, xy = T)
+# 
+# ggplot() +
+#   geom_tile(data = pred.GRF.df, aes(x = x, y = y, fill = Median)) +
+#   scale_fill_viridis() +
+#   coord_sf(
+#     xlim = c(st_bbox(Vestfold.landsat.sf)$xmin, st_bbox(Vestfold.landsat.sf)$xmax), 
+#     ylim = c(st_bbox(Vestfold.landsat.sf)$ymin, st_bbox(Vestfold.landsat.sf)$ymax)) +
+#   theme_bw()
+# 
+# dev.off()
 
 
 # 4. PREDICTION BUNGER -----------------------------------------------------
