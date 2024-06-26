@@ -21,9 +21,15 @@ my.control <- list(coord.names = c("x", "y"),
                    prior.mean = 0,
                    int.sd = 1000, # Intercept standard deviation
                    other.sd = 10, # Covariate effect standard deviation
-                   prior.range = c(10, 0.1), # Prior chance 10% that parameter falls below range of 1km
-                   prior.space.sigma = c(50, 0.1), # Prior chance 10% that parameter falls above SD of 5
                    addRandom = FALSE) # No random effect
+
+my.control.GRF <- list(coord.names = c("x", "y"),
+                       prior.mean = 0,
+                       int.sd = 1000, # Intercept standard deviation
+                       other.sd = 10, # Covariate effect standard deviation
+                       prior.range = c(10, 0.1), # Prior chance 10% that parameter falls below range of 1km
+                       prior.space.sigma = c(50, 0.1), # Prior chance 10% that parameter falls above SD of 5
+                       addRandom = TRUE) # With random effect
 
 
 PA_fit <- PA_fit %>% mutate(area = 80)
@@ -70,6 +76,11 @@ p2 <- ggplot() +
 # ggsave(plot = p1, filename = here("Case_Study/Figures/mesh_range_10km_cutoff_50.png"), width = 10, height = 10, dpi = 300)
 # ggsave(plot = p2, filename = here("Case_Study/Figures/mesh_range_10km_cutoff_50_ALL.png"), width = 10, height = 10, dpi = 300)
 
+
+rm(ice_free)
+rm(ice_freeSPVE)
+gc()
+
 # Integrated Model Fitting ------------------------------------------------
 
 m.int.no.GRF <- isdm(observationList = list(POdat = PO,
@@ -82,14 +93,6 @@ m.int.no.GRF <- isdm(observationList = list(POdat = PO,
                      biasFormula = ~1, #Intercept only
                      artefactFormulas = list(PA = ~1), # Intercept only
                      control = my.control)    
-
-my.control.GRF <- list(coord.names = c("x", "y"),
-                   prior.mean = 0,
-                   int.sd = 1000, # Intercept standard deviation
-                   other.sd = 10, # Covariate effect standard deviation
-                   prior.range = c(10, 0.1), # Prior chance 10% that parameter falls below range of 1km
-                   prior.space.sigma = c(50, 0.1), # Prior chance 10% that parameter falls above SD of 5
-                   addRandom = TRUE) # With random effect
 
 m.int.GRF <- isdm(observationList = list(POdat = PO,
                                          PAdat = PA_fit),
@@ -105,7 +108,7 @@ m.int.GRF <- isdm(observationList = list(POdat = PO,
 # Presence-Only Model Fitting ---------------------------------------------
 
 
-m.PO <- isdm(observationList = list(POdat = PO), 
+m.PO.no.GRF <- isdm(observationList = list(POdat = PO), 
              covars = East.Ant.covs.stk,
              mesh = mesh.range.10km.cutoff.50,
              responseNames = NULL,
@@ -118,33 +121,25 @@ m.PO <- isdm(observationList = list(POdat = PO),
 
 # Presence-Absence Model Fitting ------------------------------------------
 
-# fm.PA <- isdm(observationList = list(PAdat = PA_fit),
-#               covars = cov,
-#               mesh = mesh.default,
-#               responseNames = c(PA = "presence"),
-#               sampleAreaNames = c(PA = "area"),
-#               distributionFormula = dist.form,
-#               biasFormula = NULL,
-#               artefactFormulas = artefact.form,
-#               control = my.control)
-
-
-# Intercept only
-artefact.form <- list(PA = ~1)
-
-m.PA <- isdm(observationList = list(PAdat = PA_fit), 
+m.PA.no.GRF <- isdm(observationList = list(PAdat = PA_fit), 
              covars = East.Ant.covs.stk,
              mesh = mesh.range.10km.cutoff.50,
              responseNames = c(PA = "presence"),
              sampleAreaNames = c(PA = "area"),
              distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
              biasFormula = NULL, #Intercept only
-             artefactFormulas = artefact.form,
+             artefactFormulas = list(PA = ~1), # Intercept only
              control = my.control)
 
 # Stack models as a list
-mod.list <- list(integrated = m.int,
-                 PO = m.PO)
+mod.list <- list(integrated.no.GRF = m.int.no.GRF,
+                 integrated.GRF = m.int.GRF,
+                 PO.no.GRF = m.PO.no.GRF,
+                 PO.GRF = m.PO.GRF,
+                 PA.no.GRF = m.PA.no.GRF)
 
+mod.list <- list(integrated.no.GRF= m.int.no.GRF,
+                 PO.no.GRF = m.PO.no.GRF,
+                 PA.no.GRF = m.PA.no.GRF)
 
 

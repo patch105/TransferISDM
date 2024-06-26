@@ -3,10 +3,16 @@
 map(mod.list, function(x) {summary(x)})
 
 ## Residual plots
-map(mod.list, function(x) {
+output.path <- here("Case_Study/Figures")
+
+## Residual plots
+imap(mod.list, function(x, i) {
+  
+  png(paste0(output.path, "/plot.isdm_", names(mod.list)[i], ".png"), width = 10, height = 10, units = "in", res = 300)
   
   plot(x, nFigRow = 2, ask = FALSE)
   
+  dev.off()
 })
 
 
@@ -31,7 +37,6 @@ ggplot(data = as.data.frame(x$mod$marginals.hyperpar$`Stdev for isdm.spat.XXX`))
   xlab("GRF Std. Dev Parameter")  
 
 })
-
 
 
 
