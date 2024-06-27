@@ -241,15 +241,18 @@ PA_val <- PA_val %>% mutate(area = 1000)
 
 # Integrated Model Fitting
 
-boundary <- fmesher::fm_as_segm(st_as_sf(ACBRS.NorthEastAnt))
+ACBRS.NorthEastAnt.buffer1k <- terra::buffer(ACBRS.NorthEastAnt, 1000)
+ACBRS.NorthEastAnt.buffer1k <- terra::aggregate(ACBRS.NorthEastAnt.buffer1k, by = NULL, dissolve = T, fun = "mean")
+
+boundary1k <- fmesher::fm_as_segm(st_as_sf(ACBRS.NorthEastAnt.buffer1k))
 
 dep.range <- 10000 # 10km Set the range based on biology
 
-mesh.range.10km.cutoff.50 <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf),
-                                                      boundary = boundary,
-                                                      max.edge = c(0.2, 0.5)*dep.range,
-                                                      cutoff = 50,
-                                                      crs=3031)
+mesh.1k.boundary <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf),
+                                             boundary = boundary1k,
+                                             max.edge = c(0.2, 0.5)*dep.range,
+                                             cutoff = 50,
+                                             crs=3031)
 
 # Integrated Model Fitting ------------------------------------------------
 # 
@@ -268,7 +271,7 @@ mesh.range.10km.cutoff.50 <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf
 m.int.GRF <- isdm(observationList = list(POdat = PO,
                                          PAdat = PA_fit),
                   covars = East.Ant.covs.stk,
-                  mesh = mesh.range.10km.cutoff.50,
+                  mesh = mesh.1k.boundary,
                   responseNames = c(PO = NULL, PA = "presence"),
                   sampleAreaNames = c(PO = NULL, PA = "area"),
                   distributionFormula = ~0 + elev + slope + aspect, # Linear w covs
