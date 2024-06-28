@@ -2,7 +2,9 @@
 
 library(tidyverse)
 
-packages <- c("sf", "terra", "viridis", "here", "ggpubr", "ENMTools", "mgcv", "RColorBrewer", "flexsdm")
+# remotes::install_github("sjevelazco/flexsdm")
+
+packages <- c("sf", "terra", "viridis", "here", "ggpubr", "ENMTools", "mgcv", "RColorBrewer")
 
 walk(packages, require, character.only = T)
 
