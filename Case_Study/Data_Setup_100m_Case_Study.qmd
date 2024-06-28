@@ -290,7 +290,7 @@ resid <- data.frame(lon = coarse_field$long,
 
 ggplot(data = resid, aes(x = lon, y = lat, fill = res)) +
   geom_raster(interpolate = T) +
-  scale_fill_gradientn(colours = myPalette(100)) +
+  scale_fill_gradient(colours = myPalette(100)) +
   labs(fill = "", x = "Easting", y = "Northing") + #, title = "Coarse Field") +
   theme_bw()
 
