@@ -238,8 +238,8 @@ my.control.GRF <- list(coord.names = c("x", "y"),
                        prior.mean = 0,
                        int.sd = 1000, # Intercept standard deviation
                        other.sd = 10, # Covariate effect standard deviation
-                       prior.range = c(10, 0.1), # Prior chance 10% that parameter falls below range of 1km
-                       prior.space.sigma = c(50, 0.1), # Prior chance 10% that parameter falls above SD of 5
+                       prior.range = c(0.1, 0.1), # Prior chance 10% that parameter falls below range of 1km
+                       prior.space.sigma = c(5, 0.1), # Prior chance 10% that parameter falls above SD of 5
                        addRandom = TRUE) # With random effect
 
 PA_fit <- PA_fit %>% mutate(area = 80)
@@ -263,15 +263,18 @@ PA_val <- PA_val %>% mutate(area = 1000)
 #                          offset = NULL, # Default is dep.range
 #                          doPlot = TRUE)
 
-boundary <- fmesher::fm_as_segm(st_as_sf(ACBRS.NorthEastAnt))
+ACBRS.NorthEastAnt.buffer1k <- terra::buffer(ACBRS.NorthEastAnt, 1000)
+ACBRS.NorthEastAnt.buffer1k <- terra::aggregate(ACBRS.NorthEastAnt.buffer1k, by = NULL, dissolve = T, fun = "mean")
+
+boundary1k <- fmesher::fm_as_segm(st_as_sf(ACBRS.NorthEastAnt.buffer1k))
 
 dep.range <- 10000 # 10km Set the range based on biology
 
-mesh.range.10km.cutoff.50 <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf),
-                                                      boundary = boundary,
-                                                      max.edge = c(0.2, 0.5)*dep.range,
-                                                      cutoff = 50,
-                                                      crs=3031)
+mesh.1k.boundary <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf),
+                                             boundary = boundary1k,
+                                             max.edge = c(0.2, 0.5)*dep.range,
+                                             cutoff = 50,
+                                             crs=3031)
 
 # p1 <- ggplot() +
 #   inlabru::gg(mesh.range.10km.cutoff.50) +
@@ -303,7 +306,7 @@ mesh.range.10km.cutoff.50 <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf
 m.int.GRF <- isdm(observationList = list(POdat = PO,
                                          PAdat = PA_fit),
                   covars = East.Ant.covs.stk,
-                  mesh = mesh.range.10km.cutoff.50,
+                  mesh = mesh.1k.boundary,
                   responseNames = c(PO = NULL, PA = "presence"),
                   sampleAreaNames = c(PO = NULL, PA = "area"),
                   distributionFormula = ~0 + elev + slope + aspect, # Linear w covs
@@ -328,7 +331,7 @@ print("Integrated Model Fitted")
 
 m.PO.GRF <- isdm(observationList = list(POdat = PO), 
                  covars = East.Ant.covs.stk,
-                 mesh = mesh.range.10km.cutoff.50,
+                 mesh = mesh.1k.boundary,
                  responseNames = NULL,
                  sampleAreaNames = NULL,
                  distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
@@ -507,7 +510,7 @@ dev.off()
 # dev.off()
 
 ## Another set of plots for GRF 
-png(here("output", "GRF.plot.ZOOMED.m.int.GRF.png"), width = 10, height = 10, units = "in", res = 300)
+png(paste0(output.path, "/GRF.plot_ZOOMED.m.int.GRF.png"),width = 10, height = 10, units = "in", res = 300)
 
 pred.GRF.df <- as.data.frame(m.int.GRF$preds.GRF$field$Median, xy = T)
 

@@ -285,8 +285,8 @@ my.control.GRF <- list(coord.names = c("x", "y"),
                        prior.mean = 0,
                        int.sd = 1000, # Intercept standard deviation
                        other.sd = 10, # Covariate effect standard deviation
-                       prior.range = c(10, 0.1), # Prior chance 10% that parameter falls below range of 1km
-                       prior.space.sigma = c(50, 0.1), # Prior chance 10% that parameter falls above SD of 5
+                       prior.range = c(1, 0.1), # Prior chance 10% that parameter falls below range of 100m
+                       prior.space.sigma = c(5, 0.1), # Prior chance 10% that parameter falls above SD of 5
                        addRandom = TRUE) # With random effect
 
 PA_fit <- PA_fit %>% mutate(area = 80)
@@ -404,7 +404,7 @@ m.PA.GRF <- isdm(observationList = list(PAdat = PA_fit),
                  distributionFormula = ~0 + elev + slope + aspect, # Linear w one cov
                  biasFormula = NULL, #Intercept only
                  artefactFormulas = list(PA = ~1), # Intercept only
-                 control = my.control)
+                 control = my.control.GRF)
 
 # Stack models as a list
 mod.list <- list(integrated.no.GRF = m.int.no.GRF,
@@ -546,7 +546,7 @@ plot(m.PO.GRF$preds.GRF$field[[1:3]], nc = 3)
 dev.off()
 
 ## Another set of plots for GRF 
-png(here("output", "GRF.plot.ZOOMED.m.int.GRF.png"), width = 10, height = 10, units = "in", res = 300)
+png(paste0(output.path, "/GRF.plot_ZOOMED.m.int.GRF.png"),width = 10, height = 10, units = "in", res = 300)
 
 pred.GRF.df <- as.data.frame(m.int.GRF$preds.GRF$field$Median, xy = T)
 
