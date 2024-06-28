@@ -1,5 +1,8 @@
 
 gc()
+rm(rema)
+rm(slope)
+rm(aspect)
 
 for(i in seq_along(mod.list)) {
   
@@ -13,7 +16,7 @@ for(i in seq_along(mod.list)) {
     
     png(paste0(output.path, "/plot.pred.int.bunger_", names(mod.list)[i], ".png"), width = 10, height = 10, units = "in", res = 300)
     
-    plot(mod.list[[i]]$preds.INT.BUNGER$field[[1:3]], nc = 3)                           
+    plot(mod.list[[i]]$preds.INT.BUNGER$field[[2]])                           
     
     dev.off()
     
@@ -27,7 +30,7 @@ for(i in seq_along(mod.list)) {
     
     png(paste0(output.path, "/plot.pred.prob.bunger_", names(mod.list)[i], ".png"), width = 10, height = 10, units = "in", res = 300)
     
-    plot(mod.list[[i]]$preds.PROB.BUNGER$field[[1:3]], nc = 3)                           
+    plot(mod.list[[i]]$preds.PROB.BUNGER$field[[2]])                           
     
     dev.off() 
     
@@ -42,7 +45,7 @@ for(i in seq_along(mod.list)) {
   
   png(paste0(output.path, "/plot.pred.int.bunger_", names(mod.list)[i], ".png"), width = 10, height = 10, units = "in", res = 300)
   
-  plot(mod.list[[i]]$preds.INT.BUNGER$field[[1:3]], nc = 3)                           
+  plot(mod.list[[i]]$preds.INT.BUNGER$field[[2]])                           
   
   dev.off()
 
@@ -56,8 +59,9 @@ for(i in seq_along(mod.list)) {
   
   png(paste0(output.path, "/plot.pred.prob.bunger_", names(mod.list)[i], ".png"), width = 10, height = 10, units = "in", res = 300)
   
-  plot(mod.list[[i]]$preds.PROB.BUNGER$field[[1:3]], nc = 3)                           
+  plot(mod.list[[i]]$preds.PROB.BUNGER$field[[2]])                           
   
   dev.off()
     }}
+
 
