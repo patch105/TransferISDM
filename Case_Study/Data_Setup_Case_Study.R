@@ -30,6 +30,7 @@ ice_freeSPVE.NorthEastAnt <- terra::crop(ice_freeSPVE, north_east_ant)
 # Do the same for the ACBRs for the mesh creation
 ACBRS.NorthEastAnt <- terra::crop(ACBRS_SPVE, north_east_ant)
 
+
 # Load 100m rema layer ----------------------------------------------------
 
 rema <- terra::rast(here("Data/rema_mosaic_100m_v2.0_filled_cop30_dem.tif"))
@@ -55,6 +56,17 @@ aspect <- rast(here("Data/REMA_East_Ant_v2_100m_aspect.tif"))
 predictors <- c(elev, slope, aspect)
 names(predictors) <- c("elev", "slope", "aspect")
 
+# Standardise predictors 
+
+# Function to standardize a single layer
+standardise_layer <- function(layer) {
+  mean_val <- mean(layer, na.rm = TRUE)
+  sd_val <- sd(layer, na.rm = TRUE)
+  (layer - mean_val) / sd_val
+}
+
+# Apply the standardization function to each layer in the raster stack
+predictors <- app(predictors, standardise_layer)
 
 # Trim predictors to ice-free land ----------------------------------------
 
