@@ -61,14 +61,14 @@ names(predictors) <- c("elev", "slope", "aspect")
 # Standardise predictors 
 
 # Function to standardize a single layer
-standardise_layer <- function(layer) {
-  mean_val <- mean(layer, na.rm = TRUE)
-  sd_val <- sd(layer, na.rm = TRUE)
-  (layer - mean_val) / sd_val
-}
-
-# Apply the standardization function to each layer in the raster stack
-predictors <- app(predictors, standardise_layer)
+# standardise_layer <- function(layer) {
+#   mean_val <- mean(layer, na.rm = TRUE)
+#   sd_val <- sd(layer, na.rm = TRUE)
+#   (layer - mean_val) / sd_val
+# }
+# 
+# # Apply the standardization function to each layer in the raster stack
+# predictors <- app(predictors, standardise_layer)
 
 # Trim predictors to ice-free land ----------------------------------------
 
@@ -108,6 +108,19 @@ predictors.icefree.Bunger.crop <- terra::crop(predictors.icefree.Bunger, ext(Bun
 predictors.icefree.Vestfold <-terra::mask(predictors.icefree, Vestfold.landsat)
 predictors.icefree.Vestfold.crop <- terra::crop(predictors.icefree.Vestfold, ext(Vestfold.landsat))
 
+
+# Make Habitat Area layer -------------------------------------------------
+
+# This layer has values of cell area size for ice-free land (the study domain) and 0 for ice-covered land
+
+habitat.area.NEA <- predictors.icefree.NorthEastAnt[[1]] 
+area <- cellSize(habitat.area.NEA)
+
+habitat.area.NEA <- mask(area, habitat.area.NEA, maskvalue = NA)
+habitat.area.NEA <- terra::ifel(is.na(habitat.area.NEA), 0, habitat.area.NEA)
+
+# Add to predictors stack
+predictors.icefree.NorthEastAnt <- c(predictors.icefree.NorthEastAnt, habitat.area.NEA)
 
 # Load biodiversity data --------------------------------------------------
 
