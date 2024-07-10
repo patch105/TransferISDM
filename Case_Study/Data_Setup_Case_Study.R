@@ -85,9 +85,12 @@ predictors.icefree <- terra::mask(predictors, ice_freeSPVE)
 predictors.icefree.NorthEastAnt <- terra::mask(predictors, ice_freeSPVE.NorthEastAnt)
 predictors.icefree.NorthEastAnt <- terra::crop(predictors.icefree.NorthEastAnt, ext(north_east_ant))
 
+# Also make a layer of predictors ice and ice-free land
+predictors.NorthEastAnt <- terra::crop(predictors, ext(north_east_ant))
 
 # Set all predictors to NA if NA in any
 predictors.icefree.NorthEastAnt <- ENMTools::check.env(predictors.icefree.NorthEastAnt)
+predictors.NorthEastAnt <- ENMTools::check.env(predictors.NorthEastAnt)
 
 # Load Vestfold Hills polygon
 Vestfold.landsat <- st_read(here("Data/Vestfold_Landsat_Polygon.shp")) %>% 
@@ -121,6 +124,7 @@ habitat.area.NEA <- terra::ifel(is.na(habitat.area.NEA), 0, habitat.area.NEA)
 
 # Add to predictors stack
 predictors.icefree.NorthEastAnt <- c(predictors.icefree.NorthEastAnt, habitat.area.NEA)
+predictors.NorthEastAnt <- c(predictors.NorthEastAnt, habitat.area.NEA)
 
 # Load biodiversity data --------------------------------------------------
 

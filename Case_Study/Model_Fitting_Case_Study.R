@@ -1,4 +1,12 @@
 
+rm(habitat.area.NEA)
+rm(predictors)
+rm(ice_free)
+rm(ice_freeSPVE)
+rm(rema)
+rm(slope)
+gc()
+
 
 library(tidyverse)
 
@@ -15,6 +23,7 @@ here::here()
 
 
 East.Ant.covs.stk <- predictors.icefree.NorthEastAnt
+East.Ant.covs.stk <- predictors.NorthEastAnt
 
 # Priors
 my.control <- list(coord.names = c("x", "y"),
@@ -36,7 +45,7 @@ my.control.GRF <- list(coord.names = c("x", "y"),
 
 
 PA_fit <- PA_fit %>% mutate(area = 80)
-PA_val <- PA_val %>% mutate(area = 1000)
+PA_val <- PA_val %>% mutate(area = 1e+06)
 
 
 # Integrated Model Fitting
@@ -93,22 +102,21 @@ mesh.1k.boundary <- fmesher::fm_mesh_2d_inla(loc = st_coordinates(PO.sf),
 # ggsave(plot = p2, filename = here("Case_Study/Figures/mesh_range_10km_cutoff_50_ALL.png"), width = 10, height = 10, dpi = 300)
 
 
-rm(ice_free)
-rm(ice_freeSPVE)
 gc()
 
 # Integrated Model Fitting ------------------------------------------------
 
-# m.int.no.GRF <- isdm(observationList = list(POdat = PO,
-#                                             PAdat = PA_fit),
-#                      covars = East.Ant.covs.stk,
-#                      mesh = mesh.range.10km.cutoff.50,
-#                      responseNames = c(PO = NULL, PA = "presence"),
-#                      sampleAreaNames = c(PO = NULL, PA = "area"),
-#                      distributionFormula = ~0 + elev + slope + aspect, # Linear w covs
-#                      biasFormula = ~1, #Intercept only
-#                      artefactFormulas = list(PA = ~1), # Intercept only
-#                      control = my.control)    
+m.int.no.GRF <- isdm(observationList = list(POdat = PO,
+                                            PAdat = PA_fit),
+                     covars = East.Ant.covs.stk,
+                     habitatArea = "area",
+                     mesh = mesh.1k.boundary,
+                     responseNames = c(PO = NULL, PA = "presence"),
+                     sampleAreaNames = c(PO = NULL, PA = "area"),
+                     distributionFormula = ~0 + elev + slope + aspect, # Linear w covs
+                     biasFormula = ~1, #Intercept only
+                     artefactFormulas = list(PA = ~1), # Intercept only
+                     control = my.control)
 
 m.int.GRF <- isdm(observationList = list(POdat = PO,
                                          PAdat = PA_fit),
@@ -181,6 +189,6 @@ mod.list <- list(integrated.no.GRF = m.int.no.GRF,
                  PA.no.GRF = m.PA.no.GRF,
                  PA.GRF = m.PA.GRF)
 
-
+gc()
 
 

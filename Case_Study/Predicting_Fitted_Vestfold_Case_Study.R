@@ -70,7 +70,7 @@ for(i in seq_along(mod.list)) {
 m.int.GRF$preds.GRF <- predict(m.int.GRF, 
                                covars = East.Ant.covs.stk,
                                S = 30,
-                               intercept.terms = "PO_Intercept",
+                               intercept.terms = "PA_Intercept",
                                type = "link",
                                includeRandom = T,
                                includeFixed = F)
@@ -118,7 +118,7 @@ ggplot() +
 
 dev.off()
 
-png(here("output", "GRF.plot.ZOOMED.m.PO.GRF.png"), width = 10, height = 10, units = "in", res = 300)
+png(paste0(output.path, "/GRF.plot.ZOOMED.m.PO.GRF.png"), width = 10, height = 10, units = "in", res = 300)
 
 pred.GRF.df <- as.data.frame(m.PO.GRF$preds.GRF$field$Median, xy = T)
 
@@ -132,7 +132,7 @@ ggplot() +
 
 dev.off()
 
-png(here("output", "GRF.plot.ZOOMED.m.PA.GRF.png"), width = 10, height = 10, units = "in", res = 300)
+png(paste0(output.path, "/GRF.plot.ZOOMED.m.PA.GRF.png"), width = 10, height = 10, units = "in", res = 300)
 
 pred.GRF.df <- as.data.frame(m.PA.GRF$preds.GRF$field$Median, xy = T)
 
