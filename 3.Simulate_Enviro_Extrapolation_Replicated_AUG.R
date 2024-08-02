@@ -34,7 +34,7 @@ extrap_func <- function() {
   rand.limB <- c(xmax - rast_sizeB[1], ymax - rast_sizeB[2])
   
   ##### GRID A ###### 
-  # Create random coordinate index for top (bottom left?) corner of subgrid within grid domain
+  # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
   # Do this by generating a random number and finding the nearest eastings/northings value
   # Then use this index on x0 to get the coordinate
   xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
