@@ -45,6 +45,7 @@ PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
     if(length(po.rand.gridB) == 0) {
       print(paste0("No PO in Grid A, Extrap.type: ", extrap.name, ", Rep:", rep_index))
     }
+    
       
           return(list(PO_GridA = po.rand.gridA, 
                 PO_GridB = po.rand.gridB)) 
@@ -53,5 +54,5 @@ PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
 })
 
 # Add PO data to list
-extrap.reps.out.PO <- map2(extrap.reps.out, PO.data, ~map2(.x, .y, c))
+extrap.reps.out <- map2(extrap.reps.out, PO.data, ~map2(.x, .y, c))
 
