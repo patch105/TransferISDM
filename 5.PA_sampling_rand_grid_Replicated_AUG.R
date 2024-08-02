@@ -3,6 +3,7 @@
 # 2. Then simulate sampling from this
 # 3. All the same after that
 
+# At the moment assuming complete survey coverage of a grid site 
 
 library(purrr)
 
@@ -17,11 +18,55 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     
     rand.gridA <- rep$rand.gridA
     rand.gridB <- rep$rand.gridB
-    
+    PO_GridA <- rep$PO_GridA
+    PO_GridB <- rep$PO_GridB
     
     #-------------------------------------------------------------------------------
     # Site A
     #-------------------------------------------------------------------------------
+    
+    #### 1. SELECTING A RANDOM GRID FOR SITE A
+    
+    # Set size of grid (number of cells) for PA grid in Site A (Reference)
+    # NOTE - must be smaller than total cell number in x y directions
+    rast_cellsA <- c(20, 15)
+    rast_sizeA <- c(rast_cellsA[1]*res(rand.gridA)[1], rast_cellsA[2]*res(rand.gridA)[2])
+    
+    # Get coords of overall grid domain boundary
+    xmin <- xmin(rand.gridA)
+    xmax <- xmax(rand.gridA)
+    ymin <- ymin(rand.gridA)
+    ymax <- ymax(rand.gridA)
+    
+    eastings <- crds(rand.gridA)[,1]
+    northings <- crds(rand.gridA)[,2]
+    
+    # Set the limit for x and y coord so box is completely inside the domain
+    rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
+    
+    # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
+    # Do this by generating a random number and finding the nearest eastings/northings value
+    # Then use this index on x0 to get the coordinate
+    xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
+    ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+    
+    xmax.randA <- eastings[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
+    ymax.randA <- northings[which.min(abs(northings - (ymin.randA + rast_sizeA[2])))]
+    
+    PA.rand.gridA <- rast(xmin = xmin.randA, 
+                       xmax = xmax.randA, 
+                       ymin = ymin.randA, 
+                       ymax = ymax.randA, 
+                       nrows = rast_cellsA[1], 
+                       ncols = rast_cellsA[2],
+                       vals = 1:rast_cellsA[2]) # Just setting values for plotting and for converting to a dataframe
+    
+    plot(rand.gridA)
+    plot(PA.rand.gridA, add = T)
+    
+    
+    
+    ##### 2. SAMPLING PA DATA FROM RANDOM GRID A
     
     # Get the domain of region a
     dom_a_bbox <- c(east_min = xmin(rand.gridA), east_max = xmax(rand.gridA), north_min = ymin(rand.gridA), north_max = ymax(rand.gridA))
