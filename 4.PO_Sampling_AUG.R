@@ -1,6 +1,7 @@
 ## TO DO: 
 # Need to think about case when there's no PO data in a grid. Need to set some sort of minimum number of PO data points in a grid
 
+library(purrr)
 
 # Non-thinned version -----------------------------------------------------
 # Have to rep over all replicates, extract the Grid A and B keep the spp PO records from just those grids
