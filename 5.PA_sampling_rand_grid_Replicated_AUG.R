@@ -1,13 +1,10 @@
+# TO DO:
+# 1. Generate a random sampling grid in the Site A
+# 2. Then simulate sampling from this
+# 3. All the same after that
+
 
 library(purrr)
-
-spp_process <- cbind(x = lg.s$x, y = lg.s$y)
-
-# po <- thinpp[, c("x", "y")]
-
-# For random covariate case
-po <- spp_process
-
 
 PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
   
