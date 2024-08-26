@@ -58,7 +58,14 @@ PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
 # Add PO data to list
 extrap.reps.out <- map2(extrap.reps.out, PO.data, ~map2(.x, .y, c))
 
-# Plot one grid
+# Plot one grid to check
+ggplot() +
+  geom_tile(data = extrap.reps.out$Low[[1]]$covs.SiteA, aes(x = x, y = y, fill = cov1)) +
+  geom_point(data = extrap.reps.out$Low[[1]]$PO_GridA, aes(x = x, y = y), color = "red") +
+  theme_bw()
+
+ggplot() +
+  geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov1)) 
 
 plot(extrap.reps.out$Low[[1]]$rand.gridA)
 plot(extrap.reps.out$Low[[1]]$SiteA.rast, add = TRUE, col = "red")

@@ -42,22 +42,29 @@ extrap_func <- function() {
   # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
   # Do this by generating a random number and finding the nearest eastings/northings value
   # Then use this index on x0 to get the coordinate
-  xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
+  xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))] 
+  # xmin.randA <- xmin.randA - bau_east_step/2 
   ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+  # ymin.randA <- ymin.randA - bau_north_step/2
   
   xmax.randA <- eastings[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
+  # xmax.randA <- xmax.randA - bau_east_step/2 
   ymax.randA <- northings[which.min(abs(northings - (ymin.randA + rast_sizeA[2])))]
+  # ymax.randA <- ymax.randA - bau_north_step/2
 
   #### GRID B ########
   
   Generate_Grid_B <- function() {
     
     xmin.randB <<- eastings[which.min(abs(eastings - (runif(1, min = xmin, max = rand.limB[1]))))]
+    # xmin.randB <<- xmin.randB - bau_east_step/2
     ymin.randB <<- northings[which.min(abs(northings - (runif(1, min = ymin, max = rand.limB[2]))))]
+    # ymin.randB <<- ymin.randB - bau_north_step/2
     
     xmax.randB <<- eastings[which.min(abs(eastings - (xmin.randB + rast_sizeB[1])))]
+    # xmax.randB <<- xmax.randB - bau_east_step/2 
     ymax.randB <<- northings[which.min(abs(northings - (ymin.randB + rast_sizeB[2])))]
-    
+    # ymax.randB <<- ymax.randB - bau_north_step/2
   
   }
   
@@ -97,16 +104,30 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
   
+  # Add 0.005 to grid coordinates because of weird problem with raster coords
+  rand.grid.df$x <- rand.grid.df$x + bau_east_step/2
+  rand.grid.df$y <- rand.grid.df$y + bau_north_step/2
+  
   cov1.SiteA <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
   cov2.SiteA <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
   # Join to create one dataframe
   covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
   
+  # Plot covariates for checking --------------------------------------------
+  
+  ggplot() +
+    geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov1))  
+  ggplot() +
+    geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov2)) 
   
   # Extract covariates for the random grid Site B ---------------------------
   
   rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
+  
+  # Add 0.005 to grid coordinates because of weird problem with raster coords
+  rand.grid.df$x <- rand.grid.df$x + bau_east_step/2
+  rand.grid.df$y <- rand.grid.df$y + bau_north_step/2
   
   cov1.SiteB <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
   cov2.SiteB <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
@@ -114,6 +135,13 @@ extrap_func <- function() {
   # Join to create one dataframe
   covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
   
+
+# Plot covariates for checking --------------------------------------------
+  
+  ggplot() +
+    geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov1))  
+  ggplot() +
+    geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov2)) 
   
   # Plotting location of data in cov space ----------------------------------
   
