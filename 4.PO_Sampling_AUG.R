@@ -13,6 +13,7 @@ spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 # For random covariate case
 po <- spp_process
 
+# This function locates the presence-only data in the Grid A and B and saves it as an object
 PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
   
   {
@@ -56,4 +57,10 @@ PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
 
 # Add PO data to list
 extrap.reps.out <- map2(extrap.reps.out, PO.data, ~map2(.x, .y, c))
+
+# Plot one grid
+
+plot(extrap.reps.out$Low[[1]]$rand.gridA)
+plot(extrap.reps.out$Low[[1]]$SiteA.rast, add = TRUE, col = "red")
+
 

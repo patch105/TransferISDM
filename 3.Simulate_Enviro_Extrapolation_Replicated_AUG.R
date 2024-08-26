@@ -1,3 +1,8 @@
+##TO CONSIDER:
+# I removed this code because then the Site A and B were saved twice as SiteA.rast and rand.gridA
+# extrap_out <- c(SiteA.rast = rand.gridA,
+#                 SiteB.rast = rand.gridB)
+
 # Version 2a. Sample grid GRF covariates - XZ code -----------------
 
 # # Install flexsdm
@@ -87,9 +92,6 @@ extrap_func <- function() {
   
   lines(ext(rand.gridA), lwd = 2, col = "red")
   lines(ext(rand.gridB), lwd = 2, col = "blue")
-  
-  extrap_out <- c(SiteA.rast = rand.gridA,
-                  SiteB.rast = rand.gridB)
   
   # Extract covariates for the random grid Site A  --------------------------
   

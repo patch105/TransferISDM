@@ -134,7 +134,7 @@ c2 <- cov2 %>%
   ggtitle('Covariate 2')
 
 plot2 <- ggarrange(c1, c2)
-plot2 
+# plot2 
 ggsave(plot = plot2, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
 
 
