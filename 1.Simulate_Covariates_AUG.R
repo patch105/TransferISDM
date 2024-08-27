@@ -94,11 +94,11 @@ names(cov1) <- "cov"
 cov2 <- nlm_gaussianfield(ncol = ncol,
                           nrow = nrow,
                           resolution = res,
-                          autocorr_range = 50, # Maximum range (raster units) of spatial autocorrelation
+                          autocorr_range = 200, # Maximum range (raster units) of spatial autocorrelation
                           mag_var = 1, # Magnitude of variation over the landscape
                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
                           mean = 0.5, # Mean value over the field
-                          user_seed = 3L, # Set random seed for the simulation
+                          user_seed = , # Set random seed for the simulation
                           rescale = T # If T, the values are rescaled between 0 and 1
 ) %>% 
   rast()
