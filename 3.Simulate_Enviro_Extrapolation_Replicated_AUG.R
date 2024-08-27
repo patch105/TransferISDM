@@ -132,6 +132,8 @@ extrap_func <- function() {
   # Join to create one dataframe
   covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
   
+  covs.SiteA.rast <- crop(cov, ext(rand.gridA))
+  
   # Plot covariates for checking --------------------------------------------
   
   ggplot() +
@@ -153,6 +155,7 @@ extrap_func <- function() {
   # Join to create one dataframe
   covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
   
+  covs.SiteB.rast <- crop(cov, ext(rand.gridB))
 
 # Plot covariates for checking --------------------------------------------
   
@@ -229,6 +232,8 @@ extrap_func <- function() {
                                    rand.gridB = rand.gridB,
                                    covs.SiteA = covs.SiteA,
                                    covs.SiteB = covs.SiteB,
+                                   covs.SiteA.rast = covs.SiteA.rast,
+                                   covs.SiteB.rast = covs.SiteB.rast,
                                    extrap.plot = extrap.plot,
                                    extrap.df = shape_extrap,
                                    summary.extrap = summary.extrap))
