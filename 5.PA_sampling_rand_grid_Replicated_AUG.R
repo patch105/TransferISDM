@@ -103,7 +103,7 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     # Halt the computation and move to next replicate
     if(length(po_a) == 0) {
       print("No PO in PA grid A")
-      
+      po_a_df <- data.frame(x = NA, y = NA)
       
     }
     

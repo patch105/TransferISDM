@@ -55,11 +55,13 @@ points_df <- as.data.frame(cbind(lg.s$x, lg.s$y)[, 1:2]) %>%
   rename(x = V1, y = V2)
 
 # Add the points to the intensity plot
-true.int.plot +
-  geom_point(data=points_df, aes(x=x, y=y), color='black', size=1.5) 
+# true.int.plot +
+#   geom_point(data=points_df, aes(x=x, y=y), color='black', size=1.5) 
 
 # Save the plot
-ggsave("True_log_intensity.png", true.int.plot, width = 6, height = 6, units = "in")
+ggsave(paste0(outpath, "/output/True_log_intensity.png"), true.int.plot, width = 6, height = 6, units = "in")
+
+
 
 ############## ARCHIVE ##############################
 

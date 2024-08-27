@@ -29,7 +29,7 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
     # Extract the models dataframe [[name]] double brackets for list extract
     models_df <- extrap.reps.out.mods[[name]][[rep]]$models
     
-    for (i in nrow(models_df)) { 
+    for (i in 1:2) { # Until get PA again
       
       mod.summary <- models_df[[i, "Summary"]]
       

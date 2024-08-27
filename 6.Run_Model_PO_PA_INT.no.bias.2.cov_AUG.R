@@ -110,7 +110,7 @@ extrap.reps.out.mods <- map2(extrap.reps.out.PA, mods.reps, ~map2(.x, .y, c))
 
 rm(extrap.reps.out.PA)
 rm(mods.reps)
-
+gc()
 
 ##### ARCHIVE #####
 # Covariates add together
