@@ -62,6 +62,7 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
                        ncols = rast_cellsA[2],
                        vals = 1:rast_cellsA[2]) # Just setting values for plotting and for converting to a dataframe
     
+    crs(PA.rand.gridA) <- "epsg:3857"
 
     ##### 2. SAMPLING PA DATA FROM RANDOM GRID A
     
