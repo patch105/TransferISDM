@@ -64,10 +64,10 @@ ggplot() +
   geom_point(data = extrap.reps.out$Low[[1]]$PO_GridA, aes(x = x, y = y), color = "red") +
   theme_bw()
 
+# Plot other grid to check
 ggplot() +
-  geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov1)) 
-
-plot(extrap.reps.out$Low[[1]]$rand.gridA)
-plot(extrap.reps.out$Low[[1]]$SiteA.rast, add = TRUE, col = "red")
+  geom_tile(data = extrap.reps.out$Low[[1]]$covs.SiteB, aes(x = x, y = y, fill = cov1)) +
+  geom_point(data = extrap.reps.out$Low[[1]]$PO_GridB, aes(x = x, y = y), color = "red") +
+  theme_bw()
 
 

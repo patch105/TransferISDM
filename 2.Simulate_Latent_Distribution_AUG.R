@@ -49,7 +49,7 @@ set.seed(seed)
 # Create LGCP with environmental covariate
 lg.s <- rLGCP('exp', mu = mu,
               var=var, scale=scal)
-plot(lg.s)
+# plot(lg.s)
 
 
 # TO DOs ------------------------------------------------------------------

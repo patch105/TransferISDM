@@ -2,8 +2,11 @@
 # Fix the PA plot and add back to final list
 # FIX ERROR CODE
 # At the moment assuming complete survey coverage of a grid site 
+# The PA grid is a subset of the Site A area
 
 library(purrr)
+
+rep <- extrap.reps.out$Low[[1]]
 
 PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
   
@@ -36,8 +39,8 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     ymin <- ymin(rand.gridA)
     ymax <- ymax(rand.gridA)
     
-    eastings <- crds(rand.gridA)[,1]
-    northings <- crds(rand.gridA)[,2]
+    eastingsSITE <- crds(rand.gridA)[,1]
+    northingsSITE <- crds(rand.gridA)[,2]
     
     # Set the limit for x and y coord so box is completely inside the domain
     rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
@@ -45,11 +48,11 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
     # Do this by generating a random number and finding the nearest eastings/northings value
     # Then use this index on x0 to get the coordinate
-    xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
-    ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+    xmin.randA <- eastingsSITE[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
+    ymin.randA <- northingsSITE[which.min(abs(northingsSITE - runif(1, min = ymin, max = rand.limA[2])))]
     
-    xmax.randA <- eastings[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
-    ymax.randA <- northings[which.min(abs(northings - (ymin.randA + rast_sizeA[2])))]
+    xmax.randA <- eastingsSITE[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
+    ymax.randA <- northingsSITE[which.min(abs(northingsSITE - (ymin.randA + rast_sizeA[2])))]
     
     PA.rand.gridA <- rast(xmin = xmin.randA, 
                        xmax = xmax.randA, 

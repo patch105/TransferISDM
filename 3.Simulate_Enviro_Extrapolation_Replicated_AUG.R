@@ -42,29 +42,37 @@ extrap_func <- function() {
   # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
   # Do this by generating a random number and finding the nearest eastings/northings value
   # Then use this index on x0 to get the coordinate
-  xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))] 
-  # xmin.randA <- xmin.randA - bau_east_step/2 
-  ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
-  # ymin.randA <- ymin.randA - bau_north_step/2
+  # Had to take 0.01 off at the end to make it 50 cells
   
-  xmax.randA <- eastings[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
-  # xmax.randA <- xmax.randA - bau_east_step/2 
-  ymax.randA <- northings[which.min(abs(northings - (ymin.randA + rast_sizeA[2])))]
-  # ymax.randA <- ymax.randA - bau_north_step/2
+  xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))] 
+  xmax.randA <- xmin.randA + rast_sizeA[1]
+  
+  xmin.randA <- xmin.randA - bau_east_step/2
+  xmax.randA <- xmax.randA + bau_east_step/2 - bau_east_step
+  
+  ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+  ymax.randA <- ymin.randA + rast_sizeA[2]
+  
+  ymin.randA <- ymin.randA - bau_north_step/2
+  ymax.randA <- ymax.randA + bau_north_step/2 - bau_east_step
+
 
   #### GRID B ########
   
   Generate_Grid_B <- function() {
     
     xmin.randB <<- eastings[which.min(abs(eastings - (runif(1, min = xmin, max = rand.limB[1]))))]
-    # xmin.randB <<- xmin.randB - bau_east_step/2
-    ymin.randB <<- northings[which.min(abs(northings - (runif(1, min = ymin, max = rand.limB[2]))))]
-    # ymin.randB <<- ymin.randB - bau_north_step/2
+    xmax.randB <<- xmin.randB + rast_sizeB[1]
     
-    xmax.randB <<- eastings[which.min(abs(eastings - (xmin.randB + rast_sizeB[1])))]
-    # xmax.randB <<- xmax.randB - bau_east_step/2 
-    ymax.randB <<- northings[which.min(abs(northings - (ymin.randB + rast_sizeB[2])))]
-    # ymax.randB <<- ymax.randB - bau_north_step/2
+    xmin.randB <<- xmin.randB - bau_east_step/2
+    xmax.randB <<- xmax.randB + bau_east_step/2 - bau_east_step
+    
+    ymin.randB <<- northings[which.min(abs(northings - (runif(1, min = ymin, max = rand.limB[2]))))]
+    ymax.randB <<- ymin.randB + rast_sizeB[2]
+    
+    ymin.randB <<- ymin.randB - bau_north_step/2
+    ymax.randB <<- ymax.randB + bau_north_step/2 - bau_east_step
+    
   
   }
   
@@ -80,6 +88,7 @@ extrap_func <- function() {
   } 
          
   
+  ### Make the grids into rasters
   rand.gridA <- rast(xmin = xmin.randA, 
                      xmax = xmax.randA, 
                      ymin = ymin.randA, 
@@ -87,6 +96,11 @@ extrap_func <- function() {
                      nrows = rast_cellsA[1], 
                      ncols = rast_cellsA[2],
                      vals = 1:rast_cellsA[2]) # Just setting values for plotting and for converting to a dataframe
+  
+
+                     
+  crs(rand.gridA) <- "epsg:3857"
+  
   
   rand.gridB <- rast(xmin = xmin.randB, 
                      xmax = xmax.randB, 
@@ -97,6 +111,10 @@ extrap_func <- function() {
                      vals = 1:rast_cellsB[2]) # Just setting values for plotting and for converting to a dataframe
   
   
+
+  crs(rand.gridB) <- "epsg:3857"
+  
+
   lines(ext(rand.gridA), lwd = 2, col = "red")
   lines(ext(rand.gridB), lwd = 2, col = "blue")
   
@@ -271,5 +289,85 @@ if (region == "left") {
 }
 
 
+### ANOTHER ARCHIVE - OLD WAY OF CREATING RANDOM GRID A AND B
+
+# Then use this index on x0 to get the coordinate
+xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))] 
+# xmin.randA <- xmin.randA - bau_east_step/2
+ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+# ymin.randA <- ymin.randA - bau_north_step/2
+
+xmax.randA <- eastings[which.min(abs(eastings - (xmin.randA + (rast_sizeA[1]))))]
+# xmax.randA <- xmax.randA + bau_east_step/2
+ymax.randA <- northings[which.min(abs(northings - (ymin.randA + (rast_sizeA[2]))))]
+# ymax.randA <- ymax.randA + bau_north_step/2
+
+rand.gridA <- rast(xmin = xmin.randA, 
+                   xmax = xmax.randA, 
+                   ymin = ymin.randA, 
+                   ymax = ymax.randA, 
+                   nrows = rast_cellsA[1], 
+                   ncols = rast_cellsA[2],
+                   vals = 1:rast_cellsA[2]) # Just setting values for plotting and for converting to a dataframe
 
 
+# Generate grid *centroid* coordinates
+# We generate a sequence of centroid values and then remove the last value to ensure that it is 50 x 50 in size
+# This is because otherwise it would create a centroid for the last cell, which should be edge of the grid
+
+eastings.randA <- seq(xmin.randA, xmax.randA, by = bau_east_step)
+eastings.randA <- eastings.randA[-length(eastings.randA)] 
+
+northings.randA <- seq(ymin.randA, ymax.randA, by = bau_north_step)
+northings.randA <- northings.randA[-length(northings.randA)]
+
+coords.randA <- as.matrix(expand.grid(eastings.randA, northings.randA))
+coords.randA <-  1:rast_cellsA[2]
+colnames(coords.randA) <- c("x", "y")
+
+
+# Generate grid *centroid* coordinates for Site B
+# We generate a sequence of centroid values and then remove the last value to ensure that it is 50 x 50 in size
+# This is because otherwise it would create a centroid for the last cell, which should be edge of the grid
+
+eastings.randB <- seq(xmin.randB, xmax.randB, by = bau_east_step)
+eastings.randB <- eastings.randB[-length(eastings.randB)] 
+
+northings.randB <- seq(ymin.randB, ymax.randB, by = bau_north_step)
+northings.randB <- northings.randB[-length(northings.randB)]
+
+coords.randB <- as.matrix(expand.grid(eastings.randB, northings.randB))
+colnames(coords.randB) <- c("x", "y")
+
+Generate_Grid_B <- function() {
+  
+xmin.randB <<- eastings[which.min(abs(eastings - (runif(1, min = xmin, max = rand.limB[1]))))]
+  xmin.randB <<- xmin.randB - bau_east_step/2
+  ymin.randB <<- northings[which.min(abs(northings - (runif(1, min = ymin, max = rand.limB[2]))))]
+  ymin.randB <<- ymin.randB - bau_north_step/2
+  
+  xmax.randB <<- eastings[which.min(abs(eastings - (xmin.randB + rast_sizeB[1])))]
+  xmax.randB <<- xmax.randB + bau_east_step/2
+  ymax.randB <<- northings[which.min(abs(northings - (ymin.randB + rast_sizeB[2])))]
+  ymax.randB <<- ymax.randB + bau_north_step/2
+  
+}
+
+rand.gridB <- rast(xmin = xmin.randB, 
+                   xmax = xmax.randB, 
+                   ymin = ymin.randB, 
+                   ymax = ymax.randB, 
+                   nrows = rast_cellsB[1], 
+                   ncols = rast_cellsB[2],
+                   vals = 1:rast_cellsB[2]) # Just setting values for plotting and for converting to a dataframe
+
+
+
+rand.gridA <- rast(coords.randA,
+                   type = "xyz")
+
+rand.gridB <- rast(coords.randB,
+                   type = "xyz")
+
+values(rand.gridB) <- 1:rast_cellsB[2]
+# Just setting values for plotting and for converting to a dataframe
