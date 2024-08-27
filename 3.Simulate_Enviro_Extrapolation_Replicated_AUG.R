@@ -263,6 +263,10 @@ print(extrap.reps.out$High[[1]]$extrap.plot)
 
 
 
+
+
+
+
 #### ARCHIVE ####
 # Define possible regions for the new grid 
 regions <- c("left", "right", "above", "below")
