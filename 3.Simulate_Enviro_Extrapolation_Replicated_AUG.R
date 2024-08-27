@@ -10,7 +10,7 @@
 library(flexsdm)
 
 # Specify number of replicates per extrapolation type
-nreps <- 1
+nreps <- 10
 
 extrap_out <- list()
 extrap.reps.out <- list(Low = list(), Moderate = list(), High = list())
