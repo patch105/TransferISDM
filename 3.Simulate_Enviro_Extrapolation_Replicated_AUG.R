@@ -144,8 +144,8 @@ extrap_func <- function() {
   rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
   
   # Add 0.005 to grid coordinates because of weird problem with raster coords
-  rand.grid.df$x <- rand.grid.df$x + bau_east_step/2
-  rand.grid.df$y <- rand.grid.df$y + bau_north_step/2
+  rand.grid.df$x <- rand.grid.df$x
+  rand.grid.df$y <- rand.grid.df$y
   
   cov1.SiteB <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
   cov2.SiteB <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
