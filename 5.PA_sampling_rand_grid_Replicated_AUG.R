@@ -48,10 +48,10 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
     # Do this by generating a random number and finding the nearest eastings/northings value
     # Then use this index on x0 to get the coordinate
-    xmin.randA <- eastingsSITE[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))]
+    xmin.randA <- eastingsSITE[which.min(abs(eastingsSITE - runif(1, min = xmin, max = rand.limA[1])))]
     ymin.randA <- northingsSITE[which.min(abs(northingsSITE - runif(1, min = ymin, max = rand.limA[2])))]
     
-    xmax.randA <- eastingsSITE[which.min(abs(eastings - (xmin.randA + rast_sizeA[1])))]
+    xmax.randA <- eastingsSITE[which.min(abs(eastingsSITE - (xmin.randA + rast_sizeA[1])))]
     ymax.randA <- northingsSITE[which.min(abs(northingsSITE - (ymin.randA + rast_sizeA[2])))]
     
     PA.rand.gridA <- rast(xmin = xmin.randA, 
@@ -90,13 +90,13 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     pa_a <- terra::rast(pa_a)
     
     # find species coordinates from underlying LGCP IN GRID A that are in region a
-    inbox_idx_a <- which(po.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
-                           po.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
-                           po.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
-                           po.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
+    inbox_idx_a <- which(PO_GridA[, "x"] >= dom_a_bbox["east_min"] &
+                           PO_GridA[, "x"] <= dom_a_bbox["east_max"] &
+                           PO_GridA[, "y"] >= dom_a_bbox["north_min"] &
+                           PO_GridA[, "y"] <= dom_a_bbox["north_max"])
     
     
-    po_a <- po.rand.gridA[inbox_idx_a, ]
+    po_a <- PO_GridA[inbox_idx_a, ]
     
     # If there are no presences from the presence-only data in the PA grid
     # Halt the computation and move to next replicate
@@ -146,11 +146,11 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     pa_a[pres_idx] <- 1
     
     # # plot the data
-    # plot(pa_a)
+    plot(pa_a)
     
     # pa - region a
     pa_a_df <- as.data.frame(pa_a, xy = TRUE) %>% 
-      mutate(area = dom_a_res^2)
+      mutate(area = dom_a_resE * dom_a_resN)
     
    
     #-------------------------------------------------------------------------------
@@ -169,8 +169,7 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     #   scale_color_manual(values = c("purple4", "green3"))
     
     
-    return(list(pa_a_df = pa_a_df, 
-                pa_b_df = pa_b_df))
+    return(list(pa_a_df = pa_a_df))
     
     # return(list(PA_plot = PA_plot, 
     #             pa_a_df = pa_a_df, 
