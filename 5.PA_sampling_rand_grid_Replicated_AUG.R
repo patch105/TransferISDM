@@ -6,7 +6,7 @@
 
 library(purrr)
 
-rep <- extrap.reps.out$Low[[1]]
+# rep <- extrap.reps.out$Low[[1]]
 
 PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
   
