@@ -78,7 +78,7 @@ library(terra)
 cov1 <- nlm_gaussianfield(ncol = ncol,
                           nrow = nrow,
                           resolution = res,
-                          autocorr_range = 50, # Maximum range (raster units) of spatial autocorrelation
+                          autocorr_range = 10, # Maximum range (raster units) of spatial autocorrelation
                           mag_var = 1, # Magnitude of variation over the landscape
                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
                           mean = 0.5, # Mean value over the field
@@ -94,7 +94,7 @@ names(cov1) <- "cov"
 cov2 <- nlm_gaussianfield(ncol = ncol,
                           nrow = nrow,
                           resolution = res,
-                          autocorr_range = 200, # Maximum range (raster units) of spatial autocorrelation
+                          autocorr_range = 100, # Maximum range (raster units) of spatial autocorrelation
                           mag_var = 1, # Magnitude of variation over the landscape
                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
                           mean = 0.5, # Mean value over the field
@@ -106,6 +106,11 @@ cov2 <- nlm_gaussianfield(ncol = ncol,
 crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
 names(cov2) <- "cov"
+
+
+covs <- c(cov1, cov2)
+
+names(covs) <- c("cov1", "cov2")
 
 c1 <- cov1 %>% 
   as.data.frame(xy = T) %>%  
@@ -133,9 +138,6 @@ c2 <- cov2 %>%
         legend.title = element_blank()) +
   ggtitle('Covariate 2')
 
-cov <- c(cov1, cov2)
-
-names(cov) <- c("cov1", "cov2")
 
 plot2 <- ggarrange(c1, c2)
 # plot2 
