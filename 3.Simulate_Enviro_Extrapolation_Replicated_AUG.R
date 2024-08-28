@@ -10,7 +10,7 @@
 library(flexsdm)
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 1
 
 extrap_out <- list()
 extrap.reps.out <- list(Low = list(), Moderate = list(), High = list())
@@ -22,10 +22,10 @@ extrap_func <- function() {
   
   # Set size of grid (number of cells) for Site A (Reference)
   # NOTE - must be smaller than total cell number in x y directions
-  rast_cellsA <- c(50, 50)
+  rast_cellsA <- c(100, 100)
   rast_sizeA <- c(rast_cellsA[1]*bau_east_step, rast_cellsA[2]*bau_north_step)
   # Set size of grid (number of cells) for Site B (Target)
-  rast_cellsB <- c(50, 50)
+  rast_cellsB <- c(100, 100)
   rast_sizeB <- c(rast_cellsB[1]*bau_east_step, rast_cellsB[2]*bau_north_step)
   
   # Get coords of overall grid domain boundary
@@ -132,11 +132,11 @@ extrap_func <- function() {
   # Join to create one dataframe
   covs.SiteA <- left_join(cov1.SiteA, cov2.SiteA, by = join_by(ID, x, y))
   
-  covs.SiteA.rast <- crop(cov, ext(rand.gridA))
+  covs.SiteA.rast <- crop(covs, ext(rand.gridA))
   
   # Plot covariates for checking --------------------------------------------
   
-  ggplot() +
+   ggplot() +
     geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov1))  
   ggplot() +
     geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov2)) 
@@ -155,7 +155,7 @@ extrap_func <- function() {
   # Join to create one dataframe
   covs.SiteB <- left_join(cov1.SiteB, cov2.SiteB, by = join_by(ID, x, y))
   
-  covs.SiteB.rast <- crop(cov, ext(rand.gridB))
+  covs.SiteB.rast <- crop(covs, ext(rand.gridB))
 
 # Plot covariates for checking --------------------------------------------
   
