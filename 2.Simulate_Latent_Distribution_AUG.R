@@ -1,15 +1,19 @@
 
 # Set Parameters Data Generation ----------------------------------------------------------
 
-beta0 <- 5 # Intercept
+beta0 <- 6 # Intercept
 beta1 <- 0.5 # Coefficient for cov 1
 beta2 <- 0.1 # Coefficient for cov 2
 # beta3 <- 5 # Coefficient for cov 1*2 interaction
 var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
-scal <- 0.2 # Scale parameter 
+scal <- 0.2 # Scale parameter (range of spatial effect)
 nu <- 1 # Smoothness parameter - ONLY FOR MATERN
 seed <- 3L
 
+# Assumed intensity at mean of enviro. variables
+# log(lambda) = intercept + b1*(mean of cov1) + b2*(mean of cov2)
+# exp(answer) is intensity
+exp(beta0 + beta1*(0.5) + beta2*(0.5))
 
 # Version 2. Mean of process dependent on TWO spatially-varying covar - XZ code --------
 
@@ -49,7 +53,11 @@ set.seed(seed)
 # Create LGCP with environmental covariate
 lg.s <- rLGCP('exp', mu = mu,
               var=var, scale=scal)
-# plot(lg.s)
+
+lg.s2 <- rLGCP('matern', mu = mu,
+              var=var, scale=scal, nu=nu)
+
+plot(lg.s)
 
 
 # TO DOs ------------------------------------------------------------------
