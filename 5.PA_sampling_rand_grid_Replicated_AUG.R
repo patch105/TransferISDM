@@ -19,8 +19,20 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     
     rand.gridA <- rep$rand.gridA
     rand.gridB <- rep$rand.gridB
-    PO_GridA <- rep$PO_GridA
-    PO_GridB <- rep$PO_GridB
+
+
+# Make new realisation of presences from LGCP for PA ----------------------
+
+    presenceforPA <- rpoispp(lambda = attr(lg.s, 'Lambda') )
+
+    poforPA <- cbind(x = presenceforPA$x, y = presenceforPA$y)
+    
+    # Trim NEW po to only include points in Site A or B
+    poforPA.rand.gridA <- poforPA[
+      poforPA[,1] >= xmin(ext(rand.gridA)) & poforPA[,1] <= xmax(ext(rand.gridA)) & 
+        poforPA[,2] >= ymin(ext(rand.gridA)) & poforPA[,2] <= ymax(ext(rand.gridA)), 
+    ]
+    
     
     #-------------------------------------------------------------------------------
     # Site A
@@ -30,7 +42,7 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     
     # Set size of grid (number of cells) for PA grid in Site A (Reference)
     # NOTE - must be smaller than total cell number in x y directions
-    rast_cellsA <- c(20, 15)
+    rast_cellsA <- c(50, 30)
     rast_sizeA <- c(rast_cellsA[1]*res(rand.gridA)[1], rast_cellsA[2]*res(rand.gridA)[2])
     
     # Get coords of overall grid domain boundary
@@ -64,6 +76,37 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     
     crs(PA.rand.gridA) <- "epsg:3857"
 
+    # Get extent for plotting
+    extPA <- ext(PA.rand.gridA) 
+    
+    df_extPA <- data.frame(
+      xmin = extPA[1],
+      xmax = extPA[2],
+      ymin = extPA[3],
+      ymax = extPA[4],
+      color = "black",
+      label = "PA Grid",
+      label_x = (extPA[1] + extPA[2]) / 2,  # Center of the extent for text placement
+      label_y = extPA[4] + (extPA[4] - extPA[3]) * 0.1  # Slightly above the top of the extent
+    )
+    
+    rand.gridA %>% 
+      as.data.frame(xy = T) %>% 
+      ggplot() +
+      geom_tile(aes(x = x, y = y, fill = lyr.1)) +
+      scale_fill_viridis() +
+      coord_fixed() +
+      geom_rect(data = df_extPA, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = color), 
+                fill = NA, linetype = "solid", linewidth = 1) +
+      scale_color_identity() +
+      theme_bw() +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            legend.ticks = element_blank(),
+            legend.title = element_blank(),
+            plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines")) 
+
+    
     ##### 2. SAMPLING PA DATA FROM RANDOM GRID A
     
     # Get the domain of region a
@@ -91,13 +134,13 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     pa_a <- terra::rast(pa_a)
     
     # find species coordinates from underlying LGCP IN GRID A that are in region a
-    inbox_idx_a <- which(PO_GridA[, "x"] >= dom_a_bbox["east_min"] &
-                           PO_GridA[, "x"] <= dom_a_bbox["east_max"] &
-                           PO_GridA[, "y"] >= dom_a_bbox["north_min"] &
-                           PO_GridA[, "y"] <= dom_a_bbox["north_max"])
+    inbox_idx_a <- which(poforPA.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
+                           poforPA.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
+                           poforPA.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
+                           poforPA.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
     
     
-    po_a <- PO_GridA[inbox_idx_a, ]
+    po_a <- poforPA.rand.gridA[inbox_idx_a, ]
     
     # If there are no presences from the presence-only data in the PA grid
     # Halt the computation and move to next replicate
