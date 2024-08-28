@@ -1,6 +1,6 @@
 # AntarcticISDM
 
-Code to in support of "Can integrated species distribution models improve spatial model transfer? Antarctic 'islands' as a case study". _In Preparation._
+Code to in support of "Can integrated species distribution models improve spatial model transfer?". _In Preparation._
 
 ## Project overview
 Integrated species distribution models have the potential to provide better predictions than models fitted to single data types, but this has never been tested in scenarios of spatial transfer. In Antarctica, spatially constrained survey design and an urgent need for improved prediction of biodiversity patterns motivates the use of ISDMs to predict species distributions at understudied sites. 
