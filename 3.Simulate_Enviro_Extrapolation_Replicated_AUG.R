@@ -1,3 +1,5 @@
+## NOTE - I CHANGED TO 50,50 FOR SPEED. BUT I NEED TO CHANGE BACK TO 100, 100 WHEN DOING PROPERLY
+
 ##TO CONSIDER:
 # I removed this code because then the Site A and B were saved twice as SiteA.rast and rand.gridA
 # extrap_out <- c(SiteA.rast = rand.gridA,
@@ -10,7 +12,7 @@
 library(flexsdm)
 
 # Specify number of replicates per extrapolation type
-nreps <- 1
+nreps <- 10
 
 extrap_out <- list()
 extrap.reps.out <- list(Low = list(), Moderate = list(), High = list())
@@ -22,10 +24,10 @@ extrap_func <- function() {
   
   # Set size of grid (number of cells) for Site A (Reference)
   # NOTE - must be smaller than total cell number in x y directions
-  rast_cellsA <- c(100, 100)
+  rast_cellsA <- c(50, 50)
   rast_sizeA <- c(rast_cellsA[1]*bau_east_step, rast_cellsA[2]*bau_north_step)
   # Set size of grid (number of cells) for Site B (Target)
-  rast_cellsB <- c(100, 100)
+  rast_cellsB <- c(50, 50)
   rast_sizeB <- c(rast_cellsB[1]*bau_east_step, rast_cellsB[2]*bau_north_step)
   
   # Get coords of overall grid domain boundary
@@ -44,13 +46,13 @@ extrap_func <- function() {
   # Then use this index on x0 to get the coordinate
   # Had to take 0.01 off at the end to make it 50 cells
   
-  xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = rand.limA[1])))] 
+  xmin.randA <- eastings[which.min(abs(eastings - runif(1, min = round(xmin,2), max = round(rand.limA[1],2))))] 
   xmax.randA <- xmin.randA + rast_sizeA[1]
   
   xmin.randA <- xmin.randA - bau_east_step/2
   xmax.randA <- xmax.randA + bau_east_step/2 - bau_east_step
   
-  ymin.randA <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limA[2])))]
+  ymin.randA <- northings[which.min(abs(northings - runif(1, min = round(ymin,2), max = round(rand.limA[2],2))))]
   ymax.randA <- ymin.randA + rast_sizeA[2]
   
   ymin.randA <- ymin.randA - bau_north_step/2
@@ -61,13 +63,13 @@ extrap_func <- function() {
   
   Generate_Grid_B <- function() {
     
-    xmin.randB <<- eastings[which.min(abs(eastings - (runif(1, min = xmin, max = rand.limB[1]))))]
+    xmin.randB <<- eastings[which.min(abs(eastings - (runif(1, min = round(xmin,2), max = round(rand.limB[1],2)))))]
     xmax.randB <<- xmin.randB + rast_sizeB[1]
     
     xmin.randB <<- xmin.randB - bau_east_step/2
     xmax.randB <<- xmax.randB + bau_east_step/2 - bau_east_step
     
-    ymin.randB <<- northings[which.min(abs(northings - (runif(1, min = ymin, max = rand.limB[2]))))]
+    ymin.randB <<- northings[which.min(abs(northings - (runif(1, min = round(ymin,2), max = round(rand.limB[2],2)))))]
     ymax.randB <<- ymin.randB + rast_sizeB[2]
     
     ymin.randB <<- ymin.randB - bau_north_step/2
@@ -122,10 +124,10 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
   
-  # Add 0.005 to grid coordinates because of weird problem with raster coords
-  rand.grid.df$x <- rand.grid.df$x + bau_east_step/2
-  rand.grid.df$y <- rand.grid.df$y + bau_north_step/2
-  
+  # # Add 0.005 to grid coordinates because of weird problem with raster coords
+  # rand.grid.df$x <- rand.grid.df$x + bau_east_step/2
+  # rand.grid.df$y <- rand.grid.df$y + bau_north_step/2
+  # 
   cov1.SiteA <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
   cov2.SiteA <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
@@ -145,10 +147,10 @@ extrap_func <- function() {
   
   rand.grid.df <- as.data.frame(rand.gridB, xy = T)[,c("x", "y")]
   
-  # Add 0.005 to grid coordinates because of weird problem with raster coords
-  rand.grid.df$x <- rand.grid.df$x
-  rand.grid.df$y <- rand.grid.df$y
-  
+  # # Add 0.005 to grid coordinates because of weird problem with raster coords
+  # rand.grid.df$x <- rand.grid.df$x
+  # rand.grid.df$y <- rand.grid.df$y
+  # 
   cov1.SiteB <- terra::extract(cov1, rand.grid.df, xy = T) %>% rename(cov1 = cov)
   cov2.SiteB <- terra::extract(cov2, rand.grid.df, xy = T) %>% rename(cov2 = cov)
   
@@ -271,31 +273,31 @@ print(extrap.reps.out$High[[1]]$extrap.plot)
 # Define possible regions for the new grid 
 regions <- c("left", "right", "above", "below")
 
-# Randomly select a region
-region <- sample(regions, 1)
-
-if (region == "left") {
-  xmin.randB <- eastings[which.min(abs(eastings - runif(1, min = xmin, max = xmin.randA - rast_sizeB[1])))]
-  ymin.randB <- northings[which.min(abs(northings - runif(1, min = ymin, max = rand.limB[2])))]
-  xmax.randB <- eastings[which.min(abs(eastings - (xmin.randB + rast_sizeB[1])))]
-  ymax.randB <- northings[which.min(abs(northings - (ymin.randB + rast_sizeB[2])))]
-  
-} else if (region == "right") {
-  xmin_new <- runif(1, xmax + 1, xmax + 1 + width_new)
-  xmax_new <- xmin_new + width_new
-  ymin_new <- runif(1, ymin - height_new, ymax + 1)
-  ymax_new <- ymin_new + height_new
-} else if (region == "above") {
-  ymin_new <- runif(1, ymax + 1, ymax + 1 + height_new)
-  ymax_new <- ymin_new + height_new
-  xmin_new <- runif(1, xmin - width_new, xmax + 1)
-  xmax_new <- xmin_new + width_new
-} else if (region == "below") {
-  ymax_new <- runif(1, ymin - height_new - 1, ymin - height_new)
-  ymin_new <- ymax_new - height_new
-  xmin_new <- runif(1, xmin - width_new, xmax + 1)
-  xmax_new <- xmin_new + width_new
-}
+# # Randomly select a region
+# region <- sample(regions, 1)
+# 
+# if (region == "left") {
+#   xmin.randB <- eastings[which.min(abs(eastings - runif(1, min = round(xmin,2), max = round(xmin.randA - rast_sizeB[1],2))))]
+#   ymin.randB <- northings[which.min(abs(northings - runif(1, min = round(ymin,2), max = round(rand.limB[2],2))))]
+#   xmax.randB <- eastings[which.min(abs(eastings - (xmin.randB + rast_sizeB[1])))]
+#   ymax.randB <- northings[which.min(abs(northings - (ymin.randB + rast_sizeB[2])))]
+#   
+# } else if (region == "right") {
+#   xmin_new <- runif(1, round(xmax + 1, 2), round(xmax + 1 + width_new, 2))
+#   xmax_new <- xmin_new + width_new
+#   ymin_new <- runif(1, round(ymin - height_new, 2), round(ymax + 1, 2))
+#   ymax_new <- ymin_new + height_new
+# } else if (region == "above") {
+#   ymin_new <- runif(1, round(ymax + 1, 2), round(ymax + 1 + height_new, 2))
+#   ymax_new <- ymin_new + height_new
+#   xmin_new <- runif(1, xmin - width_new, xmax + 1)
+#   xmax_new <- xmin_new + width_new
+# } else if (region == "below") {
+#   ymax_new <- runif(1, ymin - height_new - 1, ymin - height_new)
+#   ymin_new <- ymax_new - height_new
+#   xmin_new <- runif(1, xmin - width_new, xmax + 1)
+#   xmax_new <- xmin_new + width_new
+# }
 
 
 ### ANOTHER ARCHIVE - OLD WAY OF CREATING RANDOM GRID A AND B
