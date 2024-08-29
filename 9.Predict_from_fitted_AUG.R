@@ -45,7 +45,3 @@ for(extrap.type in seq_along(extrap.reps.out.mods)) {
   }
 
 
-####### TO DO: 
-# Get code working for running through all the reps
-# Check that the saving mods$preds back into the list works
-
