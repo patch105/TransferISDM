@@ -51,10 +51,10 @@ plot(mu)
 set.seed(seed)
 
 # Create LGCP with environmental covariate
-lg.s <- rLGCP('exp', mu = mu,
-              var=var, scale=scal)
+# lg.s <- rLGCP('exp', mu = mu,
+#               var=var, scale=scal)
 
-lg.s2 <- rLGCP('matern', mu = mu,
+lg.s <- rLGCP('matern', mu = mu,
               var=var, scale=scal, nu=nu)
 
 plot(lg.s)
