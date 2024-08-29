@@ -60,8 +60,9 @@ PA.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
     # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
     # Do this by generating a random number and finding the nearest eastings/northings value
     # Then use this index on x0 to get the coordinate
-    xmin.randA <- eastingsSITE[which.min(abs(eastingsSITE - runif(1, min = xmin, max = rand.limA[1])))]
-    ymin.randA <- northingsSITE[which.min(abs(northingsSITE - runif(1, min = ymin, max = rand.limA[2])))]
+    # Had to round because there was a problem if xmin and rand.limA[1] were slightly different by a tiny decimal place
+    xmin.randA <- eastingsSITE[which.min(abs(eastingsSITE - runif(1, min = round(xmin,2), max = round(rand.limA[1],2))))]
+    ymin.randA <- northingsSITE[which.min(abs(northingsSITE - runif(1, min = round(ymin,2), max = round(rand.limA[2],2))))]
     
     xmax.randA <- eastingsSITE[which.min(abs(eastingsSITE - (xmin.randA + rast_sizeA[1])))]
     ymax.randA <- northingsSITE[which.min(abs(northingsSITE - (ymin.randA + rast_sizeA[2])))]
