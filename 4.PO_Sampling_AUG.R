@@ -14,9 +14,7 @@ spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 po <- spp_process
 
 # This function locates the presence-only data in the Grid A and B and saves it as an object
-PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
-  
-  {
+PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name) {
   
   imap(extrap.type, function(rep, rep_index) {
     
@@ -112,7 +110,7 @@ PO.data <- imap(extrap.reps.out, function(extrap.type, extrap.name)
     }
     
     if(length(po.rand.gridB) == 0) {
-      print(paste0("No PO in Grid A, Extrap.type: ", extrap.name, ", Rep:", rep_index))
+      print(paste0("No PO in Grid B, Extrap.type: ", extrap.name, ", Rep:", rep_index))
     }
     
       
