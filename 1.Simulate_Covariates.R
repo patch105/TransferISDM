@@ -27,7 +27,7 @@ sim_covariates_func <- function(plot,
                             mag_var = 1, # Magnitude of variation over the landscape
                             nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
                             mean = 0.5, # Mean value over the field
-                            user_seed = seed, # Set random seed for the simulation
+                            user_seed = NULL, # Set random seed for the simulation
                             rescale = T # If T, the values are rescaled between 0 and 1
   ) %>% 
     rast()
@@ -43,7 +43,7 @@ sim_covariates_func <- function(plot,
                             mag_var = 1, # Magnitude of variation over the landscape
                             nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
                             mean = 0.5, # Mean value over the field
-                            user_seed = seed, # Set random seed for the simulation
+                            user_seed = NULL, # Set random seed for the simulation
                             rescale = T # If T, the values are rescaled between 0 and 1
   ) %>% 
     rast()
