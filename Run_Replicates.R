@@ -1,10 +1,14 @@
 
+## TO DO: ADD PLOTTING COV AND SITES AND AND B BACK INTO THE EXTRAP FUNCTION
+
+
 library(spatstat)
 library(ggplot2)
 library(dplyr)
 library(ggpubr)
 library(viridis)
 library(terra)
+library(purrr)
 
 
 # PARAMETERS --------------------------------------------------------------
@@ -81,7 +85,7 @@ run_setup_func <- function(){
                                   ncol = ncol, 
                                   nrow = nrow,
                                   res = res,
-                                  seed = seed,
+                                  seed = NA,
                                   range_cov1 = range_cov1,
                                   range_cov2 = range_cov2)
   
@@ -156,8 +160,42 @@ while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < n
 
 # 4. PO sampling ----------------------------------------------------------
 
+# PO_min
+# thin 
 
-                                   
+source("4.PO_Sampling.R")
+
+reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list)
+
+# If there are any reps with no PO data, re-run the parts 1,2,3 for those reps
+
+po <- po_checking_func(reps.setup.list)
+
+removed_counts <- po$removed_counts
+reps.setup.list <- po$reps.setup.list
+
+# Iterate over the setup function until you get to the desired nreps for Low, Moderate, High AND none of them have no PO data anymore
+
+while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < nreps | length(reps.setup.list$High) < nreps | sum(removed_counts) != 0) {
+  
+  reps.setup.list <- run_setup_func()
+  
+  reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list)
+  
+  # If there are any reps with no PO data, re-run the parts 1,2,3 for those reps
+  
+  po <- po_checking_func(reps.setup.list)
+  
+  removed_counts <- po$removed_counts
+  reps.setup.list <- po$reps.setup.list
+  
+  
+}
 
 
+# PA sampling -------------------------------------------------------------
+
+
+
+  
 
