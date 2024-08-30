@@ -32,7 +32,6 @@ east_min <- 0
 east_max <- 10
 north_min <- 0
 north_max <- 10
-# dom <- spatstat.geom::owin(c(east_min, east_max), c(north_min, north_max))
 
 # We generate the grid resolution from min, max dimensions and the number of pixels
 
@@ -139,9 +138,9 @@ c2 <- cov2 %>%
   ggtitle('Covariate 2')
 
 
-plot2 <- ggarrange(c1, c2)
+covs.plot <- ggarrange(c1, c2)
 # plot2 
-ggsave(plot = plot2, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+ggsave(plot = covs.plot, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
 
 
 

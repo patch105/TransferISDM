@@ -28,10 +28,10 @@ true_log_int.melt <- true_log_int %>%
 # Create a raster  
 true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
 
-crs(true_log_int.rast) <- crs(cov)
+crs(true_log_int.rast) <- crs(covs)
 
 # Extract cell size because RISDM predictions are with reference to cell area
-log.cell_size <- log(cellSize(cov))
+log.cell_size <- log(cellSize(covs))
 
 # Add intensity + log(cell area)
 true_log_int.rast <- true_log_int.rast+log.cell_size
@@ -58,8 +58,8 @@ points_df <- as.data.frame(cbind(lg.s$x, lg.s$y)[, 1:2]) %>%
 # true.int.plot +
 #   geom_point(data=points_df, aes(x=x, y=y), color='black', size=1.5) 
 
-# Save the plot
-ggsave(paste0(outpath, "/output/True_log_intensity.png"), true.int.plot, width = 6, height = 6, units = "in")
+# # Save the plot
+# ggsave(paste0(outpath, "/output/True_log_intensity.png"), true.int.plot, width = 6, height = 6, units = "in")
 
 
 
@@ -67,9 +67,9 @@ ggsave(paste0(outpath, "/output/True_log_intensity.png"), true.int.plot, width =
 
 # Extract abundance values by point for truth
 # Set up a blank grid shape of the covariate domain
-grid <- rast(ext(cov),
-             resolution = res(cov),
-             crs = crs(cov))
+grid <- rast(ext(covs),
+             resolution = res(covs),
+             crs = crs(covs))
 
 # Extract raster cell coordinates
 xy <- xyFromCell(grid, 1:ncell(grid))
@@ -82,7 +82,7 @@ grid_expand$abundance <- true_log_int[Reduce('cbind', nearest.pixel(
   grid_expand[,1], grid_expand[,2],
   im(true_log_int)))] # Converting to an image pixel so it can be processed by the nearest.pixel function
 
-truth_grid <- rast(grid_expand, crs = crs(cov))
+truth_grid <- rast(grid_expand, crs = crs(covs))
 
 plot(truth_grid)
 

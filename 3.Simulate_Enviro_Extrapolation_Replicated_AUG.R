@@ -12,12 +12,14 @@
 library(flexsdm)
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 1
 
 extrap_out <- list()
 extrap.reps.out <- list(Low = list(), Moderate = list(), High = list())
 
 plot(cov1)
+
+start.time <- Sys.time()
 
 # Function for generating Site A and Site B and calculating extrapolation
 extrap_func <- function() {
@@ -138,10 +140,10 @@ extrap_func <- function() {
   
   # Plot covariates for checking --------------------------------------------
   
-   ggplot() +
-    geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov1))  
-  ggplot() +
-    geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov2)) 
+  #  ggplot() +
+  #   geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov1))  
+  # ggplot() +
+  #   geom_tile(data = covs.SiteA, aes(x = x, y = y, fill = cov2)) 
   
   # Extract covariates for the random grid Site B ---------------------------
   
@@ -161,10 +163,10 @@ extrap_func <- function() {
 
 # Plot covariates for checking --------------------------------------------
   
-  ggplot() +
-    geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov1))  
-  ggplot() +
-    geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov2)) 
+  # ggplot() +
+  #   geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov1))  
+  # ggplot() +
+  #   geom_tile(data = covs.SiteB, aes(x = x, y = y, fill = cov2)) 
   
   # Plotting location of data in cov space ----------------------------------
   
@@ -196,12 +198,12 @@ extrap_func <- function() {
   
   shape_extrap <- cbind(shape_extrap, covs.SiteB[, c("x", "y")])
   
-  # shape_extrap %>% 
-  #   ggplot() + 
-  #   geom_tile(aes(x = x, y = y, fill = extrapolation)) + 
+  # shape_extrap %>%
+  #   ggplot() +
+  #   geom_tile(aes(x = x, y = y, fill = extrapolation)) +
   #   scale_fill_viridis() +
-  #   coord_fixed() + 
-  #   theme_bw() + 
+  #   coord_fixed() +
+  #   theme_bw() +
   #   theme(axis.title.x = element_blank(),
   #         axis.title.y = element_blank(),
   #         legend.ticks = element_blank(),
@@ -222,8 +224,9 @@ extrap_func <- function() {
                         ifelse(summary.extrap$median <= 50, "Moderate", "High"))
   
   # Plotting data in covariate space with extrapolation  ------------------------
+  extrap.plot <- NA
   
-  extrap.plot <- ggplot() + 
+  extrap.plot <- ggplot() +
     geom_point(data = covs.SiteA, aes(x = cov1, y = cov2), color = "grey") +
     geom_point(data = shape_extrap, aes(x = cov1, y = cov2, color = extrapolation)) +
     scale_color_viridis(option = "magma", direction = -1) +
@@ -258,6 +261,10 @@ extrap_func <- function() {
 while(length(extrap.reps.out$Low) < nreps | length(extrap.reps.out$Moderate) < nreps | length(extrap.reps.out$High) < nreps) {
   extrap.reps.out <- extrap_func()
 }
+
+end.time <- Sys.time()
+
+end.time - start.time
 
 print(extrap.reps.out$Low[[1]]$extrap.plot)
 print(extrap.reps.out$Moderate[[1]]$extrap.plot)
