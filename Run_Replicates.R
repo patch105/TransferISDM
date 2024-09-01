@@ -9,6 +9,7 @@ library(ggpubr)
 library(viridis)
 library(terra)
 library(purrr)
+library(readr)
 
 
 # PARAMETERS --------------------------------------------------------------
@@ -225,7 +226,8 @@ doPlot <- FALSE
 # Set the distribution formula for the model
 distributionFormula <- ~0 + cov1 + cov2 # Linear w two covs
 
-reps.setup.list <- run_model_func(prior.mean = prior.mean,
+reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
+                                  prior.mean = prior.mean,
                                   int.sd = int.sd, 
                                   other.sd = other.sd, 
                                   prior.range = prior.range, 
@@ -247,15 +249,17 @@ source("7.Extract_Model_Results.R")
 
 extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list)
 
-write_csv(extrap.scenario.df, paste0(outpath, "/output/Summary_Extrap_PO_INT_PA.no.bias.no.GRF.csv"))
+outpath <- getwd()
 
+write_csv(extrap.scenario.df, paste0(outpath, "/output/Summary_Extrap_PO_INT_PA.no.bias.no.GRF.csv"))
 
 
 # 8. Make Truth -----------------------------------------------------------
 
 source("8.Make_Truth.R")
 
-make_truth_func(reps.setup.list = reps.setup.list)
+reps.setup.list <- make_truth_func(reps.setup.list = reps.setup.list)
+
 
 
   
