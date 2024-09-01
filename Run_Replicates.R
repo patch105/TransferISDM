@@ -58,7 +58,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 1
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
@@ -193,8 +193,69 @@ while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < n
 }
 
 
-# PA sampling -------------------------------------------------------------
 
+# 5. PA sampling ----------------------------------------------------------
+
+source("5.PA_Sampling.R")
+
+reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list)
+
+
+
+# 6. Run Models -----------------------------------------------------------
+
+source("6.Run_Model.R")
+
+# Set model control parameters
+prior.mean <- 0
+int.sd <- 1000 # Intercept standard deviation
+other.sd <- 10 # Covariate effect standard deviation
+prior.range <- c(1, 0.1) # Prior chance 10% that parameter falls below range of 1km
+prior.space.sigma <- c(5, 0.1) # Prior chance 10% that parameter falls above SD of 5
+
+# Set mesh parameters
+max.n <- c(5000, 2500) # Default c(500,200)
+dep.range <- NULL # In raster projection units, default is 1/3 diagonal length of raster extent
+expans.mult <- 1.5 # Default, 1.5 x dep.range                         
+max.edge <- NULL # Default c(0.2, 0.5)*dep.range                         
+cutoff <- NULL # Default 0.2*max.edge1                         
+offset <- NULL # Default is dep.range                       
+doPlot <- FALSE                       
+
+# Set the distribution formula for the model
+distributionFormula <- ~0 + cov1 + cov2 # Linear w two covs
+
+reps.setup.list <- run_model_func(prior.mean = prior.mean,
+                                  int.sd = int.sd, 
+                                  other.sd = other.sd, 
+                                  prior.range = prior.range, 
+                                  prior.space.sigma = prior.space.sigma, 
+                                  reps.setup.list = reps.setup.list,
+                                  max.n = max.n,
+                                  dep.range = dep.range,
+                                  expans.mult = expans.mult,
+                                  max.edge = max.edge,
+                                  cutoff = cutoff,
+                                  offset = offset,
+                                  doPlot = doPlot,
+                                  distributionFormula = distributionFormula)
+
+
+# 7. Extract Model Results ------------------------------------------------
+
+source("7.Extract_Model_Results.R")
+
+extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list)
+
+write_csv(extrap.scenario.df, paste0(outpath, "/output/Summary_Extrap_PO_INT_PA.no.bias.no.GRF.csv"))
+
+
+
+# 8. Make Truth -----------------------------------------------------------
+
+source("8.Make_Truth.R")
+
+make_truth_func(reps.setup.list = reps.setup.list)
 
 
   
