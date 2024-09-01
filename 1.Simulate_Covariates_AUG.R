@@ -139,7 +139,7 @@ c2 <- cov2 %>%
 
 
 covs.plot <- ggarrange(c1, c2)
-# plot2 
+#   covs.plot 
 ggsave(plot = covs.plot, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
 
 
