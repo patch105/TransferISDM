@@ -90,10 +90,10 @@ mods.reps <- map(extrap.reps.out.PA, function(extrap.type) {
                         control = my.control)
     
     # Create a data frame for this replicate
-    list(models = tibble(
+    return(list(models = tibble(
       Mod.type = c("Integrated", "PO", "PA"),
       Model = list(m.int, m.PO, m.PA),
-      Summary = list(summary(m.int), summary(m.PO), NULL) # Update PA summary when available
+      Summary = list(summary(m.int), summary(m.PO), NULL)) # Update PA summary when available
       
     ))
     
