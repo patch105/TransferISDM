@@ -24,7 +24,7 @@ extract_model_results_func <- function(reps.setup.list) {
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
-      for (i in 1:3) { # Until get PA again
+      for (i in seq_along(models_df)) { # Until get PA again
         
         mod.summary <- models_df[[i, "Summary"]]
         

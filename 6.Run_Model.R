@@ -156,7 +156,7 @@ run_model_func <- function(prior.mean,
       
       # Create a data frame for this replicate
       return(list(models = tibble(
-        Mod.type = c("Integrated", "PO", "PA"),
+        Mod.type = c("Integrated.no.GRF", "PO.no.GRF", "PA.no.GRF"),
         Model = list(m.int.no.GRF, m.PO.no.GRF, m.PA.no.GRF),
         Summary = list(summary(m.int.no.GRF), summary(m.PO.no.GRF), summary(m.PA.no.GRF))) 
         
