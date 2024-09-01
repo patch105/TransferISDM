@@ -44,9 +44,9 @@ po_sampling_func <- function(reps.setup.list) {
     })
                   
   # Add PO data to list
-  extrap.reps.out <- map2(reps.setup.list, PO.data, ~map2(.x, .y, c))                
+  reps.setup.list <- map2(reps.setup.list, PO.data, ~map2(.x, .y, c))                
   
-  return(extrap.reps.out)
+  return(reps.setup.list)
   
 }
 
