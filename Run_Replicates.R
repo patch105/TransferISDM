@@ -232,7 +232,6 @@ reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
                                   other.sd = other.sd, 
                                   prior.range = prior.range, 
                                   prior.space.sigma = prior.space.sigma, 
-                                  reps.setup.list = reps.setup.list,
                                   max.n = max.n,
                                   dep.range = dep.range,
                                   expans.mult = expans.mult,
@@ -259,6 +258,14 @@ write_csv(extrap.scenario.df, paste0(outpath, "/output/Summary_Extrap_PO_INT_PA.
 source("8.Make_Truth.R")
 
 reps.setup.list <- make_truth_func(reps.setup.list = reps.setup.list)
+
+
+# 9. Predict from fitted --------------------------------------------------
+
+source("9.Predict_from_fitted.R")
+
+reps.setup.list <- predict_from_fitted_func(reps.setup.list = reps.setup.list)
+
 
 
 
