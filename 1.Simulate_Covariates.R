@@ -1,4 +1,6 @@
-
+library(NLMR)
+library(landscapetools)
+library(RandomFields) # See below for download from archived files.
 
 # 1.Simulate_Covariates ---------------------------------------------------
 
@@ -16,9 +18,7 @@ sim_covariates_func <- function(plot,
                                 range_cov1,
                                 range_cov2) {
   
-  library(NLMR)
-  library(landscapetools)
-  library(RandomFields) # See above for download from archived files. 
+ 
   
   cov1 <- nlm_gaussianfield(ncol = ncol,
                             nrow = nrow,
