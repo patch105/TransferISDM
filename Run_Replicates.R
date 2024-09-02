@@ -267,7 +267,22 @@ source("9.Predict_from_fitted.R")
 reps.setup.list <- predict_from_fitted_func(reps.setup.list = reps.setup.list)
 
 
+# 10. Validation true intensity -------------------------------------------
+
+source("10.Validation_True_Intensity.R")
+
+true.validation.df <- validation_func(reps.setup.list = reps.setup.list)
 
 
-  
+# 11. Plot validation true intensity --------------------------------------
 
+source("11.Plot_Validation_True_Intensity.R")
+
+plot_validation_func(true.validation.df = true.validation.df)  
+
+
+# 12. Plot Model Outputs --------------------------------------------------
+
+source("12.Plot_Model_Outputs.R")
+
+plot_model_outputs_func(reps.setup.list = reps.setup.list)
