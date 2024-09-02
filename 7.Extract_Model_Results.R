@@ -28,8 +28,7 @@ extract_model_results_func <- function(reps.setup.list) {
         
         mod.summary <- models_df[[i, "Summary"]]
         
-        # Had to add the [[1]] here because the summary is always list of length 1
-        results_list[[length(results_list) + 1]] <- data.frame(
+          results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
