@@ -1,7 +1,4 @@
 
-## TO DO: ADD PLOTTING COV AND SITES AND AND B BACK INTO THE EXTRAP FUNCTION
-
-
 library(spatstat)
 library(ggplot2)
 library(dplyr)
@@ -11,6 +8,19 @@ library(terra)
 library(purrr)
 library(readr)
 
+
+# OUTPUT FOLDER & SCENARIO NAME -------------------------------------------
+
+outpath <- file.path(getwd(), "output")
+
+scenario_name = "Test_Sep_3"
+
+# Make dir if not already there
+if(!dir.exists(file.path(outpath, scenario_name))) {
+  
+  dir.create(file.path(outpath, scenario_name), recursive = TRUE)
+  
+}
 
 # PARAMETERS --------------------------------------------------------------
 
@@ -59,7 +69,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 1
+nreps <- 10
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
@@ -75,10 +85,10 @@ run_setup_func <- function(){
   source("1.Simulate_Covariates.R")
   
   # Set autocorrelation range Cov1
-  range_cov1 <- 10 # Maximum range (raster units) of spatial autocorrelation
+  range_cov1 <<- 10 # Maximum range (raster units) of spatial autocorrelation
   
   # Set autocorrelation range Cov2
-  range_cov2 <- 100 # Maximum range (raster units) of spatial autocorrelation
+  range_cov2 <<- 100 # Maximum range (raster units) of spatial autocorrelation
   
   print("Simulating new cov")
   
@@ -95,11 +105,13 @@ run_setup_func <- function(){
   
   source("2.Simulate_Latent_Distribution.R")
   
-  beta0 <- 6 # Intercept
-  beta1 <- 0.5 # Coefficient for cov 1
-  beta2 <- 0.1 # Coefficient for cov 2
+  beta0 <<- 6 # Intercept
+  beta1 <<- 0.5 # Coefficient for cov 1
+  beta2 <<- 0.1 # Coefficient for cov 2
   
-  scal <- 0.2 # Scale parameter (range of spatial effect)
+  scal <<- 0.2 # Scale parameter (range of spatial effect)
+  
+  response.type <<- "linear"
   
   print("Simulating new latent distribution")
   
@@ -111,7 +123,7 @@ run_setup_func <- function(){
                                       cov1.mat = cov.list$cov1.mat,
                                       cov2.mat = cov.list$cov2.mat,
                                       cov1.df = cov.list$cov1.df,
-                                      response = "linear",
+                                      response.type = response.type,
                                       plot.mu = FALSE,
                                       plot.lg.s = FALSE)
   
@@ -122,8 +134,8 @@ run_setup_func <- function(){
   
   # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
   # NOTE - must be smaller than total cell number in x y directions
-  rast_cellsA <- c(50, 50)
-  rast_cellsB <- c(50, 50)
+  rast_cellsA <<- c(50, 50)
+  rast_cellsB <<- c(50, 50)
   
   print("Simulating environmental extrapolation")
   
@@ -139,6 +151,48 @@ run_setup_func <- function(){
                                      covs = cov.list$covs,
                                      reps.setup.list = reps.setup.list)
   
+  extrap_type <- run.extrap.list$extrap.type
+  
+  # Create the directory structure
+  if(!dir.exists(file.path(outpath, scenario_name, extrap_type))) {
+    
+    dir.create(file.path(outpath, scenario_name, extrap_type), recursive = TRUE)
+    
+  }
+  
+  # Create a subfolder for each replicate
+  rep_id <- length(reps.setup.list[[extrap_type]]) + 1
+  rep_path <- file.path(outpath, scenario_name, extrap_type, paste0("Rep_", rep_id))
+  
+  if(!dir.exists(rep_path)) {
+    
+    dir.create(rep_path, recursive = T)
+  }
+  
+  
+  # If it says to plot the covariates
+  if(length(cov.list$covs.plot) != 0) {
+    
+    # Save the covariates plot
+    ggsave(file.path(rep_path, "covariates_plot.png"), cov.list$covs.plot)
+    
+  }
+  
+  # If it says to plot the mu distribution
+  if(length(latent.list$mu.plot) != 0) {
+    
+    # Save the covariates plot
+    ggsave(file.path(rep_path, "mu_plot.png"), latent.list$mu.plot)
+    
+  }
+  
+  # If it says to plot the latent distribution
+  if(length(latent.list$lg.s.plot) != 0) {
+    
+    # Save the covariates plot
+    ggsave(file.path(rep_path, "mu_plot.png"), latent.list$lg.s.plot)
+    
+  }
   
   # Return the list of replicates
   reps.setup.list[[run.extrap.list$extrap.type]] <- c(reps.setup.list[[run.extrap.list$extrap.type]], list(list(cov.list = cov.list, latent.list = latent.list, extrap.reps.out = run.extrap.list$extrap.reps.out)))
@@ -242,15 +296,72 @@ reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
                                   distributionFormula = distributionFormula)
 
 
+
+# 6b. Save Scenario Information -------------------------------------------
+
+scenario_info.df <- tibble(scenario_name = scenario_name,
+                               nreps = nreps,
+                               range_cov1 = range_cov1,
+                               range_cov2 = range_cov2,
+                               beta0 = beta0,
+                               beta1 = beta1,
+                               beta2 = beta2,
+                               scal = scal,
+                               response.type = response.type,
+                               rast_cellsA = rast_cellsA[1],
+                               rast_cellsB = rast_cellsB[1],
+                               prior.mean = prior.mean,
+                               int.sd = int.sd,
+                               other.sd = other.sd,
+                               prior.range = paste0(as.character(prior.range[1]), "_", as.character(prior.range[2])),
+                               prior.space.sigma = paste0(as.character(prior.space.sigma[1]), "_", as.character(prior.space.sigma[2])),
+                               max.n = paste0(as.character(max.n[1]), "_", as.character(max.n[2])),
+                               dep.range = NA,
+                               expans.mult = expans.mult,
+                               max.edge = NA,
+                               cutoff = NA,
+                               offset = NA)
+
+write_csv(scenario_info.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name ,"_Info.csv"))
+                               
+
+# 6C. Save Replicate Information ------------------------------------------
+
+# Get the names of the extrap types for indexing
+extrap_names <- names(reps.setup.list)
+
+for(extrap.type in seq_along(reps.setup.list)) {
+  
+  # Extract the name (e.g., "Low") for indexing from the names list
+  name <- extrap_names[extrap.type]
+  
+  for(rep in seq_along(reps.setup.list[[name]])) {
+    
+    # Get path for saving
+    rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
+    
+    replicate_info.df <- data.frame(
+      scenario_name = scenario_name,
+      extrap.type = name,
+      rep = rep,
+      n_po_gridA = reps.setup.list[[name]][[rep]]$n_po_gridA,
+      n_presence_gridA = reps.setup.list[[name]][[rep]]$n_presence_gridA,
+      n_absence_gridA = reps.setup.list[[name]][[rep]]$n_absence_gridA)
+    
+    write_csv(replicate_info.df, paste0(rep_path, "/Replicate_Info_Scenario_", scenario_name, "_Rep_", name, "_", rep, ".csv"))
+    
+  }
+  
+}
+
+
 # 7. Extract Model Results ------------------------------------------------
 
 source("7.Extract_Model_Results.R")
 
 extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list)
 
-outpath <- getwd()
-
-write_csv(extrap.scenario.df, paste0(outpath, "/output/Summary_Extrap_PO_INT_PA.no.bias.no.GRF.csv"))
+write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary.csv"))
 
 
 # 8. Make Truth -----------------------------------------------------------
@@ -278,11 +389,38 @@ true.validation.df <- validation_func(reps.setup.list = reps.setup.list)
 
 source("11.Plot_Validation_True_Intensity.R")
 
-plot_validation_func(true.validation.df = true.validation.df)  
+plot_validation_func(true.validation.df = true.validation.df,
+                     save = TRUE,
+                     outpath = outpath,
+                     scenario_name = scenario_name)  
 
 
 # 12. Plot Model Outputs --------------------------------------------------
 
 source("12.Plot_Model_Outputs.R")
+# 
+# plot_residuals_func(reps.setup.list = reps.setup.list,
+#                     outpath = outpath,
+#                     scenario_name = scenario_name)
 
-plot_model_outputs_func(reps.setup.list = reps.setup.list)
+
+# 12B. Plot Data  ---------------------------------------------------------
+# If I want to plot the Presence-Absence and Presence-Only data
+
+source("12B.Plot_Data.R")
+
+plot_data_func(reps.setup.list = reps.setup.list,
+               outpath = outpath,
+               scenario_name = scenario_name)
+
+
+# 12C. Plot Predictions ---------------------------------------------------
+
+source("12C.Plot_Predictions.R")
+
+plot_predictions_func(reps.setup.list = reps.setup.list,
+                      pred.type = c("link"),
+                      outpath = outpath,
+                      scenario_name = scenario_name)
+
+
