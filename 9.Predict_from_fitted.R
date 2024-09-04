@@ -35,7 +35,7 @@ predict_from_fitted_func <- function(reps.setup.list) {
         if(type == "PO.no.GRF") { # If models are PO, use PO intercept
           
           # Had to add the [[1]] here because the summary is always list of length 1
-          mod[[1]]$preds.siteB <- predict(mod[[1]],
+          mod[[1]]$preds.link.siteB <- predict(mod[[1]],
                                           covars = cov.rep,
                                           S = 50, 
                                           intercept.terms = "PO_Intercept",
@@ -48,7 +48,7 @@ predict_from_fitted_func <- function(reps.setup.list) {
         } else { # If models are PA, use PA intercept
           
           # Had to add the [[1]] here because the summary is always list of length 1
-          mod[[1]]$preds.siteB <- predict(mod[[1]],
+          mod[[1]]$preds.link.siteB <- predict(mod[[1]],
                                           covars = cov.rep,
                                           S = 50, 
                                           intercept.terms = "PA_Intercept",
