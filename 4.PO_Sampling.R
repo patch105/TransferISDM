@@ -34,7 +34,9 @@ po_sampling_func <- function(reps.setup.list) {
         ]
         
         return(list(PO_GridA = po.rand.gridA, 
-                    PO_GridB = po.rand.gridB))
+                    PO_GridB = po.rand.gridB,
+                    n_po_gridA = length(po.rand.gridA),
+                    n_po_gridB = length(po.rand.gridB)))
         
         }
        
