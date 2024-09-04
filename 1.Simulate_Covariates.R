@@ -111,8 +111,6 @@ sim_covariates_func <- function(plot,
     
     covs.plot <- ggarrange(c1, c2)
     
-    # ggsave(plot = covs.plot, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
-    
     cov.list <- append(cov.list, list(covs.plot = covs.plot))
     
   }
