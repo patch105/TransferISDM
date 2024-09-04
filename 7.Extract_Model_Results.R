@@ -1,4 +1,3 @@
-## TO DO - NEED TO CALL MODELS BY NAME NOT BY 1:3, WHAT IF I HAD PO AND PA AND NO INTEGRATED? NAMES WOULD BE WRONG?
 
 # 7. Extract Model Results ------------------------------------------------
 
