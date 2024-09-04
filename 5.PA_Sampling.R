@@ -145,7 +145,13 @@ pa_sampling_func <- function(reps.setup.list) {
       pa_a_df <- as.data.frame(pa_a, xy = TRUE) %>% 
         mutate(area = dom_a_resE * dom_a_resN)
       
-      return(list(pa_a_df = pa_a_df))
+      return(list(pa_a_df = pa_a_df, 
+                  PA_grid_size = rast_cellsA, 
+                  PA_a_res = PA_a_res,
+                  n_presence_gridA = sum(pa_a_df$presence == 1),
+                  n_absence_gridA = sum(pa_a_df$presence == 0),
+                  PA.rand.gridA = PA.rand.gridA, # Need these last two for plotting
+                  poforPA.rand.gridA = poforPA.rand.gridA))
       
     })
     
