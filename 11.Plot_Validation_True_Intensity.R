@@ -3,7 +3,10 @@ library(ggpubr)
 
 # 11. Plot Validation True Intensity --------------------------------------
 
-plot_validation_func <- function(true.validation.df) {
+plot_validation_func <- function(true.validation.df,
+                                 save = FALSE,
+                                 outpath,
+                                 scenario_name) {
   
   # Plot the validation
   
@@ -31,6 +34,8 @@ plot_validation_func <- function(true.validation.df) {
     scale_fill_manual(values = c("Integrated.no.GRF" = "purple", "PO.no.GRF" = "skyblue", "PA.no.GRF" = "orange")) +
     theme_bw()
   
+  ## Smaller values of interval score are better
+  
   Int.score.mean <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = Mean.Int.Score, fill = mod.type)) +
     geom_boxplot() +
@@ -57,14 +62,16 @@ plot_validation_func <- function(true.validation.df) {
   
   print(cor)
   
-  ## Smaller values of interval score are better
-  
-  # ggsave(plot = p1, filename = paste0("output/Extrap_10_rep_PO_ISDM_RMSE_MAE_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
-  # 
-  # ggsave(plot = p2, filename = paste0("output/Extrap_10_rep_PO_ISDM_Int_Score_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
-  # 
-  # ggsave(plot = cor, filename = paste0("output/Extrap_10_rep_PO_ISDM_COR_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
-  # 
+  if(save == TRUE) {
+    
+    ggsave(plot = p1, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_RMSE_MAE_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    ggsave(plot = p2, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Int_Score_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    ggsave(plot = cor, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_COR_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
 
+
+  }
+  
   
 }
