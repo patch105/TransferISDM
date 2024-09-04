@@ -129,7 +129,6 @@ run_model_func <- function(prior.mean,
 
 # Presence-Absence Model Fitting - no GRF ---------------------------------
       
-      # m.PA <- list()
       m.PA.no.GRF <- isdm(observationList = list(PAdat = PA_fit), 
                    covars = cov.rep,
                    mesh = mesh.default,
@@ -142,7 +141,6 @@ run_model_func <- function(prior.mean,
       
 # Presence-Absence Model Fitting - with GRF ---------------------------------
       
-      # m.PA <- list()
       # m.PA <- isdm(observationList = list(PAdat = PA_fit), 
       #              covars = cov.rep,
       #              mesh = mesh.default,
