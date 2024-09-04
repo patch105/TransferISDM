@@ -3,16 +3,16 @@
 # Simulate Latent Distribution --------------------------------------------
 
 sim_latent_dist_func <- function(beta0,
-                                      beta1,
-                                      beta2,
-                                      scal, 
-                                      cov1,
-                                      cov1.mat,
-                                      cov2.mat,
-                                      cov1.df,
-                                      response,
-                                      plot.mu,
-                                      plot.lg.s) {
+                                 beta1,
+                                 beta2,
+                                 scal, 
+                                 cov1,
+                                 cov1.mat,
+                                 cov2.mat,
+                                 cov1.df,
+                                 response.type = "linear",
+                                 plot.mu = FALSE,
+                                 plot.lg.s = FALSE) {
   
   var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
   nu <- 1 # Smoothness parameter - ONLY FOR MATERN
@@ -24,7 +24,7 @@ sim_latent_dist_func <- function(beta0,
   
   # Can do with one or two covariates
   
-  if(response == "linear") {
+  if(response.type == "linear") {
     
     fe <- beta0 + beta1*cov1.mat[, "cov"] + beta2*cov2.mat[, "cov"]
     
