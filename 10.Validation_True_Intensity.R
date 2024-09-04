@@ -34,12 +34,12 @@ validation_func <- function(reps.setup.list) {
         mod <- models_df[[i, "Model"]]
         
         # Pull out the mean intensity prediction for each cell
-        mean.int.pred <- mod[[1]]$preds$field$Mean
+        mean.int.pred <- mod[[1]]$preds.link.siteB$field$Mean
         
         # Pull out the lower and upper bounds of the prediction
-        lower.int.pred <- mod[[1]]$preds$field$Lower
+        lower.int.pred <- mod[[1]]$preds.link.siteB$field$Lower
         
-        upper.int.pred <- mod[[1]]$preds$field$Upper
+        upper.int.pred <- mod[[1]]$preds.link.siteB$field$Upper
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
