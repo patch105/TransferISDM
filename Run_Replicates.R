@@ -403,6 +403,14 @@ source("12.Plot_Model_Outputs.R")
 #                     outpath = outpath,
 #                     scenario_name = scenario_name)
 
+plot_parameter_recovery_func(reps.setup.list = reps.setup.list,
+                             outpath = outpath,
+                             scenario_name = scenario_name,
+                             extrap.scenario.df = extrap.scenario.df,
+                             save = TRUE,
+                             beta1 = beta1,
+                             beta2 = beta2,
+                             beta0 = beta0)
 
 # 12B. Plot Data  ---------------------------------------------------------
 # If I want to plot the Presence-Absence and Presence-Only data

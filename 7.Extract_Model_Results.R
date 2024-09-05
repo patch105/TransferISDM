@@ -39,9 +39,32 @@ extract_model_results_func <- function(reps.setup.list) {
           beta1_975 = mod.summary[[1]]$DISTRIBUTION[[5]][1],
           beta2_25 = mod.summary[[1]]$DISTRIBUTION[[3]][2],
           beta2_975 = mod.summary[[1]]$DISTRIBUTION[[5]][2],
-          marg_lik = mod.summary[[1]]$marg.lik
+          PO_intercept = NA,
+          PO_intercept_25 = NA,
+          PO_intercept_975 = NA,
+          PA_intercept = NA,
+          PA_intercept_25 = NA,
+          PA_intercept_975 = NA,
+           marg_lik = mod.summary[[1]]$marg.lik
         )
         
+          # If the model name contains PO or Integrated, save the PO intercept
+        if(grepl("PO", models_df[i, "Mod.type"], fixed = T) | grepl("Integrated", models_df[i, "Mod.type"], fixed = T)) {
+
+          results_list[[length(results_list)]]$PO_intercept <- mod.summary[[1]]$PO_BIAS$mean
+          results_list[[length(results_list)]]$PO_intercept_25 <- mod.summary[[1]]$PO_BIAS[[3]]
+          results_list[[length(results_list)]]$PO_intercept_975 <- mod.summary[[1]]$PO_BIAS[[5]]
+          
+        }  
+          
+          if(grepl("PA", models_df[i, "Mod.type"], fixed = T) | grepl("Integrated", models_df[i, "Mod.type"], fixed = T)) {
+            
+            results_list[[length(results_list)]]$PA_intercept <- mod.summary[[1]]$PA_ARTEFACT$mean
+            results_list[[length(results_list)]]$PA_intercept_25 <- mod.summary[[1]]$PA_ARTEFACT[[3]]
+            results_list[[length(results_list)]]$PA_intercept_975 <- mod.summary[[1]]$PA_ARTEFACT[[5]]
+            
+          }
+          
       }
       
       

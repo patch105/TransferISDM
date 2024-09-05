@@ -56,12 +56,6 @@ plot_validation_func <- function(true.validation.df,
   
   p2 <- ggarrange(Int.score.mean, Int.score.sum, common.legend = T,  ncol = 2, nrow = 1)
   
-  print(p1) 
-  
-  print(p2) 
-  
-  print(cor)
-  
   if(save == TRUE) {
     
     ggsave(plot = p1, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_RMSE_MAE_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
@@ -71,7 +65,11 @@ plot_validation_func <- function(true.validation.df,
     ggsave(plot = cor, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_COR_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
 
 
-  }
+  } else{print(p1) 
+    
+    print(p2) 
+    
+    print(cor)}
   
   
 }
