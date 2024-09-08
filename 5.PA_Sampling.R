@@ -1,9 +1,9 @@
 
-### TO DO: ADD BACK IN PLOTTING FOR RANDOM GRID
 
 # 5. PA Sampling ----------------------------------------------------------
 
-pa_sampling_func <- function(reps.setup.list) {
+pa_sampling_func <- function(reps.setup.list,
+                             new.latent = FALSE) {
   
   PA.data <- imap(reps.setup.list, function(extrap.type, extrap.name) {
     
@@ -17,9 +17,18 @@ pa_sampling_func <- function(reps.setup.list) {
       rand.gridA <- rep$extrap.reps.out$rand.gridA
       rand.gridB <- rep$extrap.reps.out$rand.gridB
       
-      # Make new realisation of presences from LGCP for PA ----------------------
-      
-      presenceforPA <- rpoispp(lambda = attr(rep$latent.list$lg.s, 'Lambda') )
+      if(new.latent == TRUE) {
+        
+        # Make new realisation of presences from LGCP for PA ----------------------
+        
+        presenceforPA <- rpoispp(lambda = attr(rep$latent.list$lg.s, 'Lambda') )
+        
+      } else {
+        
+        # Otherwise rename presence data
+        presenceforPA <- rep$extrap.reps.out$PO_GridA
+        
+      }
       
       poforPA <- cbind(x = presenceforPA$x, y = presenceforPA$y)
       
