@@ -13,7 +13,7 @@ library(readr)
 
 outpath <- file.path(getwd(), "output")
 
-scenario_name = "Test_Sep_3"
+scenario_name = "Test_Sep_5_IPP"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
@@ -69,7 +69,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 1
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
@@ -125,7 +125,8 @@ run_setup_func <- function(){
                                       cov1.df = cov.list$cov1.df,
                                       response.type = response.type,
                                       plot.mu = FALSE,
-                                      plot.lg.s = FALSE)
+                                      plot.lg.s = FALSE,
+                                      latent.type = "ipp")
   
   
   # Simulate Environmental Extrapolation ------------------------------------
@@ -253,7 +254,8 @@ while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < n
 
 source("5.PA_Sampling.R")
 
-reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list)
+reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list,
+                                    new.latent = FALSE) # If you want to make a separate realisation of the latent state for the PA data set to true
 
 
 
@@ -375,24 +377,24 @@ reps.setup.list <- make_truth_func(reps.setup.list = reps.setup.list)
 
 source("9.Predict_from_fitted.R")
 
-reps.setup.list <- predict_from_fitted_func(reps.setup.list = reps.setup.list)
+reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list)
 
 
 # 10. Validation true intensity -------------------------------------------
 
 source("10.Validation_True_Intensity.R")
 
-true.validation.df <- validation_func(reps.setup.list = reps.setup.list)
+true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
 
 
 # 11. Plot validation true intensity --------------------------------------
 
 source("11.Plot_Validation_True_Intensity.R")
 
-plot_validation_func(true.validation.df = true.validation.df,
-                     save = TRUE,
-                     outpath = outpath,
-                     scenario_name = scenario_name)  
+plot_validation_SiteB_func(true.validation.df = true.validation.df,
+                           save = TRUE,
+                           outpath = outpath,
+                           scenario_name = scenario_name)  
 
 
 # 12. Plot Model Outputs --------------------------------------------------
@@ -426,9 +428,29 @@ plot_data_func(reps.setup.list = reps.setup.list,
 
 source("12C.Plot_Predictions.R")
 
-plot_predictions_func(reps.setup.list = reps.setup.list,
-                      pred.type = c("link"),
-                      outpath = outpath,
-                      scenario_name = scenario_name)
+plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
+                            pred.type = c("link"),
+                            outpath = outpath,
+                            scenario_name = scenario_name)
 
+
+
+# OPTIONAL - predict to and validate Site A -------------------------------
+
+# *Optional* - predict to Site A
+
+reps.setup.list <- predict_from_fitted_SiteA_func(reps.setup.list = reps.setup.list)
+
+# *Optional* - run validation for Site A
+true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list)
+
+plot_validation_SiteA_func(true.validation.df = true.validation.SiteA.df,
+                           save = TRUE,
+                           outpath = outpath,
+                           scenario_name = scenario_name)
+
+plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
+                            pred.type = c("link"),
+                            outpath = outpath,
+                            scenario_name = scenario_name)
 
