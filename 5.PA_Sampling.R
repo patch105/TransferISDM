@@ -26,7 +26,7 @@ pa_sampling_func <- function(reps.setup.list,
       } else {
         
         # Otherwise rename presence data
-        presenceforPA <- rep$extrap.reps.out$PO_GridA
+        presenceforPA <- rep$latent.list$lg.s
         
       }
       
