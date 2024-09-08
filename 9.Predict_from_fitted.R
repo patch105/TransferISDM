@@ -32,28 +32,28 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list) {
         
         type <- models_df[[i, "Mod.type"]]
         
-        if(type == "PO.no.GRF") { # If models are PO, use PO intercept
+        if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
           
           # Had to add the [[1]] here because the summary is always list of length 1
           mod[[1]]$preds.link.siteB <- predict(mod[[1]],
-                                          covars = cov.rep,
-                                          S = 50, 
-                                          intercept.terms = "PO_Intercept",
-                                          type = "link",
-                                          includeRandom = F)
+                                               covars = cov.rep,
+                                               S = 50, 
+                                               intercept.terms = "PO_Intercept",
+                                               type = "link",
+                                               includeRandom = F)
           
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod
           
-        } else { # If models are PA, use PA intercept
+        } else { # If models are PA or Integrated, use PA intercept
           
           # Had to add the [[1]] here because the summary is always list of length 1
           mod[[1]]$preds.link.siteB <- predict(mod[[1]],
-                                          covars = cov.rep,
-                                          S = 50, 
-                                          intercept.terms = "PA_Intercept",
-                                          type = "link",
-                                          includeRandom = F)
+                                               covars = cov.rep,
+                                               S = 50, 
+                                               intercept.terms = "PA_Intercept",
+                                               type = "link",
+                                               includeRandom = F)
           
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod
@@ -64,7 +64,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list) {
       # Save the updated models dataframe back to the original list
       reps.setup.list[[name]][[rep]]$models <- models_df
       
-        }
+    }
   }
   
   return(reps.setup.list)
@@ -104,7 +104,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list) {
         
         type <- models_df[[i, "Mod.type"]]
         
-        if(type == "PO.no.GRF") { # If models are PO, use PO intercept
+        if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
           
           # Had to add the [[1]] here because the summary is always list of length 1
           mod[[1]]$preds.link.siteA <- predict(mod[[1]],
@@ -117,7 +117,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list) {
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod
           
-        } else { # If models are PA, use PA intercept
+        } else { # If models are PA or Integrated, use PA intercept
           
           # Had to add the [[1]] here because the summary is always list of length 1
           mod[[1]]$preds.link.siteA <- predict(mod[[1]],
@@ -143,5 +143,5 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list) {
   
 }
 
-  
-  
+
+
