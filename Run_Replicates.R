@@ -25,7 +25,7 @@ if(!dir.exists(file.path(outpath, scenario_name))) {
 # PARAMETERS --------------------------------------------------------------
 
 # Set the seed for all
-seed <- 50
+seed <- 20
 # set.seed(50)
 
 # DOMAIN SETUP ------------------------------------------------------------
@@ -69,7 +69,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 1
+nreps <- 10
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
@@ -112,6 +112,7 @@ run_setup_func <- function(){
   scal <<- 0.2 # Scale parameter (range of spatial effect)
   
   response.type <<- "linear"
+  latent.type <<- "ipp"
   
   print("Simulating new latent distribution")
   
@@ -126,7 +127,7 @@ run_setup_func <- function(){
                                       response.type = response.type,
                                       plot.mu = FALSE,
                                       plot.lg.s = FALSE,
-                                      latent.type = "ipp")
+                                      latent.type = latent.type)
   
   
   # Simulate Environmental Extrapolation ------------------------------------
@@ -282,6 +283,9 @@ doPlot <- FALSE
 # Set the distribution formula for the model
 distributionFormula <- ~0 + cov1 + cov2 # Linear w two covs
 
+# Set the type of models to run
+mod.type = "non-spatial"
+
 reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
                                   prior.mean = prior.mean,
                                   int.sd = int.sd, 
@@ -295,34 +299,36 @@ reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
                                   cutoff = cutoff,
                                   offset = offset,
                                   doPlot = doPlot,
-                                  distributionFormula = distributionFormula)
+                                  distributionFormula = distributionFormula,
+                                  mod.type = mod.type)
 
 
 
 # 6b. Save Scenario Information -------------------------------------------
 
 scenario_info.df <- tibble(scenario_name = scenario_name,
-                               nreps = nreps,
-                               range_cov1 = range_cov1,
-                               range_cov2 = range_cov2,
-                               beta0 = beta0,
-                               beta1 = beta1,
-                               beta2 = beta2,
-                               scal = scal,
-                               response.type = response.type,
-                               rast_cellsA = rast_cellsA[1],
-                               rast_cellsB = rast_cellsB[1],
-                               prior.mean = prior.mean,
-                               int.sd = int.sd,
-                               other.sd = other.sd,
-                               prior.range = paste0(as.character(prior.range[1]), "_", as.character(prior.range[2])),
-                               prior.space.sigma = paste0(as.character(prior.space.sigma[1]), "_", as.character(prior.space.sigma[2])),
-                               max.n = paste0(as.character(max.n[1]), "_", as.character(max.n[2])),
-                               dep.range = NA,
-                               expans.mult = expans.mult,
-                               max.edge = NA,
-                               cutoff = NA,
-                               offset = NA)
+                           nreps = nreps,
+                           range_cov1 = range_cov1,
+                           range_cov2 = range_cov2,
+                           beta0 = beta0,
+                           beta1 = beta1,
+                           beta2 = beta2,
+                           scal = scal,
+                           latent.type = latent.type,
+                           response.type = response.type,
+                           rast_cellsA = rast_cellsA[1],
+                           rast_cellsB = rast_cellsB[1],
+                           prior.mean = prior.mean,
+                           int.sd = int.sd,
+                           other.sd = other.sd,
+                           prior.range = paste0(as.character(prior.range[1]), "_", as.character(prior.range[2])),
+                           prior.space.sigma = paste0(as.character(prior.space.sigma[1]), "_", as.character(prior.space.sigma[2])),
+                           max.n = paste0(as.character(max.n[1]), "_", as.character(max.n[2])),
+                           dep.range = NA,
+                           expans.mult = expans.mult,
+                           max.edge = NA,
+                           cutoff = NA,
+                           offset = NA)
 
 write_csv(scenario_info.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name ,"_Info.csv"))
                                
