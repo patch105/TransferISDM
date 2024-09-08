@@ -12,7 +12,8 @@ sim_latent_dist_func <- function(beta0,
                                  cov1.df,
                                  response.type = "linear",
                                  plot.mu = FALSE,
-                                 plot.lg.s = FALSE) {
+                                 plot.lg.s = FALSE,
+                                 latent.type) {
   
   var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
   nu <- 1 # Smoothness parameter - ONLY FOR MATERN
@@ -33,12 +34,25 @@ sim_latent_dist_func <- function(beta0,
   mu <- cov1.df %>% mutate(cov = fe)
   mu <- spatstat.geom::as.im(mu)
   
-  # Create LGCP with environmental covariate
-  # lg.s <- rLGCP('exp', mu = mu,
-  #               var=var, scale=scal)
+  if(latent.type == "lgcp") {
+    
+    # Create LGCP with environmental covariate
+    # lg.s <- rLGCP('exp', mu = mu,
+    #               var=var, scale=scal)
+    
+    lg.s <- rLGCP('matern', mu = mu,
+                  var=var, scale=scal, nu=nu)
+    
+  } 
   
-  lg.s <- rLGCP('matern', mu = mu,
-                var=var, scale=scal, nu=nu)
+  if(latent.type == "ipp") {
+    
+    # Create IPP with environmental covariate
+    lg.s <- rpoispp(mu)
+   
+  }
+  
+  
   
   latent.list <- list(mu = mu, lg.s = lg.s) 
   
