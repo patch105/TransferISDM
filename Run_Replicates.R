@@ -69,7 +69,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 2
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())

@@ -108,32 +108,68 @@ pa_sampling_func <- function(reps.setup.list,
       colnames(pa_a) <- c("x", "y", "presence")
       pa_a <- terra::rast(pa_a)
       
-      # find species coordinates from underlying LGCP IN GRID A that are in region a
-      inbox_idx_a <- which(poforPA.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
-                             poforPA.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
-                             poforPA.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
-                             poforPA.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
       
+      print(paste0("length of poforPA.rand.gridA is: ",length(poforPA.rand.gridA)))
       
-      po_a <- poforPA.rand.gridA[inbox_idx_a, ]
-      
-      # If there are no presences from the presence-only data in the PA grid
+      # If there are no presences at all in the presence-only data
       # Save an empty dataframe
-      if(length(po_a) == 0) {
+      if(length(poforPA.rand.gridA) == 0) {
+        
         print("No PO in PA grid A")
         po_a_df <- data.frame(x = NA, y = NA)
         
-      }
-      
-      # If there's only one PO location, have to adjust so that it formats into dataframe correctly
-      if(length(po_a) == 2) {
-        po_a_df <- data.frame(x = po_a[[1]], y = po_a[[2]])
-        
       } else {
         
-        po_a_df <- as.data.frame(po_a)
+        # If there's only one PO point then poforPA turns into a named vector (means it can't be indexed like a dataframe)
+        if(length(poforPA.rand.gridA) == 2) {
+          
+          # Find species coordinates from underlying LGCP IN GRID A that are in region a
+          inbox_idx_a <- which(poforPA.rand.gridA["x"] >= dom_a_bbox["east_min"] &
+                                 poforPA.rand.gridA["x"] <= dom_a_bbox["east_max"] &
+                                 poforPA.rand.gridA["y"] >= dom_a_bbox["north_min"] &
+                                 poforPA.rand.gridA["y"] <= dom_a_bbox["north_max"])
+          
+        } 
+        
+        # Find species coordinates from underlying LGCP IN GRID A that are in region a
+        if(length(poforPA.rand.gridA) > 2) {
+          
+          inbox_idx_a <- which(poforPA.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
+                                 poforPA.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
+                                 poforPA.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
+                                 poforPA.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
+          
+        }
+        
+        
+        # If there are no presences from the presence-only data in the PA grid
+        # Save an empty dataframe
+        if(length(inbox_idx_a) < 2) {
+          print("No PO in PA grid A")
+          po_a_df <- data.frame(x = NA, y = NA)
+          
+        }
+        
+        # If there's only one PO point then poforPA turns into a named vector (means it can't be indexed like a dataframe)
+        if(length(inbox_idx_a) == 2) {
+          
+          po_a <- poforPA.rand.gridA[inbox_idx_a, ]
+          
+          po_a_df <- data.frame(x = po_a[[1]], y = po_a[[2]])
+          
+        }
+        
+        if(length(inbox_idx_a) > 2) {
+          
+          po_a <- poforPA.rand.gridA[inbox_idx_a, ]
+          po_a_df <- as.data.frame(po_a)
+          
+        }
         
       }
+      
+      
+      
       
       # Debugging output for po_a_df
       print("po_a_df column names:")
