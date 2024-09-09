@@ -113,7 +113,7 @@ pa_sampling_func <- function(reps.setup.list,
       
       # If there are no presences at all in the presence-only data
       # Save an empty dataframe
-      if(length(poforPA.rand.gridA) == 0) {
+      if(length(poforPA.rand.gridA) < 2) {
         
         print("No PO in PA grid A")
         po_a_df <- data.frame(x = NA, y = NA)
@@ -209,3 +209,56 @@ pa_sampling_func <- function(reps.setup.list,
   
   
 }
+
+
+
+# # CHECK IF PO DATA IN PA SITE A GRID --------------------------------------
+# 
+# po_pa_checking_func <- function(reps.setup.list) {
+#   
+#   # Initialise a counter for removed reps
+#   removed_counts_pa <- c(Low = 0, Moderate = 0, High = 0)
+#   
+#   # Iterate through each Extrap type
+#   for (extrap.type in c("Low", "Moderate", "High")) {
+#     
+#     # Get the corresponding sub-list (Low, Moderate, or High)
+#     reps_list <- reps.setup.list[[extrap.type]]
+#     
+#     remove_index <- c()
+#     
+#     # Iterate through each rep within the sub-list
+#     for (i in seq_along(reps_list)) {
+#       
+#       # Check if PO_grid in the rep has no PO data or if there's any PO data in the PA sampling grid A
+#       if (length(reps_list[[i]]$PO_GridA) < 2 | reps_list[[i]]$n_presence_gridA == 0) {
+#         
+#         # Save index
+#         remove_index <- c(remove_index, i)
+#         
+#       }
+#     }
+#     
+#     # Remove the reps with 0 length PO_GridA or PO_GridB
+#     if (length(remove_index) > 0) {
+#       
+#       reps_list <- reps_list[-remove_index]
+#       
+#       # Count the number of removed reps for this extrap.type
+#       removed_counts_pa[extrap.type] <- length(remove_index)
+#     }
+#     
+#     # Assign the updated list back to the original structure
+#     reps.setup.list[[extrap.type]] <- reps_list
+#   }
+#   
+#   # Print the number of removed reps for each extrap.type
+#   for (extrap.type in names(removed_counts_pa)) {
+#     cat(removed_counts_pa[extrap.type], "reps removed from", extrap.type, "\n")
+#   }
+#   
+#   return(list(reps.setup.list = reps.setup.list, removed_counts_pa = removed_counts_pa)) 
+#   
+# }
+
+
