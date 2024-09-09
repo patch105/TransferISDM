@@ -163,7 +163,7 @@ plot_parameter_recovery_func <- function(reps.setup.list,
     m.lik <- extrap.scenario.df %>% 
       ggplot(aes(x = extrap.type, y = marg_lik, fill = mod.type)) +
       geom_boxplot() +
-      labs(x = "Extrapolation", y = expression(beta[0]), fill = "Model Type") +
+      labs(x = "Extrapolation", y = "Marginal Likelihood", fill = "Model Type") +
       scale_x_discrete(labels = c("Low", "Mod", "High")) +
       scale_fill_manual(values = c("Integrated.no.GRF" = "purple", "PO.no.GRF" = "skyblue", "PA.no.GRF" = "orange")) +
       theme_bw()
@@ -301,7 +301,7 @@ if(mod.type == "spatial") {
   m.lik <- extrap.scenario.df %>% 
     ggplot(aes(x = extrap.type, y = marg_lik, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = expression(beta[0]), fill = "Model Type") +
+    labs(x = "Extrapolation", y = "Marginal Likelihood", fill = "Model Type") +
     scale_x_discrete(labels = c("Low", "Mod", "High")) +
     scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
     theme_bw()
