@@ -13,7 +13,7 @@ library(readr)
 
 outpath <- file.path(getwd(), "output")
 
-scenario_name = "Test_Sep_5_IPP"
+scenario_name = "Testv3"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
@@ -25,7 +25,7 @@ if(!dir.exists(file.path(outpath, scenario_name))) {
 # PARAMETERS --------------------------------------------------------------
 
 # Set the seed for all
-seed <- 20
+seed <- 11
 # set.seed(50)
 
 # DOMAIN SETUP ------------------------------------------------------------
@@ -69,7 +69,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 2
+nreps <- 10
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
@@ -112,7 +112,7 @@ run_setup_func <- function(){
   scal <<- 0.2 # Scale parameter (range of spatial effect)
   
   response.type <<- "linear"
-  latent.type <<- "ipp"
+  latent.type <<- "lgcp" # or "ipp"
   
   print("Simulating new latent distribution")
   
@@ -228,8 +228,8 @@ reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list)
 
 po <- po_checking_func(reps.setup.list)
 
-removed_counts <- po$removed_counts
-reps.setup.list <- po$reps.setup.list
+removed_counts <- po$removed_counts # List with Low = nremoved, Mod = nremoved, High = nremoved
+reps.setup.list <- po$reps.setup.list # List with any reps removed that had no PO 
 
 # Iterate over the setup function until you get to the desired nreps for Low, Moderate, High AND none of them have no PO data anymore
 
@@ -250,14 +250,12 @@ while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < n
 }
 
 
-
 # 5. PA sampling ----------------------------------------------------------
 
 source("5.PA_Sampling.R")
 
 reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list,
                                     new.latent = FALSE) # If you want to make a separate realisation of the latent state for the PA data set to true
-
 
 
 # 6. Run Models -----------------------------------------------------------
@@ -284,7 +282,7 @@ doPlot <- FALSE
 distributionFormula <- ~0 + cov1 + cov2 # Linear w two covs
 
 # Set the type of models to run
-mod.type = "non-spatial"
+mod.type = "spatial"
 
 reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
                                   prior.mean = prior.mean,
@@ -301,6 +299,8 @@ reps.setup.list <- run_model_func(reps.setup.list = reps.setup.list,
                                   doPlot = doPlot,
                                   distributionFormula = distributionFormula,
                                   mod.type = mod.type)
+
+
 
 
 
@@ -338,6 +338,13 @@ write_csv(scenario_info.df, paste0(file.path(outpath, scenario_name), "/Scenario
 # Get the names of the extrap types for indexing
 extrap_names <- names(reps.setup.list)
 
+replicate_info_ALL.df <- data.frame(scenario_name = character(),
+                                extrap.type = character(),
+                                rep = numeric(),
+                                n_po_gridA = numeric(),
+                                n_presence_gridA = numeric(),
+                                n_absence_gridA = numeric())
+
 for(extrap.type in seq_along(reps.setup.list)) {
   
   # Extract the name (e.g., "Low") for indexing from the names list
@@ -358,10 +365,21 @@ for(extrap.type in seq_along(reps.setup.list)) {
     
     write_csv(replicate_info.df, paste0(rep_path, "/Replicate_Info_Scenario_", scenario_name, "_Rep_", name, "_", rep, ".csv"))
     
+    replicate_info_ALL.df <- rbind(replicate_info_ALL.df, replicate_info.df)
   }
   
 }
 
+n_presences_all_reps.df <- replicate_info_ALL.df %>% 
+  group_by(extrap.type) %>% 
+  summarise(mean_n_po_gridA = mean(n_po_gridA),
+            mean_n_presence_gridA = mean(n_presence_gridA),
+            mean_n_absence_gridA = mean(n_absence_gridA),
+            sd_n_po_gridA = sd(n_po_gridA),
+            sd_n_presence_gridA = sd(n_presence_gridA),
+            sd_n_absence_gridA = sd(n_absence_gridA))
+
+write_csv(n_presences_all_reps.df, paste0(file.path(outpath, scenario_name),  "/Scenario_", scenario_name, "_N_Presences_all_reps.csv"))
 
 # 7. Extract Model Results ------------------------------------------------
 
@@ -392,6 +410,7 @@ source("10.Validation_True_Intensity.R")
 
 true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
 
+write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation.csv"))
 
 # 11. Plot validation true intensity --------------------------------------
 
@@ -400,7 +419,8 @@ source("11.Plot_Validation_True_Intensity.R")
 plot_validation_SiteB_func(true.validation.df = true.validation.df,
                            save = TRUE,
                            outpath = outpath,
-                           scenario_name = scenario_name)  
+                           scenario_name = scenario_name,
+                           mod.type = "spatial")  
 
 
 # 12. Plot Model Outputs --------------------------------------------------
@@ -418,7 +438,8 @@ plot_parameter_recovery_func(reps.setup.list = reps.setup.list,
                              save = TRUE,
                              beta1 = beta1,
                              beta2 = beta2,
-                             beta0 = beta0)
+                             beta0 = beta0,
+                             mod.type = mod.type)
 
 # 12B. Plot Data  ---------------------------------------------------------
 # If I want to plot the Presence-Absence and Presence-Only data
@@ -437,7 +458,8 @@ source("12C.Plot_Predictions.R")
 plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
                             pred.type = c("link"),
                             outpath = outpath,
-                            scenario_name = scenario_name)
+                            scenario_name = scenario_name,
+                            mod.type = mod.type)
 
 
 
@@ -449,14 +471,55 @@ reps.setup.list <- predict_from_fitted_SiteA_func(reps.setup.list = reps.setup.l
 
 # *Optional* - run validation for Site A
 true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list)
+                                                  
+
+write_csv(true.validation.SiteA.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_SiteA.csv"))
+
 
 plot_validation_SiteA_func(true.validation.df = true.validation.SiteA.df,
                            save = TRUE,
                            outpath = outpath,
-                           scenario_name = scenario_name)
+                           scenario_name = scenario_name,
+                           mod.type = mod.type)
 
 plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
                             pred.type = c("link"),
                             outpath = outpath,
-                            scenario_name = scenario_name)
+                            scenario_name = scenario_name,
+                            mod.type = mod.type)
 
+
+
+
+# ARCHIVE -----------------------------------------------------------------
+
+# # Checking number of PO and PA and rerunning as necessary -----------------
+# 
+# # If there are any reps with no PO data OR no PO data in PA sampling Grid A, re-run the parts 1,2,3, 4 for those reps
+# 
+# po_pa <- po_pa_checking_func(reps.setup.list)
+# 
+# removed_counts_pa <- po_pa$removed_counts_pa # List with Low = nremoved, Mod = nremoved, High = nremoved
+# reps.setup.list <- po_pa$reps.setup.list # List with any reps removed that had no PO at PA sampling Grid A
+# 
+# 
+# # Iterate over the setup function until you get to the desired nreps for Low, Moderate, High AND none of them have no PO data anymore
+# 
+# while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < nreps | length(reps.setup.list$High) < nreps | sum(removed_counts_pa) != 0) {
+#   
+#   reps.setup.list <- run_setup_func()
+#   
+#   reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list)
+#   
+#   reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list,
+#                                       new.latent = FALSE) # If you want to make a separate realisation of the latent state for the PA data set to true
+#   
+#   # If there are any reps with no PO data, re-run the parts 1,2,3 for those reps
+#   
+#   po_pa <- po_pa_checking_func(reps.setup.list)
+#   
+#   removed_counts_pa <- po_pa$removed_counts_pa
+#   reps.setup.list <- po_pa$reps.setup.list
+#   
+#   
+# }
