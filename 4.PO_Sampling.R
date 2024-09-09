@@ -73,50 +73,50 @@ po_sampling_func <- function(reps.setup.list) {
 
 # If none, need to re-run for that rep.
 po_checking_func <- function(reps.setup.list) {
-  
+
   # Initialise a counter for removed reps
   removed_counts <- c(Low = 0, Moderate = 0, High = 0)
-  
+
   # Iterate through each Extrap type
   for (extrap.type in c("Low", "Moderate", "High")) {
-    
+
     # Get the corresponding sub-list (Low, Moderate, or High)
     reps_list <- reps.setup.list[[extrap.type]]
-    
+
     remove_index <- c()
-    
+
     # Iterate through each rep within the sub-list
     for (i in seq_along(reps_list)) {
-      
+
       # Check if PO_grid in the rep has no PO data
       if (length(reps_list[[i]]$PO_GridA) < 2) {
-        
+
         # Save index
         remove_index <- c(remove_index, i)
-        
+
       }
     }
-    
-    # Remove the reps with 0 length PO_GridA 
+
+    # Remove the reps with 0 length PO_GridA
     if (length(remove_index) > 0) {
-      
+
       reps_list <- reps_list[-remove_index]
-      
+
       # Count the number of removed reps for this extrap.type
       removed_counts[extrap.type] <- length(remove_index)
     }
-    
+
     # Assign the updated list back to the original structure
     reps.setup.list[[extrap.type]] <- reps_list
   }
-  
+
   # Print the number of removed reps for each extrap.type
   for (extrap.type in names(removed_counts)) {
     cat(removed_counts[extrap.type], "reps removed from", extrap.type, "\n")
   }
- 
-  return(list(reps.setup.list = reps.setup.list, removed_counts = removed_counts)) 
-  
+
+  return(list(reps.setup.list = reps.setup.list, removed_counts = removed_counts))
+
 }
 
 
