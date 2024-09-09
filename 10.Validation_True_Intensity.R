@@ -33,8 +33,8 @@ validation_SiteB_func <- function(reps.setup.list) {
         
         mod <- models_df[[i, "Model"]]
         
-        # Pull out the mean intensity prediction for each cell
-        mean.int.pred <- mod[[1]]$preds.link.siteB$field$Mean
+        # Pull out the median posterior intensity prediction for each cell
+        median.int.pred <- mod[[1]]$preds.link.siteB$field$Median
         
         # Pull out the lower and upper bounds of the prediction
         lower.int.pred <- mod[[1]]$preds.link.siteB$field$Lower
@@ -43,12 +43,12 @@ validation_SiteB_func <- function(reps.setup.list) {
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor <- cor(as.vector(mean.int.pred), as.vector(true_log_int.rast.SiteB))
+        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB))
         
-        MAE <- mean(abs(as.vector(mean.int.pred - true_log_int.rast.SiteB)))
+        MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteB)))
         
         RMSE <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteB), 
-                              predicted = as.vector(mean.int.pred))
+                              predicted = as.vector(median.int.pred))
         
         ### Calculating the Interval Score ###
         
@@ -119,8 +119,8 @@ validation_SiteA_func <- function(reps.setup.list) {
         
         mod <- models_df[[i, "Model"]]
         
-        # Pull out the mean intensity prediction for each cell
-        mean.int.pred <- mod[[1]]$preds.link.siteA$field$Mean
+        # Pull out the median intensity prediction for each cell
+        median.int.pred <- mod[[1]]$preds.link.siteA$field$Median
         
         # Pull out the lower and upper bounds of the prediction
         lower.int.pred <- mod[[1]]$preds.link.siteA$field$Lower
@@ -129,12 +129,12 @@ validation_SiteA_func <- function(reps.setup.list) {
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor <- cor(as.vector(mean.int.pred), as.vector(true_log_int.rast.SiteA))
+        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteA))
         
-        MAE <- mean(abs(as.vector(mean.int.pred - true_log_int.rast.SiteA)))
+        MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteA)))
         
         RMSE <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteA), 
-                              predicted = as.vector(mean.int.pred))
+                              predicted = as.vector(median.int.pred))
         
         ### Calculating the Interval Score ###
         
