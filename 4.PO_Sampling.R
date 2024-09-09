@@ -33,10 +33,24 @@ po_sampling_func <- function(reps.setup.list) {
             po[,2] >= ymin(ext(rand.gridB)) & po[,2] <= ymax(ext(rand.gridB)), 
         ]
         
+        # Formatting if there's only one PO point in Grid A or B so that they become dataframes
+        
+        if(length(po.rand.gridA) == 2) {
+          
+          po.rand.gridA <- matrix(po.rand.gridA, ncol = 2, byrow = T)
+          dimnames(po.rand.gridA) <- list(NULL, c("x", "y"))
+        }
+        
+        if(length(po.rand.gridB) == 2) {
+          
+          po.rand.gridB <- matrix(po.rand.gridB, ncol = 2, byrow = T)
+          dimnames(po.rand.gridB) <- list(NULL, c("x", "y"))
+        }
+        
         return(list(PO_GridA = po.rand.gridA, 
                     PO_GridB = po.rand.gridB,
-                    n_po_gridA = length(po.rand.gridA),
-                    n_po_gridB = length(po.rand.gridB)))
+                    n_po_gridA = nrow(po.rand.gridA),
+                    n_po_gridB = nrow(po.rand.gridB)))
         
         }
        
