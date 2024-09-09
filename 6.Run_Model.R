@@ -3,6 +3,10 @@
 
 # 6. Run Model ------------------------------------------------------------
 
+# library(devtools)
+# devtools::install_github( repo="Scott-Foster/RISDM", build_vignettes=FALSE) # Had to do force = T when I wanted to re-load
+                          
+
 library(sf)
 library(RISDM)
 
