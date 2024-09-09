@@ -88,8 +88,8 @@ po_checking_func <- function(reps.setup.list) {
     # Iterate through each rep within the sub-list
     for (i in seq_along(reps_list)) {
       
-      # Check if PO_grid in the rep has length 0
-      if (length(reps_list[[i]]$PO_GridA) == 0 | length(reps_list[[i]]$PO_GridB) == 0) {
+      # Check if PO_grid in the rep has no PO data
+      if (length(reps_list[[i]]$PO_GridA) < 2) {
         
         # Save index
         remove_index <- c(remove_index, i)
@@ -97,7 +97,7 @@ po_checking_func <- function(reps.setup.list) {
       }
     }
     
-    # Remove the reps with 0 length PO_GridA or PO_GridB
+    # Remove the reps with 0 length PO_GridA 
     if (length(remove_index) > 0) {
       
       reps_list <- reps_list[-remove_index]
