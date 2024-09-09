@@ -6,24 +6,17 @@
 plot_predictions_SiteB_func <- function(reps.setup.list,
                                   pred.type = c("link", "intensity", "probability"),
                                   outpath,
-                                  scenario_name) {
+                                  scenario_name,
+                                  mod.type) {
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
-  
-  # # Initialise a list to store mean predictions across replicates
-  # pred_mean_across_reps <- list()
   
   # For every level of extrap type (Low, Mod, High)
   for(extrap.type in seq_along(reps.setup.list)) {
     
     # Extract the name (e.g., "Low") for indexing from the names list
     name <- extrap_names[extrap.type] 
-    
-    # # List to store rasters for each repetition
-    # Integrated.rasts <- list()
-    # PO.rasts <- list()
-    # PA.rasts <- list()
     
     # For every replicate
     for(rep in seq_along(reps.setup.list[[name]])) {
@@ -44,16 +37,16 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
         
         type <- models_df[[i, "Mod.type"]]
         
-        # Pull out the mean intensity prediction for each cell
-        mean.int.pred <- mod[[1]]$preds.link.siteB$field$Mean
-        # mean.int.pred.name <- paste0("mean.int.pred.", type)
+        # Pull out the median intensity prediction for each cell
+        median.int.pred <- mod[[1]]$preds.link.siteB$field$Median
+        median.int.pred.name <- paste0("median.int.pred.", type)
         
         plot.name <- paste0("pred.plot.", type)
         
-          p <- mean.int.pred %>% 
+          p <- median.int.pred %>% 
             as.data.frame(xy = T) %>%  
             ggplot() + 
-            geom_tile(aes(x = x, y = y, fill = Mean)) + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
             scale_fill_viridis() +
             coord_fixed() + 
             theme_bw() + 
@@ -64,7 +57,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
         
           # Save back to main list
           reps.setup.list[[name]][[rep]][[plot.name]] <- p 
-          # reps.setup.list[[name]][[rep]][[mean.int.pred.name]] <- mean.int.pred
+          reps.setup.list[[name]][[rep]][[median.int.pred.name]] <- median.int.pred
 
         
       }
@@ -84,12 +77,27 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
               plot.title = element_text(hjust = 0.5)) +  # Reduce margins
         ggtitle('True log intensity')
       
-      p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.no.GRF +
-        ggtitle('Mean predicted log intensity - Integrated no GRF')
-      p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.no.GRF +
-        ggtitle('Mean predicted log intensity - PO no GRF')
-      p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.no.GRF +
-        ggtitle('Mean predicted log intensity - PA no GRF')
+      if(mod.type == "non-spatial") {
+        
+        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.no.GRF +
+          ggtitle('Median predicted log intensity - Integrated no GRF')
+        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.no.GRF +
+          ggtitle('Median predicted log intensity - PO no GRF')
+        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.no.GRF +
+          ggtitle('Median predicted log intensity - PA no GRF')
+        
+      }
+      
+      if(mod.type == "spatial") {
+        
+        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.GRF +
+          ggtitle('Median predicted log intensity - Integrated GRF')
+        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.GRF +
+          ggtitle('Median predicted log intensity - PO GRF')
+        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.GRF +
+          ggtitle('Median predicted log intensity - PA GRF')
+        
+      }
       
       prediction.plot <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
       
@@ -98,23 +106,75 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
       
       ggsave(paste0(rep_path, "/Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
     
-      # Summarise mean of intensity for the replicates of this extrap type
-      
-      # Integrated.rasts$rep <- reps.setup.list[[name]][[rep]]$mean.int.pred.Integrated.no.GRF
-      # PO.rasts$rep <- reps.setup.list[[name]][[rep]]$mean.int.pred.PO.no.GRF
-      # PA.rasts$rep <- reps.setup.list[[name]][[rep]]$mean.int.pred.PA.no.GRF
-      
         
     }
-    
-    # # Summarise mean of intensity for ALL replicates in the extrap type
-    # reps.setup.list[[name]]$mean.preds.Integrated <- global(rast(Integrated.rasts), fun = "mean") 
 
 
   }
   
 }
 
+
+# ################
+# # Now summarising median rasters across extrap types ----------------------
+# ################
+# 
+# # Get the names of the extrap types for indexing
+# extrap_names <- names(reps.setup.list)
+# 
+# # # Initialise a list to store mean predictions across replicates
+# pred_mean_across_reps <- list()
+# 
+# Integrated.rasts <- list()
+# PA.rasts <- list()
+# PO.rasts <- list()
+# 
+# # For every level of extrap type (Low, Mod, High)
+# for(extrap.type in seq_along(reps.setup.list)) {
+#   
+#   # Extract the name (e.g., "Low") for indexing from the names list
+#   name <- extrap_names[extrap.type] 
+#   
+#   # # List to store rasters for each repetition
+#   Integrated.rasts[[name]] <- list()
+#   PO.rasts[[name]] <- list()
+#   PA.rasts[[name]] <- list()
+#   
+#   # For every replicate extract elements that match "median.int.pred.Integrated"
+#   for(rep in seq_along(reps.setup.list[[name]])) {
+#     
+#     # Get the current replicate
+#     current_rep <- reps.setup.list[[name]][[rep]]
+#     
+#     # Go through names of elements of current_rep and find one that matches
+#     Integrated_matches <- sapply(names(current_rep), function(x) {
+#       grepl("median.int.pred.Integrated", x, fixed = T)
+#     })
+#     
+#     # Extract elements that match "median.int.pred.PO"
+#     PA_matches <- sapply(names(current_rep), function(x) {
+#       grepl("median.int.pred.PA", x)
+#     })
+#     
+#     # Extract elements that match "median.int.pred.PO"
+#     PO_matches <- sapply(names(current_rep), function(x) {
+#       grepl("median.int.pred.PO", x)
+#     })
+#     
+#     Integrated.rasts[[name]][rep] <- current_rep[Integrated_matches]
+#     PA.rasts[[name]][rep] <- current_rep[PA_matches]
+#     PO.rasts[[name]][rep] <- current_rep[PO_matches]
+#     
+#   }
+#   
+#   pred_mean_across_reps[[name]] <- list()
+#   
+#   stack <- rast(Integrated.rasts[[name]])
+#   
+#   pred_mean_across_reps[[name]] <- global(rast(Integrated.rasts[[name]]), fun = "mean") 
+#   
+# }
+# 
 
 
 # OPTIONAL - Plot predictions Site A --------------------------------------
@@ -123,7 +183,8 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
 plot_predictions_SiteA_func <- function(reps.setup.list,
                                         pred.type = c("link", "intensity", "probability"),
                                         outpath,
-                                        scenario_name) {
+                                        scenario_name,
+                                        mod.type) {
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -152,15 +213,15 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
         type <- models_df[[i, "Mod.type"]]
         
-        # Pull out the mean intensity prediction for each cell
-        mean.int.pred <- mod[[1]]$preds.link.siteA$field$Mean
+        # Pull out the median intensity prediction for each cell
+        median.int.pred <- mod[[1]]$preds.link.siteA$field$Median
         
         plot.name <- paste0("pred.plot.", type)
         
-        p <- mean.int.pred %>% 
+        p <- median.int.pred %>% 
           as.data.frame(xy = T) %>%  
           ggplot() + 
-          geom_tile(aes(x = x, y = y, fill = Mean)) + 
+          geom_tile(aes(x = x, y = y, fill = Median)) + 
           scale_fill_viridis() +
           coord_fixed() + 
           theme_bw() + 
@@ -192,12 +253,28 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
               plot.title = element_text(hjust = 0.5)) +  # Reduce margins
         ggtitle('True log intensity')
       
-      p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.no.GRF +
-        ggtitle('Mean predicted log intensity - Integrated no GRF')
-      p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.no.GRF +
-        ggtitle('Mean predicted log intensity - PO no GRF')
-      p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.no.GRF +
-        ggtitle('Mean predicted log intensity - PA no GRF')
+      if(mod.type == "non-spatial") {
+        
+        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.no.GRF +
+          ggtitle('Median predicted log intensity - Integrated no GRF')
+        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.no.GRF +
+          ggtitle('Median predicted log intensity - PO no GRF')
+        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.no.GRF +
+          ggtitle('Median predicted log intensity - PA no GRF')
+        
+      }
+      
+      if(mod.type == "spatial") {
+        
+        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.GRF +
+          ggtitle('Median predicted log intensity - Integrated GRF')
+        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.GRF +
+          ggtitle('Median predicted log intensity - PO GRF')
+        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.GRF +
+          ggtitle('Median predicted log intensity - PA GRF')
+        
+      }
+      
       
       prediction.plot <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
       
