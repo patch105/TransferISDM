@@ -1,7 +1,8 @@
 
 # 7. Extract Model Results ------------------------------------------------
 
-extract_model_results_func <- function(reps.setup.list) {
+extract_model_results_func <- function(reps.setup.list,
+                                       mod.type = "non-spatial") {
   
   # Extract and save summary results ----------------------------------------
   
@@ -45,7 +46,13 @@ extract_model_results_func <- function(reps.setup.list) {
           PA_intercept = NA,
           PA_intercept_25 = NA,
           PA_intercept_975 = NA,
-           marg_lik = mod.summary[[1]]$marg.lik
+           marg_lik = mod.summary[[1]]$marg.lik,
+          GRF.range.mean = NA,
+          GRF.range.sd.mean = NA,
+          GRF.range_25 = NA,
+          GRF.range_975 = NA,
+          GRF.range.sd_25 = NA,
+          GRF.range.sd_975 = NA
         )
         
           # If the model name contains PO or Integrated, save the PO intercept
@@ -64,7 +71,19 @@ extract_model_results_func <- function(reps.setup.list) {
             results_list[[length(results_list)]]$PA_intercept_975 <- mod.summary[[1]]$PA_ARTEFACT[[5]]
             
           }
-          
+       
+          ## If you have a spatial model, save the spatial parameter estimates
+          if(mod.type == "spatial") {
+            
+            results_list[[length(results_list)]]$GRF.range.mean <- mod.summary[[1]]$SPATIAL$mean[1]
+            results_list[[length(results_list)]]$GRF.range.sd.mean <- mod.summary[[1]]$SPATIAL$mean[2]
+            results_list[[length(results_list)]]$GRF.range_25 <- mod.summary[[1]]$SPATIAL[[3]][1]
+            results_list[[length(results_list)]]$GRF.range_975 <- mod.summary[[1]]$SPATIAL[[5]][1]
+            results_list[[length(results_list)]]$GRF.range.sd_25 <- mod.summary[[1]]$SPATIAL[[3]][2]
+            results_list[[length(results_list)]]$GRF.range.sd_975 <- mod.summary[[1]]$SPATIAL[[5]][2]
+            
+          }
+             
       }
       
       

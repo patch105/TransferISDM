@@ -5,7 +5,8 @@
 sim_latent_dist_func <- function(beta0,
                                  beta1,
                                  beta2,
-                                 scal, 
+                                 scal,
+                                 variance,
                                  cov1,
                                  cov1.mat,
                                  cov2.mat,
@@ -15,7 +16,6 @@ sim_latent_dist_func <- function(beta0,
                                  plot.lg.s = FALSE,
                                  latent.type) {
   
-  var <- 1 # Variance of the Gaussian field (changed  from 0.5)  
   nu <- 1 # Smoothness parameter - ONLY FOR MATERN
   
   # Assumed intensity at mean of enviro. variables
@@ -41,7 +41,7 @@ sim_latent_dist_func <- function(beta0,
     #               var=var, scale=scal)
     
     lg.s <- rLGCP('matern', mu = mu,
-                  var=var, scale=scal, nu=nu)
+                  var=variance, scale=scal, nu=nu)
     
   } 
   

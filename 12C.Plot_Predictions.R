@@ -4,7 +4,6 @@
 # 12C. Plot Predictions ---------------------------------------------------
 
 plot_predictions_SiteB_func <- function(reps.setup.list,
-                                  pred.type = c("link", "intensity", "probability"),
                                   outpath,
                                   scenario_name,
                                   mod.type) {
@@ -59,7 +58,6 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
           reps.setup.list[[name]][[rep]][[plot.name]] <- p 
           reps.setup.list[[name]][[rep]][[median.int.pred.name]] <- median.int.pred
 
-        
       }
       
       p1 <- true_log_int.rast.SiteB %>% 
@@ -184,7 +182,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
                                         pred.type = c("link", "intensity", "probability"),
                                         outpath,
                                         scenario_name,
-                                        mod.type) {
+                                        mod.type,
+                                        pred.GRF = FALSE) {
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -234,6 +233,29 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         reps.setup.list[[name]][[rep]][[plot.name]] <- p     
         
         
+        ## IF ALSO PLOTTING THE GRF PREDICTION
+        if(pred.GRF == TRUE) {
+          
+          median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
+          plot.name.GRF <- paste0("pred.GRF.plot.", type)
+          
+          p <- median.GRF.pred %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis() +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) 
+          
+          # Save back to main list
+          reps.setup.list[[name]][[rep]][[plot.name.GRF]] <- p 
+          
+            
+        }
         
         
       }
@@ -282,6 +304,24 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
       
       ggsave(paste0(rep_path, "/SITEA_Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+      
+      if(pred.GRF == TRUE & mod.type == "spatial") {
+        
+        p5 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.Integrated.GRF +
+          ggtitle('Median predicted GRF - Integrated GRF')
+        p6 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PO.GRF +
+          ggtitle('Median predicted GRF - PO GRF')
+        p7 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PA.GRF +
+          ggtitle('Median predicted GRF - PA GRF')
+        
+        GRF.prediction.plot <- ggarrange(p5, p6, p7, ncol = 2, nrow = 2)
+        
+        # Save plot
+        rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
+        
+        ggsave(paste0(rep_path, "/SITEA_GRF_Plot.png"), GRF.prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        
+      }
       
     }
     

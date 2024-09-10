@@ -13,7 +13,7 @@ library(readr)
 
 outpath <- file.path(getwd(), "output")
 
-scenario_name = "Testv3"
+scenario_name = "Testv4"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
@@ -69,7 +69,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 1
 
 # Set up a list to save covariates, latent dist, and extrapolation results
 reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
@@ -110,6 +110,7 @@ run_setup_func <- function(){
   beta2 <<- 0.1 # Coefficient for cov 2
   
   scal <<- 0.2 # Scale parameter (range of spatial effect)
+  variance <<- 1 # Variance of the Gaussian field (changed  from 0.5) 
   
   response.type <<- "linear"
   latent.type <<- "lgcp" # or "ipp"
@@ -120,6 +121,7 @@ run_setup_func <- function(){
                                       beta1 = beta1,
                                       beta2 = beta2,
                                       scal = scal,
+                                      variance = variance,
                                       cov1 = cov.list$cov1,
                                       cov1.mat = cov.list$cov1.mat,
                                       cov2.mat = cov.list$cov2.mat,
@@ -314,6 +316,7 @@ scenario_info.df <- tibble(scenario_name = scenario_name,
                            beta1 = beta1,
                            beta2 = beta2,
                            scal = scal,
+                           variance = variance,
                            latent.type = latent.type,
                            response.type = response.type,
                            rast_cellsA = rast_cellsA[1],
@@ -385,7 +388,8 @@ write_csv(n_presences_all_reps.df, paste0(file.path(outpath, scenario_name),  "/
 
 source("7.Extract_Model_Results.R")
 
-extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list)
+extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list,
+                                                 mod.type = mod.type)
 
 write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary.csv"))
 
@@ -402,6 +406,7 @@ reps.setup.list <- make_truth_func(reps.setup.list = reps.setup.list)
 source("9.Predict_from_fitted.R")
 
 reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list)
+
 
 
 # 10. Validation true intensity -------------------------------------------
@@ -439,6 +444,8 @@ plot_parameter_recovery_func(reps.setup.list = reps.setup.list,
                              beta1 = beta1,
                              beta2 = beta2,
                              beta0 = beta0,
+                             scal = scal,
+                             variance = variance,
                              mod.type = mod.type)
 
 # 12B. Plot Data  ---------------------------------------------------------
@@ -466,8 +473,11 @@ plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
 # OPTIONAL - predict to and validate Site A -------------------------------
 
 # *Optional* - predict to Site A
+## You can choose to predict just the random effect here
 
-reps.setup.list <- predict_from_fitted_SiteA_func(reps.setup.list = reps.setup.list)
+reps.setup.list <- predict_from_fitted_SiteA_func(reps.setup.list = reps.setup.list,
+                                                  pred.GRF = TRUE,
+                                                  mod.type = mod.type)
 
 # *Optional* - run validation for Site A
 true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list)
@@ -482,10 +492,11 @@ plot_validation_SiteA_func(true.validation.df = true.validation.SiteA.df,
                            scenario_name = scenario_name,
                            mod.type = mod.type)
 
+
 plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
-                            pred.type = c("link"),
                             outpath = outpath,
                             scenario_name = scenario_name,
+                            pred.GRF = TRUE,
                             mod.type = mod.type)
 
 

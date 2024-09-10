@@ -54,6 +54,8 @@ plot_parameter_recovery_func <- function(reps.setup.list,
                                     beta1,
                                     beta2,
                                     beta0,
+                                    scal,
+                                    variance,
                                     mod.type) {
 
   
@@ -234,20 +236,24 @@ if(mod.type == "spatial") {
   g2 <- extrap.scenario.df %>% 
     ggplot(aes(x = extrap.type, y = GRF.range.sd.mean, fill = mod.type)) +
     geom_boxplot() +
-    geom_hline(yintercept = var, linetype = "dashed", color = "red") +
+    geom_hline(yintercept = variance, linetype = "dashed", color = "red") +
     labs(x = "Extrapolation", y = "GRF range sd", fill = "Model Type") +
     scale_x_discrete(labels = c("Low", "Mod", "High")) +
     scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
     theme_bw()
   
-  GRF.plot <- ggarrange(g1, g2, common.legend = T, ncol = 2, nrow = 1)
+  GRF_plot <- ggarrange(g1, g2, common.legend = T, ncol = 2, nrow = 1)
   
   if(save == TRUE) {
     
     ggsave(plot = beta_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Coef_Recovery_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
     
+    ggsave(plot = GRF_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_GRF_Coef_Recovery_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
     
-  } else {print(beta_plot)}
+  } else {
+    print(beta_plot)
+    print(GRF_plot)
+    }
   
   ##### Plot the mean width of the credible interval #####
   
@@ -255,7 +261,11 @@ if(mod.type == "spatial") {
     mutate(beta1.cred.int = beta1_975 - beta1_25,
            beta2.cred.int = beta2_975 - beta2_25,
            beta1.cred.int.true = ifelse(beta1 >= beta1_25 &  beta1 <= beta1_975, 1, 0),
-           beta2.cred.int.true = ifelse(beta2 >= beta2_25 & beta2 <= beta2_975, 1, 0))
+           beta2.cred.int.true = ifelse(beta2 >= beta2_25 & beta2 <= beta2_975, 1, 0),
+           GRF.range.cred.int = GRF.range_975 - GRF.range_25,
+           GRF.range.sd.cred.int = GRF.range.sd_975 - GRF.range.sd_25,
+           GRF.range.cred.int.true = ifelse(scal >= GRF.range_25 &  scal <= GRF.range_975, 1, 0),
+           GRF.range.sd.cred.int.true = ifelse(variance >= GRF.range.sd_25 &  variance <= GRF.range.sd_975, 1, 0))
   
   b1.CI.width <- extrap.scenario.df.CI %>% 
     ggplot(aes(x = extrap.type, y = beta1.cred.int, fill = mod.type)) +
@@ -275,12 +285,36 @@ if(mod.type == "spatial") {
   
   beta_CI_width_plot <- ggarrange(b1.CI.width , b2.CI.width, common.legend = T,  ncol = 2, nrow = 1)
   
+  g1.CI.width <- extrap.scenario.df.CI %>% 
+    ggplot(aes(x = extrap.type, y = GRF.range.cred.int, fill = mod.type)) +
+    geom_boxplot() +
+    labs(x = "Extrapolation", y = "GRF range Credible Interval Width", fill = "Model Type") +
+    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    theme_bw()
+  
+  g2.CI.width <- extrap.scenario.df.CI %>%
+    ggplot(aes(x = extrap.type, y = GRF.range.sd.cred.int, fill = mod.type)) +
+    geom_boxplot() +
+    labs(x = "Extrapolation", y = "GRF range sd Credible Interval Width", fill = "Model Type") +
+    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    theme_bw()
+  
+  GRF_CI_width_plot <- ggarrange(g1.CI.width, g2.CI.width, common.legend = T, ncol = 2, nrow = 1)
+  
   if(save == TRUE) {
     
     ggsave(plot = beta_CI_width_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Beta_CI_Width_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
     
+    ggsave(plot = GRF_CI_width_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_GRF_CI_Width_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
     
-  } else {print(beta_CI_width_plot)}
+    
+  } else {
+    
+    print(beta_CI_width_plot)
+    print(GRF_CI_width_plot)
+    }
   
   
   ##### Plot the intercepts #####
