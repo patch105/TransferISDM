@@ -24,12 +24,16 @@ extract_model_results_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      # Extract the median extrapolation amount
+      extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
+      
       for (i in seq_along(models_df)) { # Until get PA again
         
         mod.summary <- models_df[[i, "Summary"]]
         
           results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
+          extrap.median = extrap.median,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
           beta1.mean = mod.summary[[1]]$DISTRIBUTION$mean[1],

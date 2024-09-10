@@ -24,6 +24,9 @@ validation_SiteB_func <- function(reps.setup.list) {
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      # Extract the median extrapolation amount
+      extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
+      
       # Crop out the true log intensity from the Site B
       rand.gridB <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridB
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
@@ -66,6 +69,7 @@ validation_SiteB_func <- function(reps.setup.list) {
         
         results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
+          extrap.median = extrap.median,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,
@@ -110,6 +114,9 @@ validation_SiteA_func <- function(reps.setup.list) {
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      # Extract the median extrapolation amount
+      extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
+      
       # Crop out the true log intensity from the Site A
       rand.gridA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridA
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
@@ -152,6 +159,7 @@ validation_SiteA_func <- function(reps.setup.list) {
         
         results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
+          extrap.median = extrap.median,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,

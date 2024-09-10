@@ -132,7 +132,7 @@ run_setup_func <- function(){
                                       latent.type = latent.type)
   
   
-  # Simulate Environmental Extrapolation ------------------------------------
+  # 3.Simulate Environmental Extrapolation ------------------------------------
   
   source("3.Simulate_Enviro_Extrapolation.R")
   
@@ -401,7 +401,7 @@ source("8.Make_Truth.R")
 reps.setup.list <- make_truth_func(reps.setup.list = reps.setup.list)
 
 
-# 9. Predict from fitted --------------------------------------------------
+# 9. Predict to Site B from fitted --------------------------------------------------
 
 source("9.Predict_from_fitted.R")
 
