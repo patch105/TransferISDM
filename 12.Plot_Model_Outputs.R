@@ -222,6 +222,26 @@ if(mod.type == "spatial") {
   
   beta_plot <- ggarrange(b1 , b2, common.legend = T,  ncol = 2, nrow = 1)
   
+  g1 <- extrap.scenario.df %>% 
+    ggplot(aes(x = extrap.type, y = GRF.range.mean, fill = mod.type)) +
+    geom_boxplot() +
+    geom_hline(yintercept = scal, linetype = "dashed", color = "red") +
+    labs(x = "Extrapolation", y = "GRF range", fill = "Model Type") +
+    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    theme_bw()
+    
+  g2 <- extrap.scenario.df %>% 
+    ggplot(aes(x = extrap.type, y = GRF.range.sd.mean, fill = mod.type)) +
+    geom_boxplot() +
+    geom_hline(yintercept = var, linetype = "dashed", color = "red") +
+    labs(x = "Extrapolation", y = "GRF range sd", fill = "Model Type") +
+    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    theme_bw()
+  
+  GRF.plot <- ggarrange(g1, g2, common.legend = T, ncol = 2, nrow = 1)
+  
   if(save == TRUE) {
     
     ggsave(plot = beta_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Coef_Recovery_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
@@ -327,7 +347,8 @@ if(mod.type == "spatial") {
   
   write.csv(beta_cred_int_true, file = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Prop_Cred_Int_Contains_True_Beta.csv"))
   
-}
+
+  }
 
 
 }
