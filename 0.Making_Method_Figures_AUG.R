@@ -247,9 +247,9 @@ Fig.1b <- true_log_int.rast %>%
   ggtitle('True log intensity')
 
 
-# Convert the point pattern to a data frame for ggplot
-points_df <- as.data.frame(cbind(lg.s$x, lg.s$y)[, 1:2]) %>% 
-  rename(x = V1, y = V2)
+# # Convert the point pattern to a data frame for ggplot
+# points_df <- as.data.frame(cbind(lg.s$x, lg.s$y)[, 1:2]) %>% 
+#   rename(x = V1, y = V2)
 
 # Add the points to the intensity plot
 # true.int.plot +
@@ -363,7 +363,7 @@ df_extA <- data.frame(
   ymin = extA[3],
   ymax = extA[4],
   color = "red",
-  label = "Site A",
+  label = "Reference Site",
   label_x = (extA[1] + extA[2]) / 2,  # Center of the extent for text placement
   label_y = extA[4] + (extA[4] - extA[3]) * 0.1  # Slightly above the top of the extent
 )
@@ -374,7 +374,7 @@ df_extB <- data.frame(
   ymin = extB[3],
   ymax = extB[4],
   color = "blue",
-  label = "Site B",
+  label = "Target Site",
   label_x = (extB[1] + extB[2]) / 2,  # Center of the extent for text placement
   label_y = extB[4] + (extB[4] - extB[3]) * 0.1  # Slightly above the top of the extent
 )
@@ -565,7 +565,7 @@ Fig.1d <- true_log_int.rast.SiteA %>%
         legend.title = element_blank(),
         plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines"),
         plot.title = element_text(hjust = 0.5)) +  # Reduce margins
-  ggtitle('Site A')
+  ggtitle('Reference Site')
 
 Fig.1e <- true_log_int.rast.SiteB %>% 
   as.data.frame(xy = T) %>% 
@@ -573,7 +573,6 @@ Fig.1e <- true_log_int.rast.SiteB %>%
   geom_tile(aes(x = x, y = y, fill = int)) +
   scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
   coord_fixed() +
-  geom_point(data = po.rand.gridB, aes(x = x, y = y), color = "red", size = 0.8) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
@@ -581,7 +580,7 @@ Fig.1e <- true_log_int.rast.SiteB %>%
         legend.title = element_blank(),
         plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines"),
         plot.title = element_text(hjust = 0.5)) +  # Reduce margins
-  ggtitle('Site B')
+  ggtitle('Target Site')
 
 Fig.1de <- ggarrange(Fig.1d, Fig.1e, ncol = 2, nrow = 1, align = "v", widths = c(0.5, 0.5))
 
