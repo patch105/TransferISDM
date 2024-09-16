@@ -318,6 +318,39 @@ plot_validation_SiteA_func <- function(true.validation.df,
 }
 
 
+
+
+# # PLOT VALIDATION CONTINUOUS EXTRAPOLATION --------------------------------
+# 
+# plot_validation_SiteB_continuous_func <- function(true.validation.df,
+#                                                   save = FALSE,
+#                                                   outpath,
+#                                                   scenario_name,
+#                                                   mod.type) {
+#   # Plot the validation
+# 
+#   cor <- true.validation.df %>%
+#     ggplot(aes(x = extrap.median, y = correlation, color = mod.type)) +
+#     geom_point(alpha = 0.1) +
+#     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
+#     labs(x = "Extrapolation", y = "Correlation", fill = "Model Type") +
+#     scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+#     scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+#     # coord_cartesian(xlim = c(NA, 50)) +
+#     theme_bw()
+# 
+#   true.validation.df %>% 
+#     ggplot(aes(x = extrap.median, y = MAE, color = mod.type)) +
+#     geom_point(alpha = 0.5) +
+#     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
+#         labs(x = "Extrapolation", y = "MAE", fill = "Model Type") +
+#     scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+#     scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+#     coord_cartesian(xlim = c(NA, 50)) +
+#     theme_bw()
+#   
+# 
+#   }
   
   
 
