@@ -4,7 +4,8 @@
 
 plot_data_func <- function(reps.setup.list,
                            outpath,
-                           scenario_name) {
+                           scenario_name,
+                           job_index) {
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -79,7 +80,8 @@ plot_data_func <- function(reps.setup.list,
         ggtitle('Site B')
       
       # Save plots
-      rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
+      rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep, "Job_", job_index))
+      
       
       # Make dir if not already there
       if(!dir.exists(rep_path)) {

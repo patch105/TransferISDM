@@ -1,0 +1,122 @@
+
+# # extract the arguments provided in the command line
+# args <- commandArgs(trailingOnly = TRUE)
+# # The first argument is now the job index
+# job_index <- as.integer(args[1])
+
+
+# For non-hpc version
+job_index <- 1
+
+library(spatstat)
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+library(viridis)
+library(terra)
+library(purrr)
+library(readr)
+
+
+# OUTPUT FOLDER & SCENARIO NAME -------------------------------------------
+
+outpath <- file.path(getwd(), "output")
+
+scenario_name = "Test_Sep16"
+
+# Make dir if not already there
+if(!dir.exists(file.path(outpath, scenario_name))) {
+  
+  dir.create(file.path(outpath, scenario_name), recursive = TRUE)
+  
+}
+
+# PARAMETERS --------------------------------------------------------------
+
+# Set the seed for all
+# seed <- 24
+# set.seed(50)
+
+# DOMAIN SETUP ------------------------------------------------------------
+
+# START with set up of resolution and north/east step length for later Site A and B grid creation.
+
+# Set ncol
+ncol <- 1000
+nrow <- 1000
+res <- 0.01
+
+# Create a bounded domain on [0, 10] x [0, 10]
+
+east_min <- 0
+east_max <- 10
+north_min <- 0
+north_max <- 10
+
+
+# We generate the grid resolution from min, max dimensions and the number of pixels
+
+# Set number of pixels (100 x 100)
+n_bau_east <- ncol
+n_bau_north <- nrow
+# so now we have n_bau_est x n_bau_north grid cells
+
+# Obtain the cell resolution
+bau_east_step <- (east_max - east_min) / n_bau_east
+bau_north_step <- (north_max - north_min) / n_bau_north 
+
+# Generate grid centroid coordinates
+# We do this so that our centroid begins in the centre of a cell (hence, bau_east_step/2))
+
+eastings <- seq(east_min + bau_east_step/2, east_max - bau_east_step/2, by = bau_east_step)
+northings <- seq(north_min + bau_north_step/2, north_max - bau_north_step/2, by = bau_north_step)
+
+coords <- as.matrix(expand.grid(eastings, northings))
+colnames(coords) <- c("eastings", "northings")
+
+
+# Run setup for replicates ------------------------------------------------
+
+# Specify number of replicates per extrapolation type
+nreps <- 1
+
+beta0 <- 6 # Intercept
+beta1 <- 0.5 # Coefficient for cov 1
+beta2 <- 0.1 # Coefficient for cov 2
+
+scal <- 0.2 # Scale parameter (range of spatial effect)
+variance <- 1 # Variance of the Gaussian field (changed  from 0.5)
+
+mod.type = "spatial"
+
+source("0.Run_Replicate.R")
+
+Run_Replicate_Func(outpath = outpath,
+                   scenario_name = scenario_name,
+                   ncol = ncol,
+                   nrow =nrow,
+                   res = res,
+                   east_min = east_min,
+                   east_max = east_max,
+                   north_min = north_min,
+                   north_max = north_max,
+                   n_bau_east = n_bau_east,
+                   n_bau_north = n_bau_north,
+                   bau_east_step = bau_east_step,
+                   bau_north_step = bau_north_step,
+                   eastings = eastings,
+                   northings = northings,
+                   coords = coords,
+                   nreps = nreps,
+                   mod.type = mod.type,
+                   beta0 = beta0,
+                   beta1 = beta1,
+                   beta2 = beta2,
+                   scal = scal,
+                   variance = variance,
+                   job_index = job_index)
+
+
+
+
+

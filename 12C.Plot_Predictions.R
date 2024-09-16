@@ -6,7 +6,8 @@
 plot_predictions_SiteB_func <- function(reps.setup.list,
                                   outpath,
                                   scenario_name,
-                                  mod.type) {
+                                  mod.type,
+                                  job_index) {
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -100,7 +101,8 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
       prediction.plot <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
       
       # Save plot
-      rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
+      rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
+      
       
       ggsave(paste0(rep_path, "/Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
     
@@ -183,7 +185,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
                                         outpath,
                                         scenario_name,
                                         mod.type,
-                                        pred.GRF = FALSE) {
+                                        pred.GRF = FALSE,
+                                        job_index) {
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -301,7 +304,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       prediction.plot <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
       
       # Save plot
-      rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
+      rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
       
       ggsave(paste0(rep_path, "/SITEA_Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
       
@@ -317,7 +320,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         GRF.prediction.plot <- ggarrange(p5, p6, p7, ncol = 2, nrow = 2)
         
         # Save plot
-        rep_path <- file.path(outpath, scenario_name, name, paste0("Rep_", rep))
+        rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
         
         ggsave(paste0(rep_path, "/SITEA_GRF_Plot.png"), GRF.prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
         
