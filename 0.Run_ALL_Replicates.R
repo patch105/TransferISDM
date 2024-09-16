@@ -117,6 +117,7 @@ Run_Replicate_Func(outpath = outpath,
                    job_index = job_index)
 
 
-
+# Save the input parameters for this job ----------------------------------
+save(mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
 

@@ -1,9 +1,23 @@
 
+# LOAD INPUT PARAMETERS ---------------------------------------------------
+
+
+#***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
+#****
+
+scenario_name = "Test_Sep16"
+
+outpath <- file.path(getwd(), "output")
+
+#****
+
+load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
+
 
 # Load and join replicates together ---------------------------------------
 
 # 1. FIRST list all the files with n presences (for each Job)
-file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "N_Presences_each_rep_Job*\\.csv$", full.names = TRUE, recursive = TRUE) 
+file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "N_Presences_EACH_rep_Job*", full.names = TRUE, recursive = TRUE) 
 
 # Read all the CSV files and save them to a list
 npresence.list <- lapply(file_list, read.csv)
@@ -15,7 +29,7 @@ replicate_info_ALL.df <- do.call(rbind, npresence.list)
 
 # 2. THEN list all the files with validation dataframes (for each Job)
 
-file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "True_Validation.*\\.csv$", full.names = TRUE, recursive = TRUE) 
+file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "True_Validation_Job", full.names = TRUE, recursive = TRUE) 
 
 true.validation.df.list <- lapply(file_list, read.csv)
 
@@ -25,7 +39,7 @@ true.validation.df <- do.call(rbind, true.validation.df.list)
 
 # 3. THEN list all the files with validation dataframes for Site A (for each Job)
 
-file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "True_Validation.*\\.csv$", full.names = TRUE, recursive = TRUE) 
+file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "True_Validation_SiteA_Job", full.names = TRUE, recursive = TRUE) 
 
 true.validation.SiteA.df.list <- lapply(file_list, read.csv)
 
@@ -35,7 +49,7 @@ true.validation.SiteA.df <- do.call(rbind, true.validation.SiteA.df.list)
 
 # 4. FINALLy list all the files with model outputs (for each job)
 
-file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Results_Summary.*\\.csv$", full.names = TRUE, recursive = TRUE) 
+file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Results_Summary", full.names = TRUE, recursive = TRUE) 
 
 # Read all the CSV files and save them to a list
 extrap.scenario.df.list <- lapply(file_list, read.csv)
