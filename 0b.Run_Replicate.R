@@ -23,6 +23,10 @@ Run_Replicate_Func <- function(n_cores,
                                beta2,
                                scal,
                                variance,
+                               bias,
+                               detect.prob,
+                               maxprob,
+                               latent.type,
                                job_index
                                ) {
   
@@ -63,7 +67,7 @@ Run_Replicate_Func <- function(n_cores,
     source("2.Simulate_Latent_Distribution.R")
     
     response.type <<- "linear"
-    latent.type <<- "lgcp" # or "ipp"
+    latent.type <<- latent.type # or "ipp"
     
     print("Simulating new latent distribution")
     
@@ -88,12 +92,12 @@ Run_Replicate_Func <- function(n_cores,
     
     # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
     # NOTE - must be smaller than total cell number in x y directions
-    rast_cellsA <<- c(50, 50)
-    rast_cellsB <<- c(50, 50)
+    rast_cellsA <<- c(100, 100)
+    rast_cellsB <<- c(100, 100)
     
     print("Simulating environmental extrapolation")
     
-    run.extrap.list <- run_extrap_func(ncores = ncores,
+    run.extrap.list <- run_extrap_func(n_cores = n_cores,
                                        nreps = nreps,
                                        rast_cellsA = rast_cellsA,
                                        rast_cellsB = rast_cellsB,
@@ -175,7 +179,10 @@ Run_Replicate_Func <- function(n_cores,
   
   source("4.PO_Sampling.R")
   
-  reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list)
+  reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list,
+                                      bias = bias,
+                                      detect.prob = detect.prob,
+                                      maxprob = maxprob)
   
   # If there are any reps with no PO data, re-run the parts 1,2,3 for those reps
   

@@ -8,7 +8,7 @@
 # remotes::install_github("sjevelazco/flexsdm")
 library(flexsdm)
 
-run_extrap_func <- function(ncores,
+run_extrap_func <- function(n_cores,
                             nreps,
                             rast_cellsA,
                             rast_cellsB,

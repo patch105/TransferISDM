@@ -24,7 +24,7 @@ library(readr)
 
 outpath <- file.path(getwd(), "output")
 
-scenario_name = "Test_Sep17"
+scenario_name = "TestB_Sept17"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
@@ -51,14 +51,14 @@ n_cores <- 3
 # Set ncol
 ncol <- 1000
 nrow <- 1000
-res <- 0.01
+res <- 1
 
 # Create a bounded domain on [0, 10] x [0, 10]
 
 east_min <- 0
-east_max <- 10
+east_max <- 1000
 north_min <- 0
-north_max <- 10
+north_max <- 1000
 
 
 # We generate the grid resolution from min, max dimensions and the number of pixels
@@ -85,18 +85,26 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 10
+nreps <- 1
 
-beta0 <- 6 # Intercept
-beta1 <- 0.5 # Coefficient for cov 1
+beta0 <- -2 # Intercept
+beta1 <- 2 # Coefficient for cov 1
 beta2 <- 0.1 # Coefficient for cov 2
 
-scal <- 0.2 # Scale parameter (range of spatial effect)
-variance <- 1 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+scal <- 20 # Scale parameter (range of spatial effect)
+variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
 
 mod.type = "spatial"
 
-source("0.Run_Replicate.R")
+latent.type = "lgcp" # OR "ipp"
+
+# Choosing thinning or bias for PO sampling -------------------------------
+
+bias <- TRUE
+detect.prob <- 0.2
+maxprob <- 0.2
+
+source("0b.Run_Replicate.R")
 
 Run_Replicate_Func(n_cores = n_cores,
                    outpath = outpath,
@@ -122,6 +130,10 @@ Run_Replicate_Func(n_cores = n_cores,
                    beta2 = beta2,
                    scal = scal,
                    variance = variance,
+                   bias = bias,
+                   detect.prob = detect.prob,
+                   maxprob = maxprob,
+                   latent.type = latent.type,
                    job_index = job_index)
 
 
