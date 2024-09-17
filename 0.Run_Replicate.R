@@ -1,5 +1,6 @@
 
-Run_Replicate_Func <- function(outpath,
+Run_Replicate_Func <- function(n_cores,
+                               outpath,
                                scenario_name,
                                ncol,
                                nrow,
@@ -92,7 +93,8 @@ Run_Replicate_Func <- function(outpath,
     
     print("Simulating environmental extrapolation")
     
-    run.extrap.list <- run_extrap_func(nreps = nreps,
+    run.extrap.list <- run_extrap_func(ncores = ncores,
+                                       nreps = nreps,
                                        rast_cellsA = rast_cellsA,
                                        rast_cellsB = rast_cellsB,
                                        bau_east_step = bau_east_step,

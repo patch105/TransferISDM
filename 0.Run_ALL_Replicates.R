@@ -1,4 +1,6 @@
 
+## HPC version
+
 # # extract the arguments provided in the command line
 # args <- commandArgs(trailingOnly = TRUE)
 # # The first argument is now the job index
@@ -22,7 +24,7 @@ library(readr)
 
 outpath <- file.path(getwd(), "output")
 
-scenario_name = "Test_Sep16"
+scenario_name = "Test_Sep17"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
@@ -30,6 +32,11 @@ if(!dir.exists(file.path(outpath, scenario_name))) {
   dir.create(file.path(outpath, scenario_name), recursive = TRUE)
   
 }
+
+
+# Number of cores ---------------------------------------------------------
+
+n_cores <- 3
 
 # PARAMETERS --------------------------------------------------------------
 
@@ -78,20 +85,21 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 1
+nreps <- 10
 
 beta0 <- 6 # Intercept
 beta1 <- 0.5 # Coefficient for cov 1
 beta2 <- 0.1 # Coefficient for cov 2
 
 scal <- 0.2 # Scale parameter (range of spatial effect)
-variance <- 1 # Variance of the Gaussian field (changed  from 0.5)
+variance <- 1 # Variance of the Gaussian field at distance zero (changed  from 0.5)
 
 mod.type = "spatial"
 
 source("0.Run_Replicate.R")
 
-Run_Replicate_Func(outpath = outpath,
+Run_Replicate_Func(n_cores = n_cores,
+                   outpath = outpath,
                    scenario_name = scenario_name,
                    ncol = ncol,
                    nrow =nrow,

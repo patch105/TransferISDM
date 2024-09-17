@@ -8,7 +8,8 @@
 # remotes::install_github("sjevelazco/flexsdm")
 library(flexsdm)
 
-run_extrap_func <- function(nreps,
+run_extrap_func <- function(ncores,
+                            nreps,
                             rast_cellsA,
                             rast_cellsB,
                             bau_east_step,
@@ -151,11 +152,12 @@ run_extrap_func <- function(nreps,
     projection <- covs.SiteB %>% 
       .[,c("cov1", "cov2")]
     
-    shape_extrap <- extra_eval(training_data = training,
-                               pr_ab = "Presence",
-                               projection_data = projection,
-                               metric = "mahalanobis",
-                               univar_comb = F)
+    shape_extrap <- flexsdm::extra_eval(training_data = training,
+                                        pr_ab = "Presence",
+                                        projection_data = projection,
+                                        metric = "mahalanobis",
+                                        univar_comb = F,
+                                        n_cores = n_cores)
     
     shape_extrap <- cbind(shape_extrap, covs.SiteB[, c("x", "y")])
     
