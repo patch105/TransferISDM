@@ -182,7 +182,8 @@ Run_Replicate_Func <- function(n_cores,
   reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list,
                                       bias = bias,
                                       detect.prob = detect.prob,
-                                      maxprob = maxprob)
+                                      maxprob = maxprob,
+                                      rast_cellsA = rast_cellsA)
   
   # If there are any reps with no PO data, re-run the parts 1,2,3 for those reps
   

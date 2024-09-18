@@ -87,10 +87,10 @@ po_sampling_func <- function(reps.setup.list,
           
         }
 
-        # po.rand.gridB <- po[
-        #   po[,1] >= xmin(ext(rand.gridB)) & po[,1] <= xmax(ext(rand.gridB)) & 
-        #     po[,2] >= ymin(ext(rand.gridB)) & po[,2] <= ymax(ext(rand.gridB)), 
-        # ]
+        po.rand.gridB <- po[
+          po[,1] >= xmin(ext(rand.gridB)) & po[,1] <= xmax(ext(rand.gridB)) &
+            po[,2] >= ymin(ext(rand.gridB)) & po[,2] <= ymax(ext(rand.gridB)),
+        ]
         
         # Formatting if there's only one PO point in Grid A or B so that they become dataframes
         
