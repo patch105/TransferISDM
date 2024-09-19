@@ -2,8 +2,8 @@
 
 # 5. PA Sampling ----------------------------------------------------------
 
-pa_sampling_func <- function(reps.setup.list,
-                             new.latent = FALSE) {
+pa_sampling_func <- function(reps.setup.list) {
+                             
   
   PA.data <- imap(reps.setup.list, function(extrap.type, extrap.name) {
     
@@ -15,29 +15,8 @@ pa_sampling_func <- function(reps.setup.list,
       print(paste("Processing rep:", rep_index))
       
       rand.gridA <- rep$extrap.reps.out$rand.gridA
-      rand.gridB <- rep$extrap.reps.out$rand.gridB
-      
-      if(new.latent == TRUE) {
-        
-        # Make new realisation of presences from LGCP for PA ----------------------
-        
-        presenceforPA <- rpoispp(lambda = attr(rep$latent.list$lg.s, 'Lambda') )
-        
-      } else {
-        
-        # Otherwise rename presence data
-        presenceforPA <- rep$latent.list$lg.s
-        
-      }
-      
-      poforPA <- cbind(x = presenceforPA$x, y = presenceforPA$y)
-      
-      # Trim NEW po to only include points in Site A or B
-      poforPA.rand.gridA <- poforPA[
-        poforPA[,1] >= xmin(ext(rand.gridA)) & poforPA[,1] <= xmax(ext(rand.gridA)) & 
-          poforPA[,2] >= ymin(ext(rand.gridA)) & poforPA[,2] <= ymax(ext(rand.gridA)), 
-      ]
-      
+
+      poforPA.rand.gridA <- rep$PO_GridA
       
       #-------------------------------------------------------------------------------
       # Site A

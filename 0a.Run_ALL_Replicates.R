@@ -24,7 +24,7 @@ library(readr)
 
 outpath <- file.path(getwd(), "output")
 
-scenario_name = "TestB_Sept17"
+scenario_name = "Test_Sep19"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {

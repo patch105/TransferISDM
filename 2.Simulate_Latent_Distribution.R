@@ -68,7 +68,7 @@ sim_latent_dist_func <- function(beta0,
     mu <- mu + GRF.mat[, "GRF"]
     
     # Simulate the latent Gaussian field
-    lg.s <- rpoispp(exp(mu.GRF))
+    lg.s <- rpoispp(exp(mu))
     
     latent.list <- list(mu = mu, lg.s = lg.s, fixed.rast = fixed.rast, GRF.rast = GRF.rast) 
     

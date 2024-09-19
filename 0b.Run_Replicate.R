@@ -29,6 +29,7 @@ Run_Replicate_Func <- function(n_cores,
                                latent.type,
                                pred.GRF,
                                pred.fixed,
+                               posterior_nsamps,
                                job_index
                                ) {
   
@@ -217,8 +218,8 @@ Run_Replicate_Func <- function(n_cores,
   
   source("5.PA_Sampling.R")
   
-  reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list,
-                                      new.latent = FALSE) # If you want to make a separate realisation of the latent state for the PA data set to true
+  reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list)
+                                     
   
   
   # 6. Run Models -----------------------------------------------------------
@@ -358,7 +359,8 @@ Run_Replicate_Func <- function(n_cores,
   
   source("9.Predict_from_fitted.R")
   
-  reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list)
+  reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list,
+                                                    posterior_nsamps = posterior_nsamps)
   
   
   
@@ -401,7 +403,8 @@ Run_Replicate_Func <- function(n_cores,
   reps.setup.list <- predict_from_fitted_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
                                                     pred.fixed = pred.fixed,
-                                                    mod.type = mod.type)
+                                                    mod.type = mod.type,
+                                                    posterior_nsamps = posterior_nsamps)
   
   plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
                               outpath = outpath,
