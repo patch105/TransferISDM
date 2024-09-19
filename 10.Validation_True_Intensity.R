@@ -94,7 +94,9 @@ validation_SiteB_func <- function(reps.setup.list) {
 # OPTIONAL - RUN THE VALIDATION FOR SITE A --------------------------------
 
 
-validation_SiteA_func <- function(reps.setup.list) {
+validation_SiteA_func <- function(reps.setup.list,
+                                  pred.GRF = FALSE,
+                                  pred.fixed = FALSE) {
   
   # Create an empty list to store results
   results_list <- list()
@@ -121,6 +123,28 @@ validation_SiteA_func <- function(reps.setup.list) {
       rand.gridA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridA
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
       true_log_int.rast.SiteA <- crop(true_log_int.rast, ext(rand.gridA))
+      
+      ### IF GRF has been plotted, look at correlation with TRUTH
+      # First get true one from rep
+      if(pred.GRF == TRUE) {
+        
+        # First extract the TRUE random effect for comparison
+        # Crop out the TRUE random effect from the Site A
+        GRF.rast <- reps.setup.list[[name]][[rep]]$latent.list$GRF.rast
+        GRF.rast.SiteA <- crop(GRF.rast, ext(rand.gridA))
+        
+      }
+      
+      ### IF Fixed effect has been plotted, look at correlation with TRUTH
+      # First get true one from rep
+      if(pred.fixed == TRUE) {
+        
+        # First extract the TRUE fixed effect for comparison
+        # Crop out the TRUE fixed effect from the Site A
+        fixed.rast <- reps.setup.list[[name]][[rep]]$latent.list$fixed.rast
+        fixed.rast.SiteA <- crop(fixed.rast, ext(rand.gridA))
+        
+      }
       
       for (i in seq_along(models_df)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
         
@@ -155,6 +179,23 @@ validation_SiteA_func <- function(reps.setup.list) {
         
         Mean.Int.Score <- mean(interval_score)
         
+        if(pred.GRF == TRUE) {
+          
+          median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
+          
+          cor.GRF <- cor(as.vector(median.int.pred), as.vector(GRF.rast.SiteA))
+          
+        } else { cor.GRF = NULL }
+        
+        
+        if(pred.fixed = TRUE) {
+          
+          median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
+          
+          cor.FIXED <- cor(as.vector(median.int.pred), as.vector(fixed.rast.SiteA))
+          
+        } else { cor.FIXED = NULL }
+        
         # Save results to list
         
         results_list[[length(results_list) + 1]] <- data.frame(
@@ -163,6 +204,8 @@ validation_SiteA_func <- function(reps.setup.list) {
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,
+          cor.GRF = cor.GRF,
+          cor.FIXED = cor.FIXED,
           MAE = MAE,
           RMSE = RMSE,
           Sum.Int.Score = Sum.Int.Score,

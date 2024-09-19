@@ -98,6 +98,10 @@ mod.type = "spatial"
 
 latent.type = "lgcp" # OR "ipp"
 
+# If doing a spatial model, choose whether to predict the GRF and the Fixed effect
+pred.GRF <- TRUE 
+pred.fixed <- TRUE
+
 # Choosing thinning or bias for PO sampling -------------------------------
 
 bias <- TRUE
@@ -134,6 +138,8 @@ Run_Replicate_Func(n_cores = n_cores,
                    detect.prob = detect.prob,
                    maxprob = maxprob,
                    latent.type = latent.type,
+                   pred.GRF = pred.GRF,
+                   pred.fixed = pred.fixed,
                    job_index = job_index)
 
 

@@ -164,7 +164,9 @@ plot_validation_SiteA_func <- function(true.validation.df,
                                        save = FALSE,
                                        outpath,
                                        scenario_name,
-                                       mod.type) {
+                                       mod.type,
+                                       pred.GRF = FALSE,
+                                       pred.fixed = FALSE) {
   
   
   if(mod.type == "non-spatial") {
@@ -311,7 +313,44 @@ plot_validation_SiteA_func <- function(true.validation.df,
       
       print(cor)}
     
-    
+    ### IF Predicted GRF, plot the Correlation
+    if(pred.GRF == TRUE) {
+      
+      cor.GRF <- true.validation.df %>% 
+        ggplot(aes(x = extrap.type, y = cor.GRF, fill = mod.type)) +
+        geom_boxplot() +
+        labs(x = "Extrapolation", y = "Correlation GRF", fill = "Model Type") +
+        scale_x_discrete(labels = c("Low", "Mod", "High")) +
+        scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+        theme_bw()
+      
+      if(save == TRUE) {
+        
+        ggsave(plot = cor.GRF, filename = paste0(file.path(outpath, scenario_name, "SiteA"),"/Scenario_", scenario_name, "_COR_GRF_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+        
+      } else {print(cor.GRF)}
+      
+    }
+   
+    ### IF Predicted Fixed, plot the Correlation
+    if(pred.fixed == TRUE) {
+      
+      cor.FIXED <- true.validation.df %>% 
+        ggplot(aes(x = extrap.type, y = cor.FIXED, fill = mod.type)) +
+        geom_boxplot() +
+        labs(x = "Extrapolation", y = "Correlation FIXED", fill = "Model Type") +
+        scale_x_discrete(labels = c("Low", "Mod", "High")) +
+        scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+        theme_bw()
+      
+      if(save == TRUE) {
+        
+        ggsave(plot = cor.FIXED, filename = paste0(file.path(outpath, scenario_name, "SiteA"),"/Scenario_", scenario_name, "_COR_FIXED_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+        
+      } else {print(cor.FIXED)}
+      
+    }
+     
   }
   
   

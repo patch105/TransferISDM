@@ -18,7 +18,7 @@ make_truth_func <- function(reps.setup.list) {
       # Get the (v) log intensity values (expected number of points per unit area)
       # NOTE - the format is from the lgcp package, so I need to reverse the order if want to plot
       # NOTE because log(intensity) = mu (when using rpoispp), the true_log_int = mu
-      true_log_int <- mu
+      true_log_int <- rep$latent.list$mu
       
       # Reverse the row order
       true_log_int <- apply(true_log_int, 2, rev)

@@ -75,6 +75,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list) {
 
 predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                            pred.GRF = FALSE,
+                                           pred.fixed = FALSE,
                                            mod.type = "non-spatial") {
   
   #### PREDICT for every extrap type, for every rep, for every model type
@@ -216,6 +217,45 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
           
         }
 
+        ###########
+        ### If also plotting fixed effect at Site A
+        ###########
+        
+        if(pred.fixed == TRUE & mod.type == "spatial") {
+          
+          if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
+            
+            # Had to add the [[1]] here because the summary is always list of length 1
+            mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
+                                                covars = cov.rep,
+                                                S = 50, 
+                                                intercept.terms = "PO_Intercept",
+                                                type = "link",
+                                                includeRandom = F,
+                                                includeFixed = T)
+            
+            # Save the updated model back to the dataframe
+            models_df[[i, "Model"]] <- mod
+            
+          } else { # If models are PA or Integrated, use PA intercept
+            
+            # Had to add the [[1]] here because the summary is always list of length 1
+            mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
+                                                covars = cov.rep,
+                                                S = 50, 
+                                                intercept.terms = "PA_Intercept",
+                                                type = "link",
+                                                includeRandom = F,
+                                                includeFixed = T)
+            
+            # Save the updated model back to the dataframe
+            models_df[[i, "Model"]] <- mod
+            
+          }
+          
+          
+        }
+        
       
       # Save the updated models dataframe back to the original list
       reps.setup.list[[name]][[rep]]$models <- models_df

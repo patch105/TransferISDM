@@ -5,7 +5,7 @@
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Test_Sep16"
+scenario_name = "TestB_Sept17"
 
 outpath <- file.path(getwd(), "output")
 
@@ -110,6 +110,8 @@ plot_validation_SiteA_func(true.validation.df = true.validation.SiteA.df,
                            save = TRUE,
                            outpath = outpath,
                            scenario_name = scenario_name,
-                           mod.type = mod.type)
+                           mod.type = mod.type,
+                           pred.GRF = pred.GRF,
+                           pred.fixed = pred.fixed)
 
 

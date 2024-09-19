@@ -184,8 +184,9 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
                                         pred.type = c("link", "intensity", "probability"),
                                         outpath,
                                         scenario_name,
-                                        mod.type,
                                         pred.GRF = FALSE,
+                                        pred.fixed = FALSE,
+                                        mod.type,
                                         job_index) {
   
   # Get the names of the extrap types for indexing
@@ -260,6 +261,30 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
             
         }
         
+        ## IF ALSO PLOTTING THE FIXED EFFECT
+        if(pred.fixed == TRUE) {
+          
+          median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
+          plot.name.FIXED <- paste0("pred.FIXED.plot.", type)
+          
+          p <- median.FIXED.pred %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis() +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) 
+          
+          # Save back to main list
+          reps.setup.list[[name]][[rep]][[plot.name.GRF]] <- p 
+          
+          
+        }
+        
         
       }
       
@@ -308,21 +333,83 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       
       ggsave(paste0(rep_path, "/SITEA_Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
       
+      # Plot the random effect with true random effect
       if(pred.GRF == TRUE & mod.type == "spatial") {
         
-        p5 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.Integrated.GRF +
+        # First extract the TRUE random effect for comparison
+        # Crop out the TRUE random effect from the Site A
+        GRF.rast <- reps.setup.list[[name]][[rep]]$latent.list$GRF.rast
+        GRF.rast.SiteA <- crop(GRF.rast, ext(rand.gridA))
+        
+        # Make a plot for the TRUE random effect
+        p5 <- GRF.rast.SiteA %>% 
+          as.data.frame(xy = T) %>% 
+          ggplot() +
+          geom_tile(aes(x = x, y = y, fill = int)) +
+          scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+          coord_fixed() +
+          theme_bw() +
+          theme(axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                legend.ticks = element_blank(),
+                legend.title = element_blank(),
+                plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines"),
+                plot.title = element_text(hjust = 0.5)) +  # Reduce margins
+          ggtitle('True random effect')
+        
+        p6 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.Integrated.GRF +
           ggtitle('Median predicted GRF - Integrated GRF')
-        p6 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PO.GRF +
+        p7 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PO.GRF +
           ggtitle('Median predicted GRF - PO GRF')
-        p7 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PA.GRF +
+        p8 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PA.GRF +
           ggtitle('Median predicted GRF - PA GRF')
         
-        GRF.prediction.plot <- ggarrange(p5, p6, p7, ncol = 2, nrow = 2)
+        GRF.prediction.plot <- ggarrange(p5, p6, p7, p8, ncol = 2, nrow = 2)
         
         # Save plot
         rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
         
         ggsave(paste0(rep_path, "/SITEA_GRF_Plot.png"), GRF.prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        
+      }
+      
+      # Plot the fixed effect with true fixed effect
+      if(pred.fixed == TRUE & mod.type == "spatial") {
+        
+        # First extract the TRUE fixed effect for comparison
+        # Crop out the TRUE fixed effect from the Site A
+        fixed.rast <- reps.setup.list[[name]][[rep]]$latent.list$fixed.rast
+        fixed.rast.SiteA <- crop(fixed.rast, ext(rand.gridA))
+        
+        # Make a plot for the TRUE random effect
+        p5 <- fixed.rast.SiteA %>% 
+          as.data.frame(xy = T) %>% 
+          ggplot() +
+          geom_tile(aes(x = x, y = y, fill = int)) +
+          scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+          coord_fixed() +
+          theme_bw() +
+          theme(axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                legend.ticks = element_blank(),
+                legend.title = element_blank(),
+                plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines"),
+                plot.title = element_text(hjust = 0.5)) +  # Reduce margins
+          ggtitle('True fixed effect')
+        
+        p6 <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.Integrated.GRF +
+          ggtitle('Median predicted FIXED - Integrated GRF')
+        p7 <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.PO.GRF +
+          ggtitle('Median predicted FIXED - PO GRF')
+        p8 <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.PA.GRF +
+          ggtitle('Median predicted FIXED - PA GRF')
+        
+        FIXED.prediction.plot <- ggarrange(p5, p6, p7, p8, ncol = 2, nrow = 2)
+        
+        # Save plot
+        rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
+        
+        ggsave(paste0(rep_path, "/SITEA_FIXED_Plot.png"), FIXED.prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
         
       }
       
