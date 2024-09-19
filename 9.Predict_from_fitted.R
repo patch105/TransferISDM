@@ -2,7 +2,8 @@
 
 # 9. Predict from fitted --------------------------------------------------
 
-predict_from_fitted_SiteB_func <- function(reps.setup.list) {
+predict_from_fitted_SiteB_func <- function(reps.setup.list,
+                                           posterior_nsamps) {
                                                     
   #### PREDICT for every extrap type, for every rep, for every model type
   # Save prediction to the model list
@@ -37,7 +38,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list) {
           # Had to add the [[1]] here because the summary is always list of length 1
           mod[[1]]$preds.link.siteB <- predict(mod[[1]],
                                                covars = cov.rep,
-                                               S = 50, 
+                                               S = posterior_nsamps, 
                                                intercept.terms = "PO_Intercept",
                                                type = "link",
                                                includeRandom = F)
@@ -50,7 +51,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list) {
           # Had to add the [[1]] here because the summary is always list of length 1
           mod[[1]]$preds.link.siteB <- predict(mod[[1]],
                                                covars = cov.rep,
-                                               S = 50, 
+                                               S = posterior_nsamps, 
                                                intercept.terms = "PA_Intercept",
                                                type = "link",
                                                includeRandom = F)
@@ -76,7 +77,8 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list) {
 predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                            pred.GRF = FALSE,
                                            pred.fixed = FALSE,
-                                           mod.type = "non-spatial") {
+                                           mod.type = "non-spatial",
+                                           posterior_nsamps) {
   
   #### PREDICT for every extrap type, for every rep, for every model type
   # Save prediction to the model list
@@ -117,7 +119,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.link.siteA <- predict(mod[[1]],
                                                  covars = cov.rep,
-                                                 S = 50, 
+                                                 S = posterior_nsamps, 
                                                  intercept.terms = "PO_Intercept",
                                                  type = "link",
                                                  includeRandom = T)
@@ -130,7 +132,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.link.siteA <- predict(mod[[1]],
                                                  covars = cov.rep,
-                                                 S = 50, 
+                                                 S = posterior_nsamps, 
                                                  intercept.terms = "PA_Intercept",
                                                  type = "link",
                                                  includeRandom = T)
@@ -152,7 +154,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.link.siteA <- predict(mod[[1]],
                                                  covars = cov.rep,
-                                                 S = 50, 
+                                                 S = posterior_nsamps, 
                                                  intercept.terms = "PO_Intercept",
                                                  type = "link",
                                                  includeRandom = F)
@@ -165,7 +167,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.link.siteA <- predict(mod[[1]],
                                                  covars = cov.rep,
-                                                 S = 50, 
+                                                 S = posterior_nsamps, 
                                                  intercept.terms = "PA_Intercept",
                                                  type = "link",
                                                  includeRandom = F)
@@ -189,7 +191,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
                                                  covars = cov.rep,
-                                                 S = 50, 
+                                                 S = posterior_nsamps, 
                                                  intercept.terms = "PO_Intercept",
                                                  type = "link",
                                                  includeRandom = T,
@@ -203,7 +205,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
                                                  covars = cov.rep,
-                                                 S = 50, 
+                                                 S = posterior_nsamps, 
                                                  intercept.terms = "PA_Intercept",
                                                  type = "link",
                                                  includeRandom = T,
@@ -228,7 +230,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
                                                 covars = cov.rep,
-                                                S = 50, 
+                                                S = posterior_nsamps, 
                                                 intercept.terms = "PO_Intercept",
                                                 type = "link",
                                                 includeRandom = F,
@@ -242,7 +244,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
                                                 covars = cov.rep,
-                                                S = 50, 
+                                                S = posterior_nsamps, 
                                                 intercept.terms = "PA_Intercept",
                                                 type = "link",
                                                 includeRandom = F,

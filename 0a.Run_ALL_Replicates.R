@@ -102,6 +102,9 @@ latent.type = "lgcp" # OR "ipp"
 pred.GRF <- TRUE 
 pred.fixed <- TRUE
 
+# Number of posterior samples to take * note that it slows things down
+posterior_nsamps <- 500
+
 # Choosing thinning or bias for PO sampling -------------------------------
 
 bias <- TRUE
@@ -140,6 +143,7 @@ Run_Replicate_Func(n_cores = n_cores,
                    latent.type = latent.type,
                    pred.GRF = pred.GRF,
                    pred.fixed = pred.fixed,
+                   posterior_nsamps = posterior_nsamps,
                    job_index = job_index)
 
 
