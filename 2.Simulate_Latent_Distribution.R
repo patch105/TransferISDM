@@ -16,7 +16,7 @@ sim_latent_dist_func <- function(beta0,
                                  plot.lg.s = FALSE,
                                  latent.type) {
   
-  nu <- 1 # Smoothness parameter - ONLY FOR MATERN
+  nu <- 1/2 # Smoothness parameter - ONLY FOR MATERN
   
   # Assumed intensity at mean of enviro. variables
   # log(lambda) = intercept + b1*(mean of cov1) + b2*(mean of cov2)
@@ -37,24 +37,53 @@ sim_latent_dist_func <- function(beta0,
   if(latent.type == "lgcp") {
     
     # Create LGCP with environmental covariate
-    # lg.s <- rLGCP('exp', mu = mu,
-    #               var=var, scale=scal)
+    # Separate out fixed and random effects
     
-    lg.s <- rLGCP('matern', mu = mu,
-                  var=variance, scale=scal, nu=nu)
+    xSeq <- terra::xFromCol(cov1)
+    ySeq <- terra::yFromRow(cov1)
+    
+    # Simulate the random effect
+    REff <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = variance , rho = scal, nu = nu)
+    
+    REff <- as.numeric(REff)
+    
+    GRF.mat <- cov1.mat
+    
+    GRF.mat[, "cov"] <- as.numeric(REff)
+    
+    colnames(GRF.mat)[colnames(GRF.mat) == "cov"] <- "GRF"
+    
+    # Save a version that removes mu and just keeps GRF for plotting
+    GRF.rast <- rast((mu*0 + GRF.mat[, "GRF"]))
+    
+    crs(GRF.rast) <- crs(cov1)
+    names(GRF.rast) <- "GRF"
+    
+    # Save a version that just keeps fixed effects for plotting
+    fixed.rast <- rast(mu)
+    crs(fixed.rast) <- crs(cov1)
+    names(fixed.rast) <- "Fixed"
+    
+    # Add fixed and random effects
+    mu <- mu + GRF.mat[, "GRF"]
+    
+    # Simulate the latent Gaussian field
+    lg.s <- rpoispp(exp(mu.GRF))
+    
+    latent.list <- list(mu = mu, lg.s = lg.s, fixed.rast = fixed.rast, GRF.rast = GRF.rast) 
     
   } 
   
   if(latent.type == "ipp") {
     
-    # Create IPP with environmental covariate
-    lg.s <- rpoispp(mu)
+    # Create IPP with environmental covariates
+    lg.s <- rpoispp(exp(mu))
    
+    latent.list <- list(mu = mu, lg.s = lg.s) 
+    
   }
   
   
-  
-  latent.list <- list(mu = mu, lg.s = lg.s) 
   
   if(plot.mu == TRUE) {
     

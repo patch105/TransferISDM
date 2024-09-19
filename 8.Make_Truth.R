@@ -15,12 +15,10 @@ make_truth_func <- function(reps.setup.list) {
     
     imap(extrap.type, function(rep, rep_index) {
       
-      # True intensity
-      Lam <- attr(rep$latent.list$lg.s, "Lambda")
-      
       # Get the (v) log intensity values (expected number of points per unit area)
       # NOTE - the format is from the lgcp package, so I need to reverse the order if want to plot
-      true_log_int <- log(Lam$v) 
+      # NOTE because log(intensity) = mu (when using rpoispp), the true_log_int = mu
+      true_log_int <- mu
       
       # Reverse the row order
       true_log_int <- apply(true_log_int, 2, rev)
