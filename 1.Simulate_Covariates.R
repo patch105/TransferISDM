@@ -1,6 +1,7 @@
 library(NLMR)
 library(landscapetools)
 library(RandomFields) # See below for download from archived files.
+library(RISDM)
 
 # 1.Simulate_Covariates ---------------------------------------------------
 
@@ -16,37 +17,61 @@ sim_covariates_func <- function(plot,
                                 res,
                                 seed,
                                 range_cov1,
-                                range_cov2) {
+                                range_cov2,
+                                east_min,
+                                east_max,
+                                north_min,
+                                north_max) {
   
  
+    # cov1 <- nlm_gaussianfield(ncol = ncol,
+  #                           nrow = nrow,
+  #                           resolution = res,
+  #                           autocorr_range = range_cov1, # Maximum range (raster units) of spatial autocorrelation
+  #                           mag_var = 1, # Magnitude of variation over the landscape
+  #                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
+  #                           mean = 0.5, # Mean value over the field
+  #                           user_seed = NULL, # Set random seed for the simulation
+  #                           rescale = T # If T, the values are rescaled between 0 and 1
+  # ) %>% 
+  #   rast()
   
-  cov1 <- nlm_gaussianfield(ncol = ncol,
-                            nrow = nrow,
-                            resolution = res,
-                            autocorr_range = range_cov1, # Maximum range (raster units) of spatial autocorrelation
-                            mag_var = 1, # Magnitude of variation over the landscape
-                            nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
-                            mean = 0.5, # Mean value over the field
-                            user_seed = NULL, # Set random seed for the simulation
-                            rescale = T # If T, the values are rescaled between 0 and 1
-  ) %>% 
-    rast()
+  # cov2 <- nlm_gaussianfield(ncol = ncol,
+  #                           nrow = nrow,
+  #                           resolution = res,
+  #                           autocorr_range = range_cov2, # Maximum range (raster units) of spatial autocorrelation
+  #                           mag_var = 1, # Magnitude of variation over the landscape
+  #                           nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
+  #                           mean = 0.5, # Mean value over the field
+  #                           user_seed = NULL, # Set random seed for the simulation
+  #                           rescale = T # If T, the values are rescaled between 0 and 1
+  # ) %>% 
+  #   rast()
+  
+  landscape.rast <- terra::rast(xmin = east_min, 
+                                xmax = east_max, 
+                                ymin = north_min,  
+                                ymax = north_max, 
+                                nrows = nrow,
+                                ncols = ncol,
+                                vals = 1:1000)
+  
+  crs(landscape.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+  
+  xSeq <- terra::xFromCol(landscape.rast)
+  ySeq <- terra::yFromRow(landscape.rast)
+  
+  cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov1, nu = 1/2) 
+  
+  cov1 <- rast(cov1)
   
   crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
   
   names(cov1) <- "cov"
   
-  cov2 <- nlm_gaussianfield(ncol = ncol,
-                            nrow = nrow,
-                            resolution = res,
-                            autocorr_range = range_cov2, # Maximum range (raster units) of spatial autocorrelation
-                            mag_var = 1, # Magnitude of variation over the landscape
-                            nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
-                            mean = 0.5, # Mean value over the field
-                            user_seed = NULL, # Set random seed for the simulation
-                            rescale = T # If T, the values are rescaled between 0 and 1
-  ) %>% 
-    rast()
+  cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov2, nu = 1/2) 
+  
+  cov2 <- rast(cov1)
   
   crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
   

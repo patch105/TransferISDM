@@ -62,7 +62,11 @@ Run_Replicate_Func <- function(n_cores,
                                     res = res,
                                     seed = NA,
                                     range_cov1 = range_cov1,
-                                    range_cov2 = range_cov2)
+                                    range_cov2 = range_cov2,
+                                    east_min = east_min,
+                                    east_max = east_max,
+                                    north_min = north_min,
+                                    north_max = north_max)
     
     
     # 2. Simulate Latent Distribution -----------------------------------------

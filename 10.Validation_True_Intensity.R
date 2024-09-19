@@ -188,7 +188,7 @@ validation_SiteA_func <- function(reps.setup.list,
         } else { cor.GRF = NULL }
         
         
-        if(pred.fixed = TRUE) {
+        if(pred.fixed == TRUE) {
           
           median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
           
