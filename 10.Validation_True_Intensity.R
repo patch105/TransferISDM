@@ -183,7 +183,7 @@ validation_SiteA_func <- function(reps.setup.list,
           
           median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
           
-          cor.GRF <- cor(as.vector(median.int.pred), as.vector(GRF.rast.SiteA))
+          cor.GRF <- cor(as.vector(median.GRF.pred), as.vector(GRF.rast.SiteA))
           
         } else { cor.GRF = NULL }
         
@@ -192,7 +192,7 @@ validation_SiteA_func <- function(reps.setup.list,
           
           median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
           
-          cor.FIXED <- cor(as.vector(median.int.pred), as.vector(fixed.rast.SiteA))
+          cor.FIXED <- cor(as.vector(median.FIXED.pred), as.vector(fixed.rast.SiteA))
           
         } else { cor.FIXED = NULL }
         

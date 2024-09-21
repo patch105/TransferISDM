@@ -280,7 +280,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
                   legend.title = element_blank()) 
           
           # Save back to main list
-          reps.setup.list[[name]][[rep]][[plot.name.GRF]] <- p 
+          reps.setup.list[[name]][[rep]][[plot.name.FIXED]] <- p 
           
           
         }
@@ -345,7 +345,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         p5 <- GRF.rast.SiteA %>% 
           as.data.frame(xy = T) %>% 
           ggplot() +
-          geom_tile(aes(x = x, y = y, fill = int)) +
+          geom_tile(aes(x = x, y = y, fill = GRF)) +
           scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
           coord_fixed() +
           theme_bw() +
@@ -385,7 +385,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         p5 <- fixed.rast.SiteA %>% 
           as.data.frame(xy = T) %>% 
           ggplot() +
-          geom_tile(aes(x = x, y = y, fill = int)) +
+          geom_tile(aes(x = x, y = y, fill = Fixed)) +
           scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
           coord_fixed() +
           theme_bw() +

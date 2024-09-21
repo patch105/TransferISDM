@@ -71,7 +71,7 @@ sim_covariates_func <- function(plot,
   
   cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov2, nu = 1/2) 
   
-  cov2 <- rast(cov1)
+  cov2 <- rast(cov2)
   
   crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
   

@@ -26,7 +26,7 @@ pa_sampling_func <- function(reps.setup.list) {
       
       # Set size of grid (number of cells) for PA grid in Site A (Reference)
       # NOTE - must be smaller than total cell number in x y directions
-      rast_cellsA <- c(50, 30)
+      rast_cellsA <- c(10, 10)
       rast_sizeA <- c(rast_cellsA[1]*res(rand.gridA)[1], rast_cellsA[2]*res(rand.gridA)[2])
       
       # Get coords of overall grid domain boundary
