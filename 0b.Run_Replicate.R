@@ -345,11 +345,11 @@ Run_Replicate_Func <- function(n_cores,
   # 7. Extract Model Results ------------------------------------------------
   
   source("7.Extract_Model_Results.R")
-  
-  extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list,
-                                                   mod.type = mod.type)
-  
-  write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary_Job_", job_index, ".csv"))
+
+extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list,
+                                                 mod.type = mod.type)
+
+write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary_Job_", job_index, ".csv"))
   
   
   # 8. Make Truth -----------------------------------------------------------
@@ -362,7 +362,7 @@ Run_Replicate_Func <- function(n_cores,
   # 9. Predict to Site B from fitted --------------------------------------------------
   
   source("9.Predict_from_fitted.R")
-  
+
   reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list,
                                                     posterior_nsamps = posterior_nsamps)
   
@@ -371,33 +371,33 @@ Run_Replicate_Func <- function(n_cores,
   # 10. Validation true intensity -------------------------------------------
   
   source("10.Validation_True_Intensity.R")
-  
+
   true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
-  
+
   write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
-  
+
   
   # 12B. Plot Data  ---------------------------------------------------------
   # If I want to plot the Presence-Absence and Presence-Only data
   
   source("12B.Plot_Data.R")
-  
+
   plot_data_func(reps.setup.list = reps.setup.list,
                  outpath = outpath,
                  scenario_name = scenario_name,
                  job_index = job_index)
-  
+
   
   # 12C. Plot Predictions ---------------------------------------------------
   
   source("12C.Plot_Predictions.R")
-  
+
   plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
                               outpath = outpath,
                               scenario_name = scenario_name,
                               mod.type = mod.type,
                               job_index = job_index)
-  
+
   
   # OPTIONAL - predict to and validate Site A -------------------------------
   
@@ -409,7 +409,7 @@ Run_Replicate_Func <- function(n_cores,
                                                     pred.fixed = pred.fixed,
                                                     mod.type = mod.type,
                                                     posterior_nsamps = posterior_nsamps)
-  
+
   plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
                               outpath = outpath,
                               scenario_name = scenario_name,

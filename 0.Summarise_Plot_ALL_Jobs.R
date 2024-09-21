@@ -5,7 +5,7 @@
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "TestB_Sept17"
+scenario_name = "Test_Sep20"
 
 outpath <- file.path(getwd(), "output")
 

@@ -85,7 +85,7 @@ colnames(coords) <- c("eastings", "northings")
 # Run setup for replicates ------------------------------------------------
 
 # Specify number of replicates per extrapolation type
-nreps <- 1
+nreps <- 10
 
 beta0 <- -2 # Intercept
 beta1 <- 2 # Coefficient for cov 1
