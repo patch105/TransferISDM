@@ -26,7 +26,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
       rand.gridB <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridB
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
       true_log_int.rast.SiteB <- crop(true_log_int.rast, ext(rand.gridB))
-      
+      range_true_log_int.SiteB <- range(values(true_log_int.rast.SiteB))
       
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
@@ -47,7 +47,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
             as.data.frame(xy = T) %>%  
             ggplot() + 
             geom_tile(aes(x = x, y = y, fill = Median)) + 
-            scale_fill_viridis() +
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_true_log_int.SiteB) +
             coord_fixed() + 
             theme_bw() + 
             theme(axis.title.x = element_blank(),
@@ -207,6 +207,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
       true_log_int.rast.SiteA <- crop(true_log_int.rast, ext(rand.gridA))
       
+      range_true_log_int.SiteA <- range(values(true_log_int.rast.SiteA))
+      
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
@@ -225,7 +227,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           as.data.frame(xy = T) %>%  
           ggplot() + 
           geom_tile(aes(x = x, y = y, fill = Median)) + 
-          scale_fill_viridis() +
+          scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_true_log_int.SiteA) +
           coord_fixed() + 
           theme_bw() + 
           theme(axis.title.x = element_blank(),
@@ -240,14 +242,21 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         ## IF ALSO PLOTTING THE GRF PREDICTION
         if(pred.GRF == TRUE) {
           
+          # First extract the TRUE random effect for comparison
+          # Crop out the TRUE random effect from the Site A
+          GRF.rast <- reps.setup.list[[name]][[rep]]$latent.list$GRF.rast
+          GRF.rast.SiteA <- crop(GRF.rast, ext(rand.gridA))
+          range.GRF.rast <- range(values(GRF.rast.SiteA))
+          
           median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
+          
           plot.name.GRF <- paste0("pred.GRF.plot.", type)
           
           p <- median.GRF.pred %>% 
             as.data.frame(xy = T) %>%  
             ggplot() + 
             geom_tile(aes(x = x, y = y, fill = Median)) + 
-            scale_fill_viridis() +
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.GRF.rast) +
             coord_fixed() + 
             theme_bw() + 
             theme(axis.title.x = element_blank(),
@@ -264,14 +273,21 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         ## IF ALSO PLOTTING THE FIXED EFFECT
         if(pred.fixed == TRUE) {
           
+          # First extract the TRUE fixed effect for comparison
+          # Crop out the TRUE fixed effect from the Site A
+          fixed.rast <- reps.setup.list[[name]][[rep]]$latent.list$fixed.rast
+          fixed.rast.SiteA <- crop(fixed.rast, ext(rand.gridA))
+          range.fixed.rast <- range(values(fixed.rast.SiteA))
+          
           median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
+          
           plot.name.FIXED <- paste0("pred.FIXED.plot.", type)
           
           p <- median.FIXED.pred %>% 
             as.data.frame(xy = T) %>%  
             ggplot() + 
             geom_tile(aes(x = x, y = y, fill = Median)) + 
-            scale_fill_viridis() +
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.fixed.rast) +
             coord_fixed() + 
             theme_bw() + 
             theme(axis.title.x = element_blank(),
