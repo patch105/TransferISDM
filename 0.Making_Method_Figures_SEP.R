@@ -77,39 +77,53 @@ colnames(coords) <- c("eastings", "northings")
 # remotes::install_github("ropensci/NLMR")
 # install.packages("landscapetools")
 
-library(NLMR)
-library(landscapetools)
-library(RandomFields) # See above for download from archived files. 
+
 library(terra)
 library(RISDM)
 
-cov1 <- nlm_gaussianfield(ncol = ncol,
-                          nrow = nrow,
-                          resolution = res,
-                          autocorr_range = 10, # Maximum range (raster units) of spatial autocorrelation
-                          mag_var = 1, # Magnitude of variation over the landscape
-                          nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
-                          mean = 0.5, # Mean value over the field
-                          user_seed = 2L, # Set random seed for the simulation
-                          rescale = T # If T, the values are rescaled between 0 and 1
-) %>% 
-  rast()
+landscape.rast <- terra::rast(xmin = east_min, 
+                              xmax = east_max, 
+                              ymin = north_min,  
+                              ymax = north_max, 
+                              nrows = nrow,
+                              ncols = ncol,
+                              vals = 1:1000)
 
+crs(landscape.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+
+#### Make a simple Cov 1 #####
+
+# Generate a matrix of continuous values from 0 to 1, going left to right
+covariate_matrix <- matrix(seq(1, 0, length.out = ncol), nrow = nrow, ncol = ncol, byrow = TRUE)
+
+# # Flatten the matrix into a vector to match the expected input format for 'vals'
+covariate_vals <- as.vector(covariate_matrix)
+
+cov1 <- rast(nrows = nrow,
+             ncols = ncol,
+             xmin = east_min,
+             xmax = east_max,
+             ymin = north_min,
+             ymax = north_max,
+             resolution = res,
+             vals = covariate_vals,
+             names = c("cov")
+)
 crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
 names(cov1) <- "cov"
 
-cov2 <- nlm_gaussianfield(ncol = ncol,
-                          nrow = nrow,
-                          resolution = res,
-                          autocorr_range = 100, # Maximum range (raster units) of spatial autocorrelation
-                          mag_var = 1, # Magnitude of variation over the landscape
-                          nug = 0.01, # Magnitude of variation in the scale of the autocorr_range (smaller values = more homogenous)
-                          mean = 0.5, # Mean value over the field
-                          user_seed = 3L, # Set random seed for the simulation
-                          rescale = T # If T, the values are rescaled between 0 and 1
-) %>% 
-  rast()
+
+#### Make a spatially structured Cov 2 #####
+
+range_cov2 = 300
+
+xSeq <- terra::xFromCol(landscape.rast)
+ySeq <- terra::yFromRow(landscape.rast)
+
+cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov2, nu = 1/2) 
+
+cov2 <- rast(cov2)
 
 crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
 
@@ -146,7 +160,12 @@ c2 <- cov2 %>%
 
 Fig.1a <- ggarrange(c1, c2, ncol = 2, nrow = 1, align = "v", widths = c(0.5, 0.5))
 # fig.1a 
-# ggsave(plot = fig.1a, filename = paste0(outpath, "/output/Covariates_GRF.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Fig.1a, filename = paste0("output/Figures/Covariates_plot.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+
+ggsave(plot = c1, filename = paste0("output/Figures/Covariate1_plot.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+
+ggsave(plot = c2, filename = paste0("output/Figures/Covariate2_plot.png"), w = 21.5, h = 18, units = "cm", dpi = 400, device = "png")
+
 
 
 # FIGURE 1B. --------------------------------------------------------------
