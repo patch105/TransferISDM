@@ -20,11 +20,58 @@ library(purrr)
 library(readr)
 
 
-# OUTPUT FOLDER & SCENARIO NAME -------------------------------------------
+
+# Scenario choices --------------------------------------------------------
+
+scenario_name = "Test_all_EXTRAP_random"
+
+nreps <- 4 # Replicates per extrapolation type
+
+# Spatial autocorrelation?
+latent.type = "lgcp" # OR "ipp" 
+
+# Bias in PO sampling?
+bias <- TRUE
+
+# Model choices -----------------------------------------------------------
+
+# Model types to run
+mod.type = "spatial"
+
+# If doing a spatial model, choose whether to predict the GRF and the Fixed effect
+pred.GRF <- TRUE 
+pred.fixed <- TRUE
+
+
+# Parameters --------------------------------------------------------------
+
+beta0 <- -2 # Intercept
+beta1 <- 2 # Coefficient for cov 1
+beta2 <- 0.1 # Coefficient for cov 2
+
+scal <- 20 # Scale parameter (range of spatial effect)
+variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+
+# PO sampling values
+detect.prob <- 0.2
+maxprob <- 0.2
+
+
+# Implementation choices --------------------------------------------------
+
+n_cores <- 3
+
+# Number of posterior samples to take * note that it slows things down
+posterior_nsamps <- 500
+
+
+
+# START SETUP -------------------------------------------------------------
+
+
+# Output folder name ------------------------------------------------------
 
 outpath <- file.path(getwd(), "output")
-
-scenario_name = "Test_Sep19"
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
@@ -33,16 +80,6 @@ if(!dir.exists(file.path(outpath, scenario_name))) {
   
 }
 
-
-# Number of cores ---------------------------------------------------------
-
-n_cores <- 3
-
-# PARAMETERS --------------------------------------------------------------
-
-# Set the seed for all
-# seed <- 24
-# set.seed(50)
 
 # DOMAIN SETUP ------------------------------------------------------------
 
@@ -83,33 +120,6 @@ colnames(coords) <- c("eastings", "northings")
 
 
 # Run setup for replicates ------------------------------------------------
-
-# Specify number of replicates per extrapolation type
-nreps <- 10
-
-beta0 <- -2 # Intercept
-beta1 <- 2 # Coefficient for cov 1
-beta2 <- 0.1 # Coefficient for cov 2
-
-scal <- 20 # Scale parameter (range of spatial effect)
-variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
-
-mod.type = "spatial"
-
-latent.type = "lgcp" # OR "ipp"
-
-# If doing a spatial model, choose whether to predict the GRF and the Fixed effect
-pred.GRF <- TRUE 
-pred.fixed <- TRUE
-
-# Number of posterior samples to take * note that it slows things down
-posterior_nsamps <- 500
-
-# Choosing thinning or bias for PO sampling -------------------------------
-
-bias <- TRUE
-detect.prob <- 0.2
-maxprob <- 0.2
 
 source("0b.Run_Replicate.R")
 
