@@ -171,8 +171,9 @@ run_extrap_func <- function(n_cores,
     # If median extrap is not less than or = to 50, but is less than or = to 100, moderate
     # If median extrap is not less than or = to 100, high
     
-    extrap.type <- ifelse(summary.extrap$median <= 10 , "Low", 
-                          ifelse(summary.extrap$median <= 50, "Moderate", "High"))
+    extrap.type <- ifelse(summary.extrap$median <= 5 , "Low", 
+                          ifelse(summary.extrap$median <= 10, "Moderate", 
+                                 ifelse(summary.extrap$median <= 15, "High", "Very High")))
     
     # Plotting data in covariate space with extrapolation  ------------------------
     
@@ -196,11 +197,15 @@ run_extrap_func <- function(n_cores,
     
     # If the output adds a required replicate to meet nreps, keep it
     # (x3 because there's a cov.list, latent.list, and extrap.reps.out)
-    if (length(reps.setup.list[[extrap.type]]) < nreps) { 
+    
+    if (extrap.type == "Very High") { # If above high threshold, don't save
+      
+      saved <- 0
+      
+    } else if(length(reps.setup.list[[extrap.type]]) < nreps) {
       
       # Note that an output has been saved
       saved <- 1
-      
       
     } else {
       saved <- 0
