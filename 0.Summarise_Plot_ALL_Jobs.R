@@ -5,7 +5,7 @@
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Test_Sep20"
+scenario_name = "Test_Sep23"
 
 outpath <- file.path(getwd(), "output")
 
@@ -114,4 +114,12 @@ plot_validation_SiteA_func(true.validation.df = true.validation.SiteA.df,
                            pred.GRF = pred.GRF,
                            pred.fixed = pred.fixed)
 
+
+
+### OPTIONAL
+plot_parameter_recovery_continuous_EXTRAP_func(extrap.scenario.df = extrap.scenario.df, 
+                                               save = TRUE,
+                                               outpath = outpath,
+                                               scenario_name = scenario_name,
+                                               mod.type = mod.type)
 

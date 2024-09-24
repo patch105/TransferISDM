@@ -47,6 +47,7 @@ Run_Replicate_Func <- function(n_cores,
     # 1.Simulate Covariates ---------------------------------------------------
     
     source("1.Simulate_Covariates.R")
+    # source("1B.Simulate_Covariates_Simple_Cov.R")
     
     # Set autocorrelation range Cov1
     range_cov1 <<- 10 # Maximum range (raster units) of spatial autocorrelation

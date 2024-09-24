@@ -49,7 +49,7 @@ plot_residuals_func <- function(reps.setup.list,
 plot_parameter_recovery_func <- function(outpath,
                                     scenario_name,
                                     extrap.scenario.df,
-                                    save = FALSE,
+                                    save,
                                     beta1,
                                     beta2,
                                     beta0,
@@ -193,9 +193,6 @@ plot_parameter_recovery_func <- function(outpath,
   }
     
     
-
-
-
 
 # Spatial version -----------------------------------------------------
 
@@ -389,36 +386,36 @@ if(mod.type == "spatial") {
  
 
 
-# # PLOT VALIDATION CONTINUOUS EXTRAPOLATION --------------------------------
-# 
-# plot_parameter_recovery_continuous_EXTRAP_func <- function(extrap.scenario.df,
-#                                                   save = FALSE,
-#                                                   outpath,
-#                                                   scenario_name,
-#                                                   mod.type) {
-#   # Plot the validation
-# 
-#   b1 <- extrap.scenario.df %>% 
-#     ggplot(aes(x = extrap.median, y = beta1.mean, color = mod.type)) +
-#     geom_point(alpha = 0.5) +
-#     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-#     geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
-#     labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
-#     scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-#     scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-#     coord_cartesian(xlim = c(NA, 50)) +
-#     theme_bw()
-#   
-#   extrap.scenario.df %>% 
-#     ggplot(aes(x = extrap.median, y = beta2.mean, color = mod.type)) +
-#     geom_point(alpha = 0.5) +
-#     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-#     geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
-#     labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
-#     scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-#     scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-#     # coord_cartesian(xlim = c(NA, 50)) +
-#     theme_bw()
-#   
-#   }
+# PLOT VALIDATION CONTINUOUS EXTRAPOLATION --------------------------------
+
+plot_parameter_recovery_continuous_EXTRAP_func <- function(extrap.scenario.df,
+                                                  save,
+                                                  outpath,
+                                                  scenario_name,
+                                                  mod.type) {
+  # Plot the validation
+
+  b1 <- extrap.scenario.df %>%
+    ggplot(aes(x = extrap.median, y = beta1.mean, color = mod.type)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
+    geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
+    labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
+    scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+
+  extrap.scenario.df %>%
+    ggplot(aes(x = extrap.median, y = beta2.mean, color = mod.type)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
+    geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
+    labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
+    scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+
+  }
 
