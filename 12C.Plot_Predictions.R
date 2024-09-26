@@ -76,43 +76,79 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
               plot.title = element_text(hjust = 0.5)) +  # Reduce margins
         ggtitle('True log intensity')
       
-      if(mod.type == "non-spatial") {
+      pred.plot.list <- list()
+      
+      if(grepl("no-GRF", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
         
-        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.no.GRF +
+        p2a <- reps.setup.list[[name]][[rep]]$pred.plot.m.int +
           ggtitle('Median predicted log intensity - Integrated no GRF')
-        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.no.GRF +
+        p3a <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO +
           ggtitle('Median predicted log intensity - PO no GRF')
-        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.no.GRF +
+        p4a <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA +
           ggtitle('Median predicted log intensity - PA no GRF')
-        
+       
+        pred.plot.list$prediction.plot.no.GRF <- ggarrange(p1, p2a, p3a, p4a, ncol = 2, nrow = 2)
+         
       }
       
-      if(mod.type == "spatial") {
+      if(grepl("spatial", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
         
-        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.GRF +
+        p2b <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF +
           ggtitle('Median predicted log intensity - Integrated GRF')
-        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.GRF +
+        p3b <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.GRF +
           ggtitle('Median predicted log intensity - PO GRF')
-        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.GRF +
+        p4b <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF +
           ggtitle('Median predicted log intensity - PA GRF')
         
+        pred.plot.list$prediction.plot.GRF <- ggarrange(p1, p2b, p3b, p4b, ncol = 2, nrow = 2)
+        
       }
       
-      prediction.plot <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+      if(grepl("no-GRF", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+        
+        p2c <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.bias +
+          ggtitle('Median predicted log intensity - Integrated no GRF w bias')
+        p3c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.bias +
+          ggtitle('Median predicted log intensity - PO no GRF w bias')
+        p4c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.bias +
+          ggtitle('Median predicted log intensity - PA no GRF w bias')
+        
+        pred.plot.list$prediction.plot.no.GRF.bias <- ggarrange(p1, p2c, p3c, p4c, ncol = 2, nrow = 2)
+        
+      }
+      
+      if(grepl("spatial", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+        
+        p2d <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF.bias +
+          ggtitle('Median predicted log intensity - Integrated GRF w bias')
+        p3d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.GRF.bias +
+          ggtitle('Median predicted log intensity - PO GRF w bias')
+        p4d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF.bias +
+          ggtitle('Median predicted log intensity - PA GRF w bias')
+        
+        pred.plot.list$prediction.plot.GRF.bias <- ggarrange(p1, p2d, p3d, p4d, ncol = 2, nrow = 2)
+        
+      }
+      
+      
       
       # Save plot
       rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
       
+      plot.names <- names(pred.plot.list)
       
-      ggsave(paste0(rep_path, "/Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
-    
+      for(x in seq_along(pred.plot.list)) {
         
-    }
-
-
+        plot.name <- plot.names[x]
+       
+        ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+         
+      }
+ 
+      }}
   }
   
-}
+
 
 
 # ################
@@ -239,70 +275,77 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         reps.setup.list[[name]][[rep]][[plot.name]] <- p     
         
         
-        ## IF ALSO PLOTTING THE GRF PREDICTION
-        if(pred.GRF == TRUE) {
+
+# If the model contains a GRF ---------------------------------------------
+
+        if(grepl("GRF", type, fixed = T)) {
           
-          # First extract the TRUE random effect for comparison
-          # Crop out the TRUE random effect from the Site A
-          GRF.rast <- reps.setup.list[[name]][[rep]]$latent.list$GRF.rast
-          GRF.rast.SiteA <- crop(GRF.rast, ext(rand.gridA))
-          range.GRF.rast <- range(values(GRF.rast.SiteA))
-          
-          median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
-          
-          plot.name.GRF <- paste0("pred.GRF.plot.", type)
-          
-          p <- median.GRF.pred %>% 
-            as.data.frame(xy = T) %>%  
-            ggplot() + 
-            geom_tile(aes(x = x, y = y, fill = Median)) + 
-            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.GRF.rast) +
-            coord_fixed() + 
-            theme_bw() + 
-            theme(axis.title.x = element_blank(),
-                  axis.title.y = element_blank(),
-                  legend.ticks = element_blank(),
-                  legend.title = element_blank()) 
-          
-          # Save back to main list
-          reps.setup.list[[name]][[rep]][[plot.name.GRF]] <- p 
-          
+          ## IF ALSO PLOTTING THE GRF PREDICTION
+          if(pred.GRF == TRUE) {
             
+            # First extract the TRUE random effect for comparison
+            # Crop out the TRUE random effect from the Site A
+            GRF.rast <- reps.setup.list[[name]][[rep]]$latent.list$GRF.rast
+            GRF.rast.SiteA <- crop(GRF.rast, ext(rand.gridA))
+            range.GRF.rast <- range(values(GRF.rast.SiteA))
+            
+            median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
+            
+            plot.name.GRF <- paste0("pred.GRF.plot.", type)
+            
+            p <- median.GRF.pred %>% 
+              as.data.frame(xy = T) %>%  
+              ggplot() + 
+              geom_tile(aes(x = x, y = y, fill = Median)) + 
+              scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.GRF.rast) +
+              coord_fixed() + 
+              theme_bw() + 
+              theme(axis.title.x = element_blank(),
+                    axis.title.y = element_blank(),
+                    legend.ticks = element_blank(),
+                    legend.title = element_blank()) 
+            
+            # Save back to main list
+            reps.setup.list[[name]][[rep]][[plot.name.GRF]] <- p 
+            
+            
+          }
+          
+          ## IF ALSO PLOTTING THE FIXED EFFECT
+          if(pred.fixed == TRUE) {
+            
+            # First extract the TRUE fixed effect for comparison
+            # Crop out the TRUE fixed effect from the Site A
+            fixed.rast <- reps.setup.list[[name]][[rep]]$latent.list$fixed.rast
+            fixed.rast.SiteA <- crop(fixed.rast, ext(rand.gridA))
+            range.fixed.rast <- range(values(fixed.rast.SiteA))
+            
+            median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
+            
+            plot.name.FIXED <- paste0("pred.FIXED.plot.", type)
+            
+            p <- median.FIXED.pred %>% 
+              as.data.frame(xy = T) %>%  
+              ggplot() + 
+              geom_tile(aes(x = x, y = y, fill = Median)) + 
+              scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.fixed.rast) +
+              coord_fixed() + 
+              theme_bw() + 
+              theme(axis.title.x = element_blank(),
+                    axis.title.y = element_blank(),
+                    legend.ticks = element_blank(),
+                    legend.title = element_blank()) 
+            
+            # Save back to main list
+            reps.setup.list[[name]][[rep]][[plot.name.FIXED]] <- p 
+            
+            
+          }
+          
         }
-        
-        ## IF ALSO PLOTTING THE FIXED EFFECT
-        if(pred.fixed == TRUE) {
-          
-          # First extract the TRUE fixed effect for comparison
-          # Crop out the TRUE fixed effect from the Site A
-          fixed.rast <- reps.setup.list[[name]][[rep]]$latent.list$fixed.rast
-          fixed.rast.SiteA <- crop(fixed.rast, ext(rand.gridA))
-          range.fixed.rast <- range(values(fixed.rast.SiteA))
-          
-          median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
-          
-          plot.name.FIXED <- paste0("pred.FIXED.plot.", type)
-          
-          p <- median.FIXED.pred %>% 
-            as.data.frame(xy = T) %>%  
-            ggplot() + 
-            geom_tile(aes(x = x, y = y, fill = Median)) + 
-            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.fixed.rast) +
-            coord_fixed() + 
-            theme_bw() + 
-            theme(axis.title.x = element_blank(),
-                  axis.title.y = element_blank(),
-                  legend.ticks = element_blank(),
-                  legend.title = element_blank()) 
-          
-          # Save back to main list
-          reps.setup.list[[name]][[rep]][[plot.name.FIXED]] <- p 
-          
-          
-        }
-        
-        
+ 
       }
+      
       
       p1 <- true_log_int.rast.SiteA %>% 
         as.data.frame(xy = T) %>% 
@@ -319,38 +362,77 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
               plot.title = element_text(hjust = 0.5)) +  # Reduce margins
         ggtitle('True log intensity')
       
-      if(mod.type == "non-spatial") {
+      pred.plot.list <- list()
+      
+      if(grepl("no-GRF", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
         
-        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.no.GRF +
+        p2a <- reps.setup.list[[name]][[rep]]$pred.plot.m.int +
           ggtitle('Median predicted log intensity - Integrated no GRF')
-        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.no.GRF +
+        p3a <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO +
           ggtitle('Median predicted log intensity - PO no GRF')
-        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.no.GRF +
+        p4a <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA +
           ggtitle('Median predicted log intensity - PA no GRF')
         
+        pred.plot.list$SITEA_prediction.plot.no.GRF <- ggarrange(p1, p2a, p3a, p4a, ncol = 2, nrow = 2)
+        
       }
       
-      if(mod.type == "spatial") {
+      if(grepl("spatial", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
         
-        p2 <- reps.setup.list[[name]][[rep]]$pred.plot.Integrated.GRF +
+        p2b <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF +
           ggtitle('Median predicted log intensity - Integrated GRF')
-        p3 <- reps.setup.list[[name]][[rep]]$pred.plot.PO.GRF +
+        p3b <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.GRF +
           ggtitle('Median predicted log intensity - PO GRF')
-        p4 <- reps.setup.list[[name]][[rep]]$pred.plot.PA.GRF +
+        p4b <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF +
           ggtitle('Median predicted log intensity - PA GRF')
         
+        pred.plot.list$SITEA_prediction.plot.GRF <- ggarrange(p1, p2b, p3b, p4b, ncol = 2, nrow = 2)
+        
       }
       
+      if(grepl("no-GRF", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+        
+        p2c <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.bias +
+          ggtitle('Median predicted log intensity - Integrated no GRF w bias')
+        p3c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.bias +
+          ggtitle('Median predicted log intensity - PO no GRF w bias')
+        p4c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.bias +
+          ggtitle('Median predicted log intensity - PA no GRF w bias')
+        
+        pred.plot.list$SITEA_prediction.plot.no.GRF.bias <- ggarrange(p1, p2c, p3c, p4c, ncol = 2, nrow = 2)
+        
+      }
       
-      prediction.plot <- ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+      if(grepl("spatial", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+        
+        p2d <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF.bias +
+          ggtitle('Median predicted log intensity - Integrated GRF w bias')
+        p3d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.GRF.bias +
+          ggtitle('Median predicted log intensity - PO GRF w bias')
+        p4d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF.bias +
+          ggtitle('Median predicted log intensity - PA GRF w bias')
+        
+        pred.plot.list$SITEA_prediction.plot.GRF.bias <- ggarrange(p1, p2d, p3d, p4d, ncol = 2, nrow = 2)
+        
+      }
+      
       
       # Save plot
       rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
       
-      ggsave(paste0(rep_path, "/SITEA_Prediction_Plot.png"), prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+      plot.names <- names(pred.plot.list)
+      
+      for(x in seq_along(pred.plot.list)) {
+        
+        plot.name <- plot.names[x]
+        
+        ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        
+      }
+      
       
       # Plot the random effect with true random effect
-      if(pred.GRF == TRUE & mod.type == "spatial") {
+      if(pred.GRF == TRUE & grepl("spatial", mod.type, fixed = T)) {
         
         # First extract the TRUE random effect for comparison
         # Crop out the TRUE random effect from the Site A
@@ -373,24 +455,53 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
                 plot.title = element_text(hjust = 0.5)) +  # Reduce margins
           ggtitle('True random effect')
         
-        p6 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.Integrated.GRF +
-          ggtitle('Median predicted GRF - Integrated GRF')
-        p7 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PO.GRF +
-          ggtitle('Median predicted GRF - PO GRF')
-        p8 <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.PA.GRF +
-          ggtitle('Median predicted GRF - PA GRF')
+        GRF.pred.plot.list <- list()
         
-        GRF.prediction.plot <- ggarrange(p5, p6, p7, p8, ncol = 2, nrow = 2)
+        if(!grepl("bias", mod.type, fixed = T)) {
+          
+          p6a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.int.GRF +
+            ggtitle('Median predicted GRF - Integrated GRF')
+          p7a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PO.GRF +
+            ggtitle('Median predicted GRF - PO GRF')
+          p8a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PA.GRF +
+            ggtitle('Median predicted GRF - PA GRF')
+          
+          GRF.pred.plot.list$SITEA_GRF.prediction.plot <- ggarrange(p5, p6a, p7a, p8a, ncol = 2, nrow = 2)
+          
+        }
+        
+        if(grepl("bias", mod.type, fixed = T)) {
+          
+          p6b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.int.GRF.bias +
+            ggtitle('Median predicted GRF - Integrated GRF w bias')
+          p7b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PO.GRF.bias +
+            ggtitle('Median predicted GRF - PO GRF w bias')
+          p8b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PA.GRF.bias +
+            ggtitle('Median predicted GRF - PA GRF w bias')
+          
+          GRF.pred.plot.list$SITEA_GRF.prediction.plot.bias <- ggarrange(p5, p6b, p7b, p8b, ncol = 2, nrow = 2)
+          
+        }
+        
+        
         
         # Save plot
         rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
         
-        ggsave(paste0(rep_path, "/SITEA_GRF_Plot.png"), GRF.prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        plot.names <- names(GRF.pred.plot.list)
+        
+        for(x in seq_along(GRF.pred.plot.list)) {
+          
+          plot.name <- plot.names[x]
+          
+          ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+          
+        }
         
       }
       
       # Plot the fixed effect with true fixed effect
-      if(pred.fixed == TRUE & mod.type == "spatial") {
+      if(pred.fixed == TRUE & grepl("spatial", mod.type, fixed = T)) {
         
         # First extract the TRUE fixed effect for comparison
         # Crop out the TRUE fixed effect from the Site A
@@ -413,19 +524,46 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
                 plot.title = element_text(hjust = 0.5)) +  # Reduce margins
           ggtitle('True fixed effect')
         
-        p6 <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.Integrated.GRF +
-          ggtitle('Median predicted FIXED - Integrated GRF')
-        p7 <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.PO.GRF +
-          ggtitle('Median predicted FIXED - PO GRF')
-        p8 <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.PA.GRF +
-          ggtitle('Median predicted FIXED - PA GRF')
+        FIXED.pred.plot.list <- list()
         
-        FIXED.prediction.plot <- ggarrange(p5, p6, p7, p8, ncol = 2, nrow = 2)
+        if(!grepl("bias", mod.type, fixed = T)) { 
+          
+          p6a <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.int.GRF +
+            ggtitle('Median predicted FIXED - Integrated GRF')
+          p7a <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PO.GRF +
+            ggtitle('Median predicted FIXED - PO GRF')
+          p8a <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PA.GRF +
+            ggtitle('Median predicted FIXED - PA GRF')
+          
+          FIXED.pred.plot.list$SITEA_FIXED.prediction.plot <- ggarrange(p5, p6a, p7a, p8a, ncol = 2, nrow = 2)
+          
+          }
+        
+        if(grepl("bias", mod.type, fixed = T)) { 
+          
+          p6b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.int.GRF.bias +
+            ggtitle('Median predicted FIXED - Integrated GRF w bias')
+          p7b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PO.GRF.bias +
+            ggtitle('Median predicted FIXED - PO GRF w bias')
+          p8b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PA.GRF.bias +
+            ggtitle('Median predicted FIXED - PA GRF w bias')
+          
+          FIXED.pred.plot.list$SITEA_FIXED.prediction.plot.bias <- ggarrange(p5, p6b, p7c, p8d, ncol = 2, nrow = 2)
+          
+        }
         
         # Save plot
         rep_path <- file.path(outpath, scenario_name, name,  paste0("Rep_", rep, "Job_", job_index))
         
-        ggsave(paste0(rep_path, "/SITEA_FIXED_Plot.png"), FIXED.prediction.plot, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        plot.names <- names(FIXED.pred.plot.list)
+        
+        for(x in seq_along(FIXED.pred.plot.list)) {
+          
+          plot.name <- plot.names[x]
+          
+          ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+          
+        }
         
       }
       

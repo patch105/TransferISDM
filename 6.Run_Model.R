@@ -24,7 +24,9 @@ run_model_func <- function(prior.mean,
                            offset,
                            doPlot,
                            distributionFormula,
-                           mod.type = "non-spatial") {
+                           mod.type = "no-GRF",
+                           bias) {
+                           
   
   
   # Model specification -----------------------------------------------------
@@ -46,6 +48,7 @@ run_model_func <- function(prior.mean,
                          prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
                          addRandom = TRUE) # With random effect
   
+
   # Load PA data and run models for each extrap type and replicate
   
   mods.reps <- map(reps.setup.list, function(extrap.type) {
@@ -63,6 +66,18 @@ run_model_func <- function(prior.mean,
       
       cov.rep <- rep$extrap.reps.out$covs.SiteA.rast
       
+
+      # Load bias covariate if relevant -----------------------------------------
+
+      # If there's bias and you're going to model it
+      if(bias == T & sum(grepl("bias", mod.type, fixed = T) > 0)) {
+        
+        # Add bias covariate to covariate stack
+        Bias.rast <- rep$Bias.rast
+        cov.rep <- c(cov.rep, Bias.rast)
+
+      }
+      
       # Mesh default ------------------------------------------------------------
       
       mesh.default <- makeMesh(cov.rep,
@@ -72,112 +87,169 @@ run_model_func <- function(prior.mean,
                                max.edge = max.edge, # Default c(0.2, 0.5)*dep.range
                                cutoff = cutoff, # Default 0.2*max.edge1
                                offset = offset, # Default is dep.range
-                               doPlot = doPlot
-      )
+                               doPlot = doPlot)
       
       
-      if(mod.type == "non-spatial") {
+      Model <- list()
+      
+      if(sum(grepl("no-GRF", mod.type, fixed = T)) > 0) { # If non-spatial model in list of models to run
         
         # Integrated Model Fitting - no GRF ---------------------------------------
         
-        m.int.no.GRF <- isdm(observationList = list(POdat = PO,
+        Model$m.int <- isdm(observationList = list(POdat = PO,
                                                     PAdat = PA_fit),
                              covars = cov.rep,
                              mesh = mesh.default,
                              responseNames = c(PO = NULL, PA = "presence"),
                              sampleAreaNames = c(PO = NULL, PA = "area"),
                              distributionFormula = distributionFormula,
-                             biasFormula = ~1, #Intercept only
+                             biasFormula = ~1, # Intercept only
                              artefactFormulas = list(PA = ~1), # Intercept only
                              control = my.control)
         
         # Presence-Only Model Fitting - no GRF ----------------------------------
         
         
-        m.PO.no.GRF <- isdm(observationList = list(POdat = PO), 
+        Model$m.PO <- isdm(observationList = list(POdat = PO), 
                             covars = cov.rep,
                             mesh = mesh.default,
                             responseNames = NULL,
                             sampleAreaNames = NULL,
                             distributionFormula = distributionFormula, # Linear w one cov
-                            biasFormula = ~1, #Intercept only
+                            biasFormula = ~1, # Intercept only
                             artefactFormulas = NULL,
                             control = my.control)     
         
         # Presence-Absence Model Fitting - no GRF ---------------------------------
         
-        m.PA.no.GRF <- isdm(observationList = list(PAdat = PA_fit), 
+        Model$m.PA <- isdm(observationList = list(PAdat = PA_fit), 
                             covars = cov.rep,
                             mesh = mesh.default,
                             responseNames = c(PA = "presence"),
                             sampleAreaNames = c(PA = "area"),
                             distributionFormula = distributionFormula, # Linear w one cov
-                            biasFormula = NULL, #Intercept only
+                            biasFormula = NULL, #Not applicable to PA
                             artefactFormulas = list(PA = ~1), # Intercept only
                             control = my.control)
         
-        # Create a data frame for this replicate
-        return(list(models = tibble(
-          Mod.type = c("Integrated.no.GRF", "PO.no.GRF", "PA.no.GRF"),
-          Model = list(m.int.no.GRF, m.PO.no.GRF, m.PA.no.GRF),
-          Summary = list(summary(m.int.no.GRF), summary(m.PO.no.GRF), summary(m.PA.no.GRF))) 
-          
-        ))
-        
       } 
       
-      if(mod.type == "spatial") {
+      if(sum(grepl("spatial", mod.type, fixed = T)) > 0) { # If spatial model in list of models to run
         
         # Integrated Model Fitting - with GRF -------------------------------------
         
         
-        m.int.GRF <- isdm(observationList = list(POdat = PO,
-                                                 PAdat = PA_fit),
-                          covars = cov.rep,
-                          mesh = mesh.default,
-                          responseNames = c(PO = NULL, PA = "presence"),
-                          sampleAreaNames = c(PO = NULL, PA = "area"),
-                          distributionFormula = distributionFormula, # Linear w one cov
-                          biasFormula = ~1, #Intercept only
-                          artefactFormulas = list(PA = ~1), # Intercept only
-                          control = my.control.GRF)
+        Model$m.int.GRF <- isdm(observationList = list(POdat = PO,
+                                                        PAdat = PA_fit),
+                                 covars = cov.rep,
+                                 mesh = mesh.default,
+                                 responseNames = c(PO = NULL, PA = "presence"),
+                                 sampleAreaNames = c(PO = NULL, PA = "area"),
+                                 distributionFormula = distributionFormula, # Linear w one cov
+                                 biasFormula = ~1, #Intercept only
+                                 artefactFormulas = list(PA = ~1), # Intercept only
+                                 control = my.control.GRF)
         
         # Presence-Only Model Fitting - with GRF ----------------------------------
         
         
-        m.PO.GRF <- isdm(observationList = list(POdat = PO),
-                         covars = cov.rep,
-                         mesh = mesh.default,
-                         responseNames = NULL,
-                         sampleAreaNames = NULL,
-                         distributionFormula = distributionFormula, # Linear w one cov
-                         biasFormula = ~1, #Intercept only
-                         artefactFormulas = NULL,
-                         control = my.control.GRF)
+        Model$m.PO.GRF <- isdm(observationList = list(POdat = PO),
+                                covars = cov.rep,
+                                mesh = mesh.default,
+                                responseNames = NULL,
+                                sampleAreaNames = NULL,
+                                distributionFormula = distributionFormula, # Linear w one cov
+                                biasFormula = ~1, #Intercept only
+                                artefactFormulas = NULL,
+                                control = my.control.GRF)
         
         # Presence-Absence Model Fitting - with GRF ---------------------------------
         
-        m.PA.GRF <- isdm(observationList = list(PAdat = PA_fit), 
-                         covars = cov.rep,
-                         mesh = mesh.default,
-                         responseNames = c(PA = "presence"),
-                         sampleAreaNames = c(PA = "area"),
-                         distributionFormula = distributionFormula, # Linear w one cov
-                         biasFormula = NULL, #Intercept only
-                         artefactFormulas = list(PA = ~1), # Intercept only
-                         control = my.control.GRF)
+        Model$m.PA.GRF <- isdm(observationList = list(PAdat = PA_fit), 
+                                covars = cov.rep,
+                                mesh = mesh.default,
+                                responseNames = c(PA = "presence"),
+                                sampleAreaNames = c(PA = "area"),
+                                distributionFormula = distributionFormula, # Linear w one cov
+                                biasFormula = NULL, #Intercept only
+                                artefactFormulas = list(PA = ~1), # Intercept only
+                                control = my.control.GRF)
         
-        # Create a data frame for this replicate
-        return(list(models = tibble(
-          Mod.type = c("Integrated.GRF", "PO.GRF", "PA.GRF"),
-          Model = list(m.int.GRF, m.PO.GRF, m.PA.GRF),
-          Summary = list(summary(m.int.GRF), summary(m.PO.GRF), summary(m.PA.GRF)))
-          
-      
-      
-      
-        ))}
+        }
         
+      if(sum(grepl("no-GRF.bias", mod.type, fixed = T)) > 0) { # If non-spatial model with bias
+        
+        # Integrated Model Fitting - no GRF ---------------------------------------
+        
+        Model$m.int.bias <- isdm(observationList = list(POdat = PO,
+                                                        PAdat = PA_fit),
+                                 covars = cov.rep,
+                                 mesh = mesh.default,
+                                 responseNames = c(PO = NULL, PA = "presence"),
+                                 sampleAreaNames = c(PO = NULL, PA = "area"),
+                                 distributionFormula = distributionFormula,
+                                 biasFormula = ~1 + bias, 
+                                 artefactFormulas = list(PA = ~1), # Intercept only
+                                 control = my.control)
+        
+        # Presence-Only Model Fitting - no GRF ----------------------------------
+        
+        
+        Model$m.PO.bias <- isdm(observationList = list(POdat = PO), 
+                                covars = cov.rep,
+                                mesh = mesh.default,
+                                responseNames = NULL,
+                                sampleAreaNames = NULL,
+                                distributionFormula = distributionFormula, # Linear w one cov
+                                biasFormula = ~1 + bias, 
+                                artefactFormulas = NULL,
+                                control = my.control)     
+        
+        
+      } 
+      
+      if(sum(grepl("spatial.bias", mod.type, fixed = T)) > 0) { # If spatial model with bias
+        
+        # Integrated Model Fitting - with GRF -------------------------------------
+        
+        Model$m.int.GRF.bias <- isdm(observationList = list(POdat = PO,
+                                                            PAdat = PA_fit),
+                                     covars = cov.rep,
+                                     mesh = mesh.default,
+                                     responseNames = c(PO = NULL, PA = "presence"),
+                                     sampleAreaNames = c(PO = NULL, PA = "area"),
+                                     distributionFormula = distributionFormula, # Linear w one cov
+                                     biasFormula = ~1 + bias, 
+                                     artefactFormulas = list(PA = ~1), # Intercept only
+                                     control = my.control.GRF)
+        
+        # Presence-Only Model Fitting - with GRF ----------------------------------
+        
+        
+        Model$m.PO.GRF.bias <- isdm(observationList = list(POdat = PO),
+                                    covars = cov.rep,
+                                    mesh = mesh.default,
+                                    responseNames = NULL,
+                                    sampleAreaNames = NULL,
+                                    distributionFormula = distributionFormula, # Linear w one cov
+                                    biasFormula = ~1 + bias, 
+                                    artefactFormulas = NULL,
+                                    control = my.control.GRF)
+        
+      }
+
+      # List and summarise all models run ---------------------------------------
+
+      Mod.type <- names(Model)
+      
+      Summary <- lapply(Model, summary) # Summarise all model objects
+    
+      # Create a data frame for this replicate
+      return(list(models = tibble(Mod.type = Mod.type,
+                                   Model = Model,
+                                   Summary = Summary)))
+      
+
     })
     
     

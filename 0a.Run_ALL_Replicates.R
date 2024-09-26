@@ -23,9 +23,9 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_all_EXTRAP_random"
+scenario_name = "Test_Sep24"
 
-nreps <- 4 # Replicates per extrapolation type
+nreps <- 1 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
 latent.type = "lgcp" # OR "ipp" 
@@ -36,11 +36,12 @@ bias <- TRUE
 # Model choices -----------------------------------------------------------
 
 # Model types to run
-mod.type = "spatial"
+mod.type = c("no-GRF", "spatial", "no-GRF.bias", "spatial.bias")
+
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
 pred.GRF <- TRUE 
-pred.fixed <- TRUE
+pred.fixed <- FALSE
 
 
 # Parameters --------------------------------------------------------------

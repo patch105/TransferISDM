@@ -70,6 +70,7 @@ po_sampling_func <- function(reps.setup.list,
           )
           
           crs(bias) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+          names(bias) <- "bias"
           
           # Add spatial bias info to PP data
           po.rand.gridA <- cbind(po.rand.gridA, bias = terra::extract(bias, po.rand.gridA[,1:2]))
@@ -109,7 +110,8 @@ po_sampling_func <- function(reps.setup.list,
         return(list(PO_GridA = po.rand.gridA, 
                     PO_GridB = po.rand.gridB,
                     n_po_gridA = nrow(po.rand.gridA),
-                    n_po_gridB = nrow(po.rand.gridB)))
+                    n_po_gridB = nrow(po.rand.gridB),
+                    Bias.rast = bias))
         
         }
        

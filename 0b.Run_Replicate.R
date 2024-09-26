@@ -24,6 +24,7 @@ Run_Replicate_Func <- function(n_cores,
                                scal,
                                variance,
                                bias,
+                               add.bias.cov,
                                detect.prob,
                                maxprob,
                                latent.type,
@@ -267,12 +268,10 @@ Run_Replicate_Func <- function(n_cores,
                                     offset = offset,
                                     doPlot = doPlot,
                                     distributionFormula = distributionFormula,
-                                    mod.type = mod.type)
+                                    mod.type = mod.type,
+                                    bias = bias)
   
-  
-  
-  
-  
+
   # 6b. Save Scenario Information -------------------------------------------
   
   scenario_info.df <- tibble(scenario_name = scenario_name,

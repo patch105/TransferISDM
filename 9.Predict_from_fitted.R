@@ -77,7 +77,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
 predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                            pred.GRF = FALSE,
                                            pred.fixed = FALSE,
-                                           mod.type = "non-spatial",
+                                           mod.type = "no-GRF",
                                            posterior_nsamps) {
   
   #### PREDICT for every extrap type, for every rep, for every model type
@@ -112,7 +112,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
         ### SPATIAL MODEL W GRF
         ######################
         
-        if(mod.type == "spatial") {
+        if(grepl("GRF", type, fixed = T)) { # If model is spatial 
           
           if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
             
@@ -147,7 +147,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
           ### NON-SPATIAL MODEL
           ######################
           
-        if(mod.type == "non-spatial") {
+        if(!grepl("GRF",  type, fixed = T)) { # If there's NO GRF
           
           if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
             
@@ -184,7 +184,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
         ### If also plotting random effect at Site A
         ###########
         
-        if(pred.GRF == TRUE & mod.type == "spatial") {
+        if(pred.GRF == TRUE & grepl("GRF", type, fixed = T)) {
           
           if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
             
@@ -223,7 +223,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
         ### If also plotting fixed effect at Site A
         ###########
         
-        if(pred.fixed == TRUE & mod.type == "spatial") {
+        if(pred.fixed == TRUE & grepl("GRF", type, fixed = T)) {
           
           if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
             
