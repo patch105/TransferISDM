@@ -29,6 +29,9 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
       # Load covariate
       cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteB.rast
       
+      # Add a dummy bias variable to keep RISDM happy
+      cov.rep$bias <- 1
+      
       for (i in seq_along(Model)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]
@@ -105,6 +108,9 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
       
       # Load covariate
       cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteA.rast
+      
+      # Add a dummy bias variable to keep RISDM happy
+      cov.rep$bias <- 1
       
       for (i in seq_along(Model)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
         
