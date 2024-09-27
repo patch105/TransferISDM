@@ -112,8 +112,8 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
           ggtitle('Median predicted log intensity - Integrated no GRF w bias')
         p3c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.bias +
           ggtitle('Median predicted log intensity - PO no GRF w bias')
-        p4c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.bias +
-          ggtitle('Median predicted log intensity - PA no GRF w bias')
+        p4c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA +
+          ggtitle('Median predicted log intensity - PA no GRF')
         
         pred.plot.list$prediction.plot.no.GRF.bias <- ggarrange(p1, p2c, p3c, p4c, ncol = 2, nrow = 2)
         
@@ -125,8 +125,8 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
           ggtitle('Median predicted log intensity - Integrated GRF w bias')
         p3d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.GRF.bias +
           ggtitle('Median predicted log intensity - PO GRF w bias')
-        p4d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF.bias +
-          ggtitle('Median predicted log intensity - PA GRF w bias')
+        p4d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF +
+          ggtitle('Median predicted log intensity - PA GRF')
         
         pred.plot.list$prediction.plot.GRF.bias <- ggarrange(p1, p2d, p3d, p4d, ncol = 2, nrow = 2)
         
@@ -142,8 +142,8 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
       for(x in seq_along(pred.plot.list)) {
         
         plot.name <- plot.names[x]
-       
-        ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        
+        ggsave(plot = pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
          
       }
  
@@ -400,8 +400,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           ggtitle('Median predicted log intensity - Integrated no GRF w bias')
         p3c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.bias +
           ggtitle('Median predicted log intensity - PO no GRF w bias')
-        p4c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.bias +
-          ggtitle('Median predicted log intensity - PA no GRF w bias')
+        p4c <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA +
+          ggtitle('Median predicted log intensity - PA no GRF')
         
         pred.plot.list$SITEA_prediction.plot.no.GRF.bias <- ggarrange(p1, p2c, p3c, p4c, ncol = 2, nrow = 2)
         
@@ -413,8 +413,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           ggtitle('Median predicted log intensity - Integrated GRF w bias')
         p3d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PO.GRF.bias +
           ggtitle('Median predicted log intensity - PO GRF w bias')
-        p4d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF.bias +
-          ggtitle('Median predicted log intensity - PA GRF w bias')
+        p4d <- reps.setup.list[[name]][[rep]]$pred.plot.m.PA.GRF +
+          ggtitle('Median predicted log intensity - PA GRF')
         
         pred.plot.list$SITEA_prediction.plot.GRF.bias <- ggarrange(p1, p2d, p3d, p4d, ncol = 2, nrow = 2)
         
@@ -430,7 +430,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
         plot.name <- plot.names[x]
         
-        ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+        ggsave(plot = pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
         
       }
       
@@ -480,8 +480,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
             ggtitle('Median predicted GRF - Integrated GRF w bias')
           p7b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PO.GRF.bias +
             ggtitle('Median predicted GRF - PO GRF w bias')
-          p8b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PA.GRF.bias +
-            ggtitle('Median predicted GRF - PA GRF w bias')
+          p8b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PA.GRF +
+            ggtitle('Median predicted GRF - PA GRF')
           
           GRF.pred.plot.list$SITEA_GRF.prediction.plot.bias <- ggarrange(p5, p6b, p7b, p8b, ncol = 2, nrow = 2)
           
@@ -498,7 +498,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
           plot.name <- plot.names[x]
           
-          ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+          ggsave(plot = pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
           
         }
         
@@ -549,8 +549,8 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
             ggtitle('Median predicted FIXED - Integrated GRF w bias')
           p7b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PO.GRF.bias +
             ggtitle('Median predicted FIXED - PO GRF w bias')
-          p8b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PA.GRF.bias +
-            ggtitle('Median predicted FIXED - PA GRF w bias')
+          p8b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PA.GRF +
+            ggtitle('Median predicted FIXED - PA GRF')
           
           FIXED.pred.plot.list$SITEA_FIXED.prediction.plot.bias <- ggarrange(p5, p6b, p7c, p8d, ncol = 2, nrow = 2)
           
@@ -565,7 +565,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
           plot.name <- plot.names[x]
           
-          ggsave(paste0(rep_path, "/", plot.name, ".png"), x, width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+          ggsave(plot = pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
           
         }
         

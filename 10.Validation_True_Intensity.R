@@ -58,10 +58,10 @@ validation_SiteB_func <- function(reps.setup.list) {
         ### Calculating the Interval Score ###
         
         interval_score <- interval_score(true_values = as.vector(true_log_int.rast.SiteB),
-                                         lower = as.vector(lower.int.pred), 
-                                         upper = as.vector(upper.int.pred),
-                                         interval_range = 95,
-                                         weigh = TRUE)
+                                                       lower = as.vector(lower.int.pred), 
+                                                       upper = as.vector(upper.int.pred),
+                                                       interval_range = 95,
+                                                       weigh = TRUE)
         
         Sum.Int.Score <- sum(interval_score)
         
@@ -153,6 +153,7 @@ validation_SiteA_func <- function(reps.setup.list,
       for (i in seq_along(Model)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]
+        type <- as.character(models_df[i, "Mod.type"])
         
         # Pull out the median intensity prediction for each cell
         median.int.pred <- mod[[1]]$preds.link.siteA$field$Median
@@ -174,31 +175,31 @@ validation_SiteA_func <- function(reps.setup.list,
         ### Calculating the Interval Score ###
         
         interval_score <- interval_score(true_values = as.vector(true_log_int.rast.SiteA),
-                                         lower = as.vector(lower.int.pred), 
-                                         upper = as.vector(upper.int.pred),
-                                         interval_range = 95,
-                                         weigh = TRUE)
+                                                       lower = as.vector(lower.int.pred), 
+                                                       upper = as.vector(upper.int.pred),
+                                                       interval_range = 95,
+                                                       weigh = TRUE)
         
         Sum.Int.Score <- sum(interval_score)
         
         Mean.Int.Score <- mean(interval_score)
         
-        if(pred.GRF == TRUE) {
+        if(pred.GRF == TRUE & grepl("GRF", type, fixed = T)) {
           
           median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
           
           cor.GRF <- cor(as.vector(median.GRF.pred), as.vector(GRF.rast.SiteA))
           
-        } else { cor.GRF = NULL }
+        } else { cor.GRF = NA }
         
         
-        if(pred.fixed == TRUE) {
+        if(pred.fixed == TRUE & grepl("GRF", type, fixed = T)) {
           
           median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
           
           cor.FIXED <- cor(as.vector(median.FIXED.pred), as.vector(fixed.rast.SiteA))
           
-        } else { cor.FIXED = NULL }
+        } else { cor.FIXED = NA }
         
         # Save results to list
         
@@ -216,7 +217,8 @@ validation_SiteA_func <- function(reps.setup.list,
           Mean.Int.Score = Mean.Int.Score
         )
         
-      }}
+      }
+      }
     
   }
   

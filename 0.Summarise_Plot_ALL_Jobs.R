@@ -1,3 +1,11 @@
+library(spatstat)
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+library(viridis)
+library(terra)
+library(purrr)
+library(readr)
 
 # LOAD INPUT PARAMETERS ---------------------------------------------------
 
@@ -5,7 +13,7 @@
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Test_Sep23"
+scenario_name = "Test_Sep27B"
 
 outpath <- file.path(getwd(), "output")
 
