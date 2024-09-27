@@ -9,9 +9,13 @@ In Antarctica, spatially constrained survey design and an urgent need for improv
 
 This work was supported by the Australian Research Council (ARC) SRIEAS Grant SR200100005 Securing Antarctica's Environmental Future.
 
-## Simulation Study
+## Simulation Study Overview
 
-### test
+We simulate a virtual landscape with two covariates (Fig. 1a) that drive the distribution of a single species (Fig. 1b). A pair of sites are situated within the landscape, one the Reference site where model fitting occurred, and one the Target site, our remote location with no data to which we aim to transfer our model (Fig. 1b). Presence-only and presence-absence data are simulated at the Reference site (Fig. 1c). Integrated, PO, and PA models are fit to the survey data at the Reference site before models are transferred to the Target site for prediction. By altering conditions at the Target site, different model transfer scenarios of environmental extrapolation and spatial autocorrelation can be explored. Predictive performance of models at the Target and Reference sites are assessed relative to the true species distribution.
+[](gg) 
+
+
+### 
 
 ## Biological data acquisition and cleaning
 [](url) 
