@@ -24,6 +24,8 @@ validation_SiteB_func <- function(reps.setup.list) {
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
       # Extract the median extrapolation amount
       extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
@@ -32,7 +34,7 @@ validation_SiteB_func <- function(reps.setup.list) {
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
       true_log_int.rast.SiteB <- crop(true_log_int.rast, ext(rand.gridB))
       
-      for (i in seq_along(models_df)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
+      for (i in seq_along(Model)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]
         
@@ -116,6 +118,8 @@ validation_SiteA_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
       # Extract the median extrapolation amount
       extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
@@ -146,7 +150,7 @@ validation_SiteA_func <- function(reps.setup.list,
         
       }
       
-      for (i in seq_along(models_df)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
+      for (i in seq_along(Model)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]
         

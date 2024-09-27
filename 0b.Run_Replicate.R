@@ -363,8 +363,8 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   
   source("9.Predict_from_fitted.R")
 
-  reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list,
-                                                    posterior_nsamps = posterior_nsamps)
+  # reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list,
+  #                                                   posterior_nsamps = posterior_nsamps)
   
   
   
@@ -372,9 +372,9 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   
   source("10.Validation_True_Intensity.R")
 
-  true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
-
-  write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
+  # true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
+  # 
+  # write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
 
   
   # 12B. Plot Data  ---------------------------------------------------------
@@ -392,11 +392,11 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   
   source("12C.Plot_Predictions.R")
 
-  plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
-                              outpath = outpath,
-                              scenario_name = scenario_name,
-                              mod.type = mod.type,
-                              job_index = job_index)
+  # plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
+  #                             outpath = outpath,
+  #                             scenario_name = scenario_name,
+  #                             mod.type = mod.type,
+  #                             job_index = job_index)
 
   
   # OPTIONAL - predict to and validate Site A -------------------------------

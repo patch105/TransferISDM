@@ -23,7 +23,7 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_Sep24"
+scenario_name = "Test_Sep27B"
 
 nreps <- 1 # Replicates per extrapolation type
 

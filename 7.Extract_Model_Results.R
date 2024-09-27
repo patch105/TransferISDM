@@ -2,7 +2,7 @@
 # 7. Extract Model Results ------------------------------------------------
 
 extract_model_results_func <- function(reps.setup.list,
-                                       mod.type = "no-GRF") {
+                                       mod.type) {
   
   # Extract and save summary results ----------------------------------------
   
@@ -24,10 +24,12 @@ extract_model_results_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
       # Extract the median extrapolation amount
       extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
-      for (i in seq_along(models_df)) { # Until get PA again
+      for (i in seq_along(Model)) { # Until get PA again
         
         mod.summary <- models_df[[i, "Summary"]]
         

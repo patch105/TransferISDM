@@ -24,7 +24,7 @@ run_model_func <- function(prior.mean,
                            offset,
                            doPlot,
                            distributionFormula,
-                           mod.type = "no-GRF",
+                           mod.type,
                            bias) {
                            
   

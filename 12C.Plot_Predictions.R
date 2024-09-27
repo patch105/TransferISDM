@@ -31,7 +31,9 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
-      for (i in seq_along(models_df)) {
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
+      for (i in seq_along(Model)) {
         
         mod <- models_df[[i, "Model"]]
         
@@ -78,7 +80,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
       
       pred.plot.list <- list()
       
-      if(grepl("no-GRF", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("no-GRF", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2a <- reps.setup.list[[name]][[rep]]$pred.plot.m.int +
           ggtitle('Median predicted log intensity - Integrated no GRF')
@@ -91,7 +93,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
          
       }
       
-      if(grepl("spatial", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("spatial", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2b <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF +
           ggtitle('Median predicted log intensity - Integrated GRF')
@@ -104,7 +106,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
         
       }
       
-      if(grepl("no-GRF", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("no-GRF", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2c <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.bias +
           ggtitle('Median predicted log intensity - Integrated no GRF w bias')
@@ -117,7 +119,7 @@ plot_predictions_SiteB_func <- function(reps.setup.list,
         
       }
       
-      if(grepl("spatial", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("spatial", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2d <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF.bias +
           ggtitle('Median predicted log intensity - Integrated GRF w bias')
@@ -248,7 +250,9 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
-      for (i in seq_along(models_df)) {
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
+      for (i in seq_along(Model)) {
         
         mod <- models_df[[i, "Model"]]
         
@@ -364,7 +368,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       
       pred.plot.list <- list()
       
-      if(grepl("no-GRF", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("no-GRF", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) >0 ) {
         
         p2a <- reps.setup.list[[name]][[rep]]$pred.plot.m.int +
           ggtitle('Median predicted log intensity - Integrated no GRF')
@@ -377,7 +381,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
       }
       
-      if(grepl("spatial", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("spatial", mod.type, fixed = T) & !grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2b <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF +
           ggtitle('Median predicted log intensity - Integrated GRF')
@@ -390,7 +394,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
       }
       
-      if(grepl("no-GRF", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("no-GRF", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2c <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.bias +
           ggtitle('Median predicted log intensity - Integrated no GRF w bias')
@@ -403,7 +407,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
       }
       
-      if(grepl("spatial", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) {
+      if(sum(grepl("spatial", mod.type, fixed = T) & grepl("bias", mod.type, fixed = T)) > 0) {
         
         p2d <- reps.setup.list[[name]][[rep]]$pred.plot.m.int.GRF.bias +
           ggtitle('Median predicted log intensity - Integrated GRF w bias')
@@ -432,7 +436,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       
       
       # Plot the random effect with true random effect
-      if(pred.GRF == TRUE & grepl("spatial", mod.type, fixed = T)) {
+      if(sum(pred.GRF == TRUE & grepl("spatial", mod.type, fixed = T)) > 0) {
         
         # First extract the TRUE random effect for comparison
         # Crop out the TRUE random effect from the Site A
@@ -457,7 +461,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
         GRF.pred.plot.list <- list()
         
-        if(!grepl("bias", mod.type, fixed = T)) {
+        if(sum(!grepl("bias", mod.type, fixed = T)) > 0) {
           
           p6a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.int.GRF +
             ggtitle('Median predicted GRF - Integrated GRF')
@@ -470,7 +474,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
         }
         
-        if(grepl("bias", mod.type, fixed = T)) {
+        if(sum(grepl("bias", mod.type, fixed = T)) > 0) {
           
           p6b <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.int.GRF.bias +
             ggtitle('Median predicted GRF - Integrated GRF w bias')
@@ -501,7 +505,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
       }
       
       # Plot the fixed effect with true fixed effect
-      if(pred.fixed == TRUE & grepl("spatial", mod.type, fixed = T)) {
+      if(sum(pred.fixed == TRUE & grepl("spatial", mod.type, fixed = T)) > 0) {
         
         # First extract the TRUE fixed effect for comparison
         # Crop out the TRUE fixed effect from the Site A
@@ -526,7 +530,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
         
         FIXED.pred.plot.list <- list()
         
-        if(!grepl("bias", mod.type, fixed = T)) { 
+        if(sum(!grepl("bias", mod.type, fixed = T)) > 0) { 
           
           p6a <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.int.GRF +
             ggtitle('Median predicted FIXED - Integrated GRF')
@@ -539,7 +543,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
           }
         
-        if(grepl("bias", mod.type, fixed = T)) { 
+        if(sum(grepl("bias", mod.type, fixed = T)) > 0) { 
           
           p6b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.int.GRF.bias +
             ggtitle('Median predicted FIXED - Integrated GRF w bias')

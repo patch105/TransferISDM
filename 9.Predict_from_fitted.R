@@ -4,7 +4,7 @@
 
 predict_from_fitted_SiteB_func <- function(reps.setup.list,
                                            posterior_nsamps) {
-                                                    
+  
   #### PREDICT for every extrap type, for every rep, for every model type
   # Save prediction to the model list
   ####
@@ -24,10 +24,12 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
       # Load covariate
       cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteB.rast
       
-      for (i in seq_along(models_df)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
+      for (i in seq_along(Model)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]
         
@@ -99,10 +101,12 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
       # Extract the models dataframe [[name]] double brackets for list extract
       models_df <- reps.setup.list[[name]][[rep]]$models
       
+      Model <- reps.setup.list[[name]][[rep]]$models$Model
+      
       # Load covariate
       cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteA.rast
       
-      for (i in seq_along(models_df)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
+      for (i in seq_along(Model)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]
         
@@ -143,10 +147,10 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
           }
         }
         
-          ######################
-          ### NON-SPATIAL MODEL
-          ######################
-          
+        ######################
+        ### NON-SPATIAL MODEL
+        ######################
+        
         if(!grepl("GRF",  type, fixed = T)) { # If there's NO GRF
           
           if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
@@ -179,7 +183,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
           
         }
         
-
+        
         ###########
         ### If also plotting random effect at Site A
         ###########
@@ -190,11 +194,11 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
-                                                 covars = cov.rep,
-                                                 S = posterior_nsamps, 
-                                                 intercept.terms = "PO_Intercept",
-                                                 type = "link",
-                                                 includeRandom = T,
+                                                covars = cov.rep,
+                                                S = posterior_nsamps, 
+                                                intercept.terms = "PO_Intercept",
+                                                type = "link",
+                                                includeRandom = T,
                                                 includeFixed = F)
             
             # Save the updated model back to the dataframe
@@ -204,11 +208,11 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
-                                                 covars = cov.rep,
-                                                 S = posterior_nsamps, 
-                                                 intercept.terms = "PA_Intercept",
-                                                 type = "link",
-                                                 includeRandom = T,
+                                                covars = cov.rep,
+                                                S = posterior_nsamps, 
+                                                intercept.terms = "PA_Intercept",
+                                                type = "link",
+                                                includeRandom = T,
                                                 includeFixed = F)
             
             # Save the updated model back to the dataframe
@@ -218,7 +222,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
           
           
         }
-
+        
         ###########
         ### If also plotting fixed effect at Site A
         ###########
@@ -229,12 +233,12 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
-                                                covars = cov.rep,
-                                                S = posterior_nsamps, 
-                                                intercept.terms = "PO_Intercept",
-                                                type = "link",
-                                                includeRandom = F,
-                                                includeFixed = T)
+                                                  covars = cov.rep,
+                                                  S = posterior_nsamps, 
+                                                  intercept.terms = "PO_Intercept",
+                                                  type = "link",
+                                                  includeRandom = F,
+                                                  includeFixed = T)
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod
@@ -243,12 +247,12 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
             
             # Had to add the [[1]] here because the summary is always list of length 1
             mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
-                                                covars = cov.rep,
-                                                S = posterior_nsamps, 
-                                                intercept.terms = "PA_Intercept",
-                                                type = "link",
-                                                includeRandom = F,
-                                                includeFixed = T)
+                                                  covars = cov.rep,
+                                                  S = posterior_nsamps, 
+                                                  intercept.terms = "PA_Intercept",
+                                                  type = "link",
+                                                  includeRandom = F,
+                                                  includeFixed = T)
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod
@@ -258,12 +262,12 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
           
         }
         
-      
-      # Save the updated models dataframe back to the original list
-      reps.setup.list[[name]][[rep]]$models <- models_df
-      
-    }
-  } }
+        
+        # Save the updated models dataframe back to the original list
+        reps.setup.list[[name]][[rep]]$models <- models_df
+        
+      }
+    } }
   
   return(reps.setup.list)
   
