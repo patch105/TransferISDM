@@ -1,7 +1,8 @@
-library(NLMR)
-library(landscapetools)
-library(RandomFields) # See below for download from archived files.
-library(RISDM)
+
+# library(NLMR,lib.loc=lib_loc)
+# library(landscapetools,lib.loc=lib_loc)
+# library(RandomFields,lib.loc=lib_loc) # See below for download from archived files.
+library(RISDM,lib.loc=lib_loc)
 
 # 1.Simulate_Covariates ---------------------------------------------------
 

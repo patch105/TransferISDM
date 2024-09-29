@@ -1,6 +1,6 @@
 
 library(Metrics)
-library(scoringutils)
+library(scoringutils, lib.loc=lib_loc)
 
 # 10. Validation true intensity -------------------------------------------
 

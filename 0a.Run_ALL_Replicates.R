@@ -6,6 +6,9 @@
 # # The first argument is now the job index
 # job_index <- as.integer(args[1])
 
+# Set the library for packages
+# lib_loc <- paste(getwd(),"/r_lib",sep="")
+lib.loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC script
 
 # For non-hpc version
 job_index <- 1
@@ -13,7 +16,7 @@ job_index <- 1
 library(spatstat)
 library(ggplot2)
 library(dplyr)
-library(ggpubr)
+library(ggpubr, lib.loc = lib_loc)
 library(viridis)
 library(terra)
 library(purrr)
@@ -28,10 +31,10 @@ scenario_name = "Test_Sep27B"
 nreps <- 1 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
-latent.type = "lgcp" # OR "ipp" 
+latent.type = "ipp" 
 
 # Bias in PO sampling?
-bias <- TRUE
+bias <- FALSE
 
 # Model choices -----------------------------------------------------------
 
@@ -40,7 +43,7 @@ mod.type = c("no-GRF", "spatial", "no-GRF.bias", "spatial.bias")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
-pred.GRF <- TRUE 
+pred.GRF <- FALSE
 pred.fixed <- FALSE
 
 

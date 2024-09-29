@@ -6,7 +6,7 @@
 
 # # Install flexsdm
 # remotes::install_github("sjevelazco/flexsdm")
-library(flexsdm)
+library(flexsdm, lib.loc = lib_loc)
 
 run_extrap_func <- function(n_cores,
                             nreps,

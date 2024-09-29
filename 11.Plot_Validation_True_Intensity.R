@@ -113,6 +113,9 @@ plot_validation_SiteA_func <- function(true.validation.df,
                    "m.PA.GRF" = "orange3")
   
  
+  # Make SiteA folder:
+  dir.create(file.path(outpath, scenario_name, "SiteA"), showWarnings = FALSE)
+  
   # Plot the validation
   
   cor <- true.validation.df %>% 

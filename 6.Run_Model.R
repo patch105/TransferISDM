@@ -6,9 +6,9 @@
 # library(devtools)
 # devtools::install_github( repo="Scott-Foster/RISDM", build_vignettes=FALSE) # Had to do force = T when I wanted to re-load
                           
-
-library(sf)
-library(RISDM)
+library(sf, lib.loc=lib_loc)
+# library(INLA)
+# INLA:::inla.binary.install(os="CentOS Linux-7")
 
 run_model_func <- function(prior.mean,
                            int.sd,
@@ -38,7 +38,8 @@ run_model_func <- function(prior.mean,
                      other.sd = other.sd, # Covariate effect standard deviation
                      prior.range = prior.range, # Prior chance 10% that parameter falls below range of 1km
                      prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
-                     addRandom = FALSE) # No random effect
+                     addRandom = FALSE, # No random effect
+                     standardiseCovariates = FALSE) 
   
   my.control.GRF <- list(coord.names = c("x", "y"),
                          prior.mean = prior.mean,
@@ -46,7 +47,8 @@ run_model_func <- function(prior.mean,
                          other.sd = other.sd, # Covariate effect standard deviation
                          prior.range = prior.range, # Prior chance 10% that parameter falls below range of 1km
                          prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
-                         addRandom = TRUE) # With random effect
+                         addRandom = TRUE, # With random effect
+                         standardiseCovariates = FALSE) 
   
 
   # Load PA data and run models for each extrap type and replicate
