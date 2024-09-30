@@ -215,10 +215,10 @@ plot_parameter_recovery_func <- function(outpath,
     
     g2 <- extrap.scenario.df %>% 
       filter(!is.na(GRF.sd.mean)) %>% 
-      ggplot(aes(x = extrap.type, y = GRF.sd.mean, fill = mod.type)) +
+      ggplot(aes(x = extrap.type, y = GRF.sd.mean^2, fill = mod.type)) +
       geom_boxplot() +
       geom_hline(yintercept = variance, linetype = "dashed", color = "red") +
-      labs(x = "Extrapolation", y = "GRF sd", fill = "Model Type") +
+      labs(x = "Extrapolation", y = "GRF svar", fill = "Model Type") +
       scale_x_discrete(labels = c("Low", "Mod", "High")) +
       scale_fill_manual(values = fill.colours) +
       theme_bw()
@@ -239,9 +239,9 @@ plot_parameter_recovery_func <- function(outpath,
     
     extrap.scenario.df.CI <- extrap.scenario.df %>% 
       mutate(GRF.range.cred.int = GRF.range_975 - GRF.range_25,
-             GRF.sd.cred.int = GRF.sd_975 - GRF.sd_25,
+             GRF.var.cred.int = (GRF.sd_975)^2 - (GRF.sd_25)^2,
              GRF.range.cred.int.true = ifelse(scal >= GRF.range_25 &  scal <= GRF.range_975, 1, 0),
-             GRF.sd.cred.int.true = ifelse(variance >= GRF.sd_25 &  variance <= GRF.sd_975, 1, 0))
+             GRF.var.cred.int.true = ifelse(variance >= (GRF.sd_25)^2 &  variance <= (GRF.sd_975)^2, 1, 0))
     
     g1.CI.width <- extrap.scenario.df.CI %>% 
       filter(!is.na(GRF.range.cred.int)) %>% 
@@ -253,10 +253,10 @@ plot_parameter_recovery_func <- function(outpath,
       theme_bw()
     
     g2.CI.width <- extrap.scenario.df.CI %>%
-      filter(!is.na(GRF.sd.cred.int)) %>% 
-      ggplot(aes(x = extrap.type, y = GRF.sd.cred.int, fill = mod.type)) +
+      filter(!is.na(GRF.var.cred.int)) %>% 
+      ggplot(aes(x = extrap.type, y = GRF.var.cred.int, fill = mod.type)) +
       geom_boxplot() +
-      labs(x = "Extrapolation", y = "GRF sd Credible Interval Width", fill = "Model Type") +
+      labs(x = "Extrapolation", y = "GRF var Credible Interval Width", fill = "Model Type") +
       scale_x_discrete(labels = c("Low", "Mod", "High")) +
       scale_fill_manual(values = fill.colours) +
       theme_bw()
@@ -281,12 +281,12 @@ plot_parameter_recovery_func <- function(outpath,
       group_by(mod.type) %>% 
       summarise(prop.GRF.range.cred.int.true = sum(GRF.range.cred.int.true) / n()) 
     
-    GRF.sd_cred_int_true <- extrap.scenario.df.CI %>%
-      filter(!is.na(GRF.sd.cred.int)) %>%
+    GRF.var_cred_int_true <- extrap.scenario.df.CI %>%
+      filter(!is.na(GRF.var.cred.int)) %>%
       group_by(mod.type) %>% 
-      summarise(prop.GRF.sd.cred.int.true = sum(GRF.sd.cred.int.true) / n())
+      summarise(prop.GRF.var.cred.int.true = sum(GRF.var.cred.int.true) / n())
     
-    GRF_cred_int_true <- merge(GRF.range_cred_int_true, GRF.sd_cred_int_true, by = "mod.type")
+    GRF_cred_int_true <- merge(GRF.range_cred_int_true, GRF.var_cred_int_true, by = "mod.type")
     
     write.csv(GRF_cred_int_true, file = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Prop_Cred_Int_Contains_True_GRF.csv"))
       
