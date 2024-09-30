@@ -48,9 +48,10 @@ plot_data_func <- function(reps.setup.list,
         geom_tile(aes(x = x, y = y, fill = int)) +
         scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
         coord_fixed() +
+        geom_point(data = reps.setup.list[[name]][[rep]]$spp_process.rand.gridA, aes(x = x, y = y), color = "white", size = 1.5) +
+        geom_point(data = reps.setup.list[[name]][[rep]]$PO_GridA, aes(x = x, y = y), color = "red", size = 1.5) +
         geom_rect(data = df_extPA, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = color), 
                   fill = NA, linetype = "solid", linewidth = 1) +
-        geom_point(data = reps.setup.list[[name]][[rep]]$poforPA.rand.gridA, aes(x = x, y = y), color = "red", size = 1.5) +
         geom_point(data = reps.setup.list[[name]][[rep]]$pa_a_df, aes(x=x, y=y, shape = factor(presence, levels = c(1,0))), size = 1.5) +
         scale_shape_manual(values = c("0" = 4, "1" = 16),
                            label = c("0" = "Absence", "1" = "Presence")) +

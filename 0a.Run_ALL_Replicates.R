@@ -8,7 +8,7 @@
 
 # Set the library for packages
 # lib_loc <- paste(getwd(),"/r_lib",sep="")
-lib.loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC script
+lib_loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC script
 
 # For non-hpc version
 job_index <- 1
@@ -26,7 +26,7 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_Sep27B"
+scenario_name = "Test_Sep30"
 
 nreps <- 1 # Replicates per extrapolation type
 

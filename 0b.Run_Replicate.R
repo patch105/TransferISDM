@@ -76,7 +76,7 @@ Run_Replicate_Func <- function(n_cores,
     source("2.Simulate_Latent_Distribution.R")
     
     response.type <<- "linear"
-    latent.type <<- latent.type # or "ipp"
+    latent.type <<- latent.type 
     
     print("Simulating new latent distribution")
     
