@@ -99,29 +99,7 @@ pa_sampling_func <- function(reps.setup.list) {
         
       } else {
         
-        # # If there's only one PO point then poforPA turns into a named vector (means it can't be indexed like a dataframe)
-        # if(length(spp_process.rand.gridA) == 2) {
-        #   
-        #   # Find species coordinates from underlying LGCP IN GRID A that are in region a
-        #   inbox_idx_a <- which(poforPA.rand.gridA["x"] >= dom_a_bbox["east_min"] &
-        #                          poforPA.rand.gridA["x"] <= dom_a_bbox["east_max"] &
-        #                          poforPA.rand.gridA["y"] >= dom_a_bbox["north_min"] &
-        #                          poforPA.rand.gridA["y"] <= dom_a_bbox["north_max"])
-        #   
-        # } 
-        # 
-        # # Find species coordinates from underlying LGCP IN GRID A that are in region a
-        # if(length(poforPA.rand.gridA) > 2) {
-        #   
-        #   inbox_idx_a <- which(poforPA.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
-        #                          poforPA.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
-        #                          poforPA.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
-        #                          poforPA.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
-        #   
-        # }
-        
-        
-        
+      
         # Random stratified sampling ----------------------------------------------
         
         
@@ -204,8 +182,7 @@ pa_sampling_func <- function(reps.setup.list) {
                   PA_a_res = PA_a_res,
                   n_presence_gridA = sum(pa_a_df$presence == 1),
                   n_absence_gridA = sum(pa_a_df$presence == 0),
-                  PA.rand.gridA = PA.rand.gridA, # Need these last two for plotting
-                  poforPA.rand.gridA = poforPA.rand.gridA))
+                  PA.rand.gridA = PA.rand.gridA)) # Need these last two for plotting
       
     })
     
