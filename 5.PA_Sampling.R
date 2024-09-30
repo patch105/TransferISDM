@@ -16,7 +16,7 @@ pa_sampling_func <- function(reps.setup.list) {
       
       rand.gridA <- rep$extrap.reps.out$rand.gridA
 
-      poforPA.rand.gridA <- rep$PO_GridA
+      spp_process.rand.gridA <- rep$spp_process.rand.gridA
       
       #-------------------------------------------------------------------------------
       # Site A
@@ -26,7 +26,7 @@ pa_sampling_func <- function(reps.setup.list) {
       
       # Set size of grid (number of cells) for PA grid in Site A (Reference)
       # NOTE - must be smaller than total cell number in x y directions
-      rast_cellsA <- c(50, 30)
+      rast_cellsA <- c(50, 50)
       rast_sizeA <- c(rast_cellsA[1]*res(rand.gridA)[1], rast_cellsA[2]*res(rand.gridA)[2])
       
       # Get coords of overall grid domain boundary
@@ -88,86 +88,116 @@ pa_sampling_func <- function(reps.setup.list) {
       pa_a <- terra::rast(pa_a)
       
       
-      print(paste0("length of poforPA.rand.gridA is: ",length(poforPA.rand.gridA)))
+      print(paste0("length of spp process rand grid A is: ",nrow(spp_process.rand.gridA)))
       
       # If there are no presences at all in the presence-only data
       # Save an empty dataframe
-      if(length(poforPA.rand.gridA) < 2) {
+      if(length(spp_process.rand.gridA) < 2) {
         
-        print("No PO in PA grid A")
-        po_a_df <- data.frame(x = NA, y = NA)
+        print("No presences in PA grid A")
+        pa_a_df <- data.frame(x = NA, y = NA)
         
       } else {
         
-        # If there's only one PO point then poforPA turns into a named vector (means it can't be indexed like a dataframe)
-        if(length(poforPA.rand.gridA) == 2) {
-          
-          # Find species coordinates from underlying LGCP IN GRID A that are in region a
-          inbox_idx_a <- which(poforPA.rand.gridA["x"] >= dom_a_bbox["east_min"] &
-                                 poforPA.rand.gridA["x"] <= dom_a_bbox["east_max"] &
-                                 poforPA.rand.gridA["y"] >= dom_a_bbox["north_min"] &
-                                 poforPA.rand.gridA["y"] <= dom_a_bbox["north_max"])
-          
-        } 
+        # # If there's only one PO point then poforPA turns into a named vector (means it can't be indexed like a dataframe)
+        # if(length(spp_process.rand.gridA) == 2) {
+        #   
+        #   # Find species coordinates from underlying LGCP IN GRID A that are in region a
+        #   inbox_idx_a <- which(poforPA.rand.gridA["x"] >= dom_a_bbox["east_min"] &
+        #                          poforPA.rand.gridA["x"] <= dom_a_bbox["east_max"] &
+        #                          poforPA.rand.gridA["y"] >= dom_a_bbox["north_min"] &
+        #                          poforPA.rand.gridA["y"] <= dom_a_bbox["north_max"])
+        #   
+        # } 
+        # 
+        # # Find species coordinates from underlying LGCP IN GRID A that are in region a
+        # if(length(poforPA.rand.gridA) > 2) {
+        #   
+        #   inbox_idx_a <- which(poforPA.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
+        #                          poforPA.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
+        #                          poforPA.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
+        #                          poforPA.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
+        #   
+        # }
         
-        # Find species coordinates from underlying LGCP IN GRID A that are in region a
-        if(length(poforPA.rand.gridA) > 2) {
+        
+        
+        # Random stratified sampling ----------------------------------------------
+        
+        
+        # Create a reference grid for the 10x10 raster to identify each cell with a unique number
+        ref_grid <- pa_a
+        values(ref_grid) <- 1:ncell(ref_grid)  # Assign unique values (1 to 100) to each cell
+        
+        # Resample the reference grid to the resolution of the 50x30 raster
+        # This doesn't change the resolution of the 50x30 raster but assigns the corresponding values from the 10x10 cells
+        alignment_layer <- resample(ref_grid, PA.rand.gridA, method="near")
+        
+        names(alignment_layer) <- "strata"
+        
+        # Assign strata to PA.rand.grid.A cells
+        PA.Strata <- c(PA.rand.gridA, alignment_layer)
+        
+        # Create a third layer in PA.Strata to store quadrats
+        quadrats_layer <- PA.rand.gridA
+        values(quadrats_layer) <- NA  # Initialize with NA
+        
+        # Loop through each unique stratum
+        for (i in unique(values(PA.Strata$strata))) {
           
-          inbox_idx_a <- which(poforPA.rand.gridA[, "x"] >= dom_a_bbox["east_min"] &
-                                 poforPA.rand.gridA[, "x"] <= dom_a_bbox["east_max"] &
-                                 poforPA.rand.gridA[, "y"] >= dom_a_bbox["north_min"] &
-                                 poforPA.rand.gridA[, "y"] <= dom_a_bbox["north_max"])
+          # Find cells in PA.Strata that belong to the current stratum
+          strata_cells <- which(values(PA.Strata$strata) == i)
+          
+          # Randomly sample two cells from the strata
+          selected_cells <- sample(strata_cells, 1, replace = FALSE)
+          
+          # Assign a unique value to the selected cells (e.g., i or 1 for selected)
+          values(quadrats_layer)[selected_cells] <- 1  
           
         }
+      
+        # Add quadrats layer to PA.Strata
+        PA.Strata <- c(PA.Strata, quadrats_layer)
+        names(PA.Strata)[nlyr(PA.Strata)] <- "quadrats"
         
+        # Change spp_process to a spatvector for extract
+        spp_process.rand.gridA.vect <- vect(spp_process.rand.gridA)
         
-        # If there are no presences from the presence-only data in the PA grid
-        # Save an empty dataframe
-        if(length(inbox_idx_a) < 2) {
-          print("No PO in PA grid A")
-          po_a_df <- data.frame(x = NA, y = NA)
-          
-        }
+        match <- terra::extract(PA.Strata, spp_process.rand.gridA.vect) %>% 
+          filter(quadrats == 1)
         
-        # If there's only one PO point then poforPA turns into a named vector (means it can't be indexed like a dataframe)
-        if(length(inbox_idx_a) == 2) {
+        # If there's no presences in the quadrats:
+        if(nrow(match) == 0) {
           
-          po_a <- poforPA.rand.gridA[inbox_idx_a, ]
+          print("No presences in PA grid A")
+          pa_a_df <- data.frame(x = NA, y = NA)
           
-          po_a_df <- data.frame(x = po_a[[1]], y = po_a[[2]])
+        } else {
           
-        }
-        
-        if(length(inbox_idx_a) > 2) {
+          # Set strata without presence to NA & update others to 1
+          values(PA.Strata$strata)[!values(PA.Strata$strata) %in% match$strata] <- NA
+          values(PA.Strata$strata)[values(PA.Strata$strata) > 1] <- 1
           
-          po_a <- poforPA.rand.gridA[inbox_idx_a, ]
-          po_a_df <- as.data.frame(po_a)
+          # Mask the quadrats that have presence by saying, where strata == NA, quadrats stay as 1, otherwise set to 0
+          temp <- mask(PA.Strata[["quadrats"]], PA.Strata[["strata"]], maskvalue = NA, updatevalue = 0)
+          po_a <- mask(temp, PA.Strata[["quadrats"]], maskvalue = NA, updatevalue = NA)
+          names(po_a) <- "presence"
+          
+          pa_a_df <- as.data.frame(po_a, xy = T)
           
         }
         
       }
       
+      # Debugging output for pa_a_df
+      print("pa_a_df column names:")
+      print(colnames(pa_a_df))
+      print(head(pa_a_df))
       
-      
-      
-      # Debugging output for po_a_df
-      print("po_a_df column names:")
-      print(colnames(po_a_df))
-      print(head(po_a_df))
-      
-      # Now assuming perfect detection
-      po_a_df$presence <- 1
-      
-      # Get cell indices of the species coordinates
-      cell_idx <- terra::cellFromXY(pa_a, po_a_df[, c("x", "y")])
-      
-      # Fill in the raster with 1 from the cell indices
-      pres_idx <- as.numeric(names(table(cell_idx)))
-      pa_a[pres_idx] <- 1
       
       # pa - region a
-      pa_a_df <- as.data.frame(pa_a, xy = TRUE) %>% 
-        mutate(area = dom_a_resE * dom_a_resN)
+      pa_a_df <- pa_a_df %>% 
+        mutate(area = 1)
       
       return(list(pa_a_df = pa_a_df, 
                   PA_grid_size = rast_cellsA, 

@@ -21,22 +21,21 @@ po_sampling_func <- function(reps.setup.list,
         
         print("no PO")
         
-        po <- cbind(x = rep$latent.list$lg.s$x, y = rep$latent.list$lg.s$y)
+        spp_process <- cbind(x = rep$latent.list$lg.s$x, y = rep$latent.list$lg.s$y)
         
         rand.gridA <- rep$extrap.reps.out$rand.gridA
         rand.gridB <- rep$extrap.reps.out$rand.gridB
         
         # Trim po to only include points in Site A
-        po.rand.gridA <- po[
-          po[,1] >= xmin(ext(rand.gridA)) & po[,1] <= xmax(ext(rand.gridA)) & 
-            po[,2] >= ymin(ext(rand.gridA)) & po[,2] <= ymax(ext(rand.gridA)), 
-        ]
+        spp_process.rand.gridA <- spp_process[
+          spp_process[,1] >= xmin(ext(rand.gridA)) & spp_process[,1] <= xmax(ext(rand.gridA)) & 
+            spp_process[,2] >= ymin(ext(rand.gridA)) & spp_process[,2] <= ymax(ext(rand.gridA)), ]
         
         # If no bias, random thinning applied
         if(bias == FALSE) {
           
           # Thin the process by the probability
-          po.rand.gridA <- cbind(po.rand.gridA, presence = rbinom(nrow(po.rand.gridA), 1, detect.prob))
+          po.rand.gridA <- cbind(spp_process.rand.gridA, presence = rbinom(nrow(spp_process.rand.gridA), 1, detect.prob))
           po.rand.gridA <- po.rand.gridA[po.rand.gridA[, "presence"] == 1, ]
           
           # Trim to just xy
@@ -73,7 +72,7 @@ po_sampling_func <- function(reps.setup.list,
           names(bias) <- "bias"
           
           # Add spatial bias info to PP data
-          po.rand.gridA <- cbind(po.rand.gridA, bias = terra::extract(bias, po.rand.gridA[,1:2]))
+          po.rand.gridA <- cbind(spp_process.rand.gridA, bias = terra::extract(bias, spp_process.rand.gridA[,1:2]))
           
           # Thin the process by the bias field
           po.rand.gridA <- cbind(po.rand.gridA, presence = rbinom(nrow(po.rand.gridA), 1, po.rand.gridA[, "bias"]))
@@ -88,9 +87,9 @@ po_sampling_func <- function(reps.setup.list,
           
         }
 
-        po.rand.gridB <- po[
-          po[,1] >= xmin(ext(rand.gridB)) & po[,1] <= xmax(ext(rand.gridB)) &
-            po[,2] >= ymin(ext(rand.gridB)) & po[,2] <= ymax(ext(rand.gridB)),
+        po.rand.gridB <- spp_process[
+          spp_process[,1] >= xmin(ext(rand.gridB)) & spp_process[,1] <= xmax(ext(rand.gridB)) &
+            spp_process[,2] >= ymin(ext(rand.gridB)) & spp_process[,2] <= ymax(ext(rand.gridB)),
         ]
         
         # Formatting if there's only one PO point in Grid A or B so that they become dataframes
@@ -107,7 +106,8 @@ po_sampling_func <- function(reps.setup.list,
           dimnames(po.rand.gridB) <- list(NULL, c("x", "y"))
         }
         
-        return(list(PO_GridA = po.rand.gridA, 
+        return(list(spp_process.rand.gridA = spp_process.rand.gridA,
+                    PO_GridA = po.rand.gridA,
                     PO_GridB = po.rand.gridB,
                     n_po_gridA = nrow(po.rand.gridA),
                     n_po_gridB = nrow(po.rand.gridB),
