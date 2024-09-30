@@ -114,6 +114,21 @@ run_extrap_func <- function(n_cores,
     
     crs(rand.gridB) <- "epsg:3857"
     
+
+    # Calculate the distance between the centre of the Site A and B -----------
+
+    # Get centre of Site A & turn into point
+    centreA <- data.frame(x = mean(c(xmin.randA, xmax.randA)), 
+                          y = mean(c(ymin.randA, ymax.randA))) %>% 
+      vect(geom=c("x", "y"), crs = "epsg:3857")
+    
+    # Get centre of Site B & turn into point
+    centreB <- data.frame(x = mean(c(xmin.randB, xmax.randB)), 
+                          y = mean(c(ymin.randB, ymax.randB))) %>% 
+      vect(geom=c("x", "y"), crs = "epsg:3857")
+    
+    Site.distance <- terra::distance(centreA, centreB)
+    
     # Extract covariates for the random grid Site A  --------------------------
     
     rand.grid.df <- as.data.frame(rand.gridA, xy = T)[,c("x", "y")]
@@ -192,7 +207,8 @@ run_extrap_func <- function(n_cores,
                            covs.SiteB.rast = covs.SiteB.rast,
                            extrap.plot = extrap.plot,
                            extrap.df = shape_extrap,
-                           summary.extrap = summary.extrap)
+                           summary.extrap = summary.extrap,
+                           Site.distance = Site.distance)
     
     
     # If the output adds a required replicate to meet nreps, keep it
