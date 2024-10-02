@@ -324,7 +324,7 @@ plot_parameter_recovery_func <- function(outpath,
     ##### Plot the mean width of the credible interval #####
     
     extrap.scenario.df.CI <- extrap.scenario.df %>% 
-      mutate(bias.coef.cred.int = bias.coef_975 - bias.coef_25)
+      mutate(bias.coef.cred.int = bias.coef_95 - bias.coef_25)
     
     bias.CI.width.plot <- extrap.scenario.df.CI %>% 
       filter(!is.na(bias.coef.cred.int)) %>% 
@@ -417,7 +417,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
   
   
   b1.CI.width <- extrap.scenario.df.CI %>% 
-    ggplot(aes(x = extrap.type, y = beta1.cred.int, color = mod.type)) +
+    ggplot(aes(x = extrap.median, y = beta1.cred.int, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = "Extrapolation", y = bquote(beta[1] ~ " Credible Interval Width"), fill = "Model Type", color = "Model Type") +
@@ -428,7 +428,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
   
   
   b2.CI.width <- extrap.scenario.df.CI %>% 
-    ggplot(aes(x = extrap.type, y = beta2.cred.int, color = mod.type)) +
+    ggplot(aes(x = extrap.median, y = beta2.cred.int, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = "Extrapolation", y = bquote(beta[2] ~ " Credible Interval Width"), fill = "Model Type", color = "Model Type") +
@@ -451,7 +451,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
   
   po.int <- extrap.scenario.df %>%
     filter(!is.na(PO_intercept)) %>% 
-    ggplot(aes(x = extrap.type, y = PO_intercept, color = mod.type)) +
+    ggplot(aes(x = extrap.median, y = PO_intercept, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
@@ -464,7 +464,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
   
   pa.int <- extrap.scenario.df %>%
     filter(!is.na(PA_intercept)) %>%
-    ggplot(aes(x = extrap.type, y = PA_intercept, color = mod.type)) +
+    ggplot(aes(x = extrap.median, y = PA_intercept, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
@@ -489,7 +489,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
   ##### Plot the marginal likelihood #####
   
   m.lik <- extrap.scenario.df %>% 
-    ggplot(aes(x = extrap.type, y = marg_lik, color = mod.type)) +
+    ggplot(aes(x = extrap.median, y = marg_lik, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = "Extrapolation", y = "Marginal Likelihood", fill = "Model Type", color = "Model Type") +
@@ -515,7 +515,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
     
     g1 <- extrap.scenario.df %>% 
       filter(!is.na(GRF.range.mean)) %>%
-      ggplot(aes(x = extrap.type, y = GRF.range.mean, color = mod.type)) +
+      ggplot(aes(x = extrap.median, y = GRF.range.mean, color = mod.type)) +
       geom_point(alpha = 0.3) +
       geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
       geom_hline(yintercept = scal, linetype = "dashed", color = "red") +
@@ -527,7 +527,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
     
     g2 <- extrap.scenario.df %>% 
       filter(!is.na(GRF.sd.mean)) %>% 
-      ggplot(aes(x = extrap.type, y = GRF.sd.mean^2, color = mod.type)) +
+      ggplot(aes(x = extrap.median, y = GRF.sd.mean^2, color = mod.type)) +
       geom_point(alpha = 0.3) +
       geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
       geom_hline(yintercept = variance, linetype = "dashed", color = "red") +
@@ -560,7 +560,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
     
     g1.CI.width <- extrap.scenario.df.CI %>% 
       filter(!is.na(GRF.range.cred.int)) %>% 
-      ggplot(aes(x = extrap.type, y = GRF.range.cred.int, color = mod.type)) +
+      ggplot(aes(x = extrap.median, y = GRF.range.cred.int, color = mod.type)) +
       geom_point(alpha = 0.3) +
       geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
       labs(x = "Extrapolation", y = "GRF range Credible Interval Width", fill = "Model Type", color = "Model Type") +
@@ -571,7 +571,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
     
     g2.CI.width <- extrap.scenario.df.CI %>%
       filter(!is.na(GRF.var.cred.int)) %>% 
-      ggplot(aes(x = extrap.type, y = GRF.var.cred.int, color = mod.type)) +
+      ggplot(aes(x = extrap.median, y = GRF.var.cred.int, color = mod.type)) +
       geom_point(alpha = 0.3) +
       geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
       labs(x = "Extrapolation", y = "GRF var Credible Interval Width", fill = "Model Type", color = "Model Type") +
@@ -603,7 +603,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
     
     bias_plot <- extrap.scenario.df %>% 
       filter(!is.na(bias.coef.mean)) %>%
-      ggplot(aes(x = extrap.type, y = bias.coef.mean, color = mod.type)) +
+      ggplot(aes(x = extrap.median, y = bias.coef.mean, color = mod.type)) +
       geom_point(alpha = 0.3) +
       geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
       labs(x = "Extrapolation", y = "Bias coef", fill = "Model Type", color = "Model Type") +
@@ -626,11 +626,11 @@ plot_parameter_recovery_continuous_func <- function(outpath,
     ##### Plot the mean width of the credible interval #####
     
     extrap.scenario.df.CI <- extrap.scenario.df %>% 
-      mutate(bias.coef.cred.int = bias.coef_975 - bias.coef_25)
+      mutate(bias.coef.cred.int = bias.coef_95 - bias.coef_25)
     
     bias.CI.width.plot <- extrap.scenario.df.CI %>% 
       filter(!is.na(bias.coef.cred.int)) %>% 
-      ggplot(aes(x = extrap.type, y = bias.coef.cred.int, color = mod.type)) +
+      ggplot(aes(x = extrap.median, y = bias.coef.cred.int, color = mod.type)) +
       geom_point(alpha = 0.3) +
       geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
       labs(x = "Extrapolation", y = "Bias Credible Interval Width", fill = "Model Type", color = "Model Type") +
