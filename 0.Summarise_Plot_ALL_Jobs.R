@@ -13,7 +13,7 @@ library(readr)
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Test_Sep27B"
+scenario_name = "Test_Oct1B"
 
 outpath <- file.path(getwd(), "output")
 
@@ -110,7 +110,18 @@ plot_parameter_recovery_func(extrap.scenario.df = extrap.scenario.df,
                              variance = variance,
                              mod.type = mod.type)
 
+# OPTIONAL - PLOT CONTINUOUS OUTPUTS TOO
 
+plot_parameter_recovery_continuous_func(extrap.scenario.df = extrap.scenario.df,
+                                        outpath = outpath,
+                                        scenario_name = scenario_name,
+                                        save = TRUE,
+                                        beta1 = beta1,
+                                        beta2 = beta2,
+                                        beta0 = beta0,
+                                        scal = scal,
+                                        variance = variance,
+                                        mod.type = mod.type)
 
 # OPTIONAL - PREDICT TO AND VALIDATE SITE A -------------------------------
 

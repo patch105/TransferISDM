@@ -123,9 +123,10 @@ plot_parameter_recovery_func <- function(outpath,
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
-  beta_CI_width_plot <- ggarrange(b1.CI.width , b2.CI.width, common.legend = T,  ncol = 2, nrow = 1)
   
   if(save == TRUE) {
+    
+    beta_CI_width_plot <- ggarrange(b1.CI.width , b2.CI.width, common.legend = T,  ncol = 2, nrow = 1)
     
     ggsave(plot = beta_CI_width_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Beta_CI_Width_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
     
@@ -157,9 +158,10 @@ plot_parameter_recovery_func <- function(outpath,
     theme_bw() +
     ggtitle('PA Intercept')
   
-  intercepts_plot <- ggarrange(po.int , pa.int,  ncol = 2, nrow = 1)
   
   if(save == TRUE) {
+    
+    intercepts_plot <- ggarrange(po.int , pa.int,  ncol = 2, nrow = 1)
     
     ggsave(plot = intercepts_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Intercepts_Plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
     
@@ -223,9 +225,10 @@ plot_parameter_recovery_func <- function(outpath,
       scale_fill_manual(values = fill.colours) +
       theme_bw()
     
-    GRF_plot <- ggarrange(g1, g2, common.legend = T, ncol = 2, nrow = 1)
     
     if(save == TRUE) {
+      
+      GRF_plot <- ggarrange(g1, g2, common.legend = T, ncol = 2, nrow = 1)
       
       ggsave(plot = GRF_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_GRF_Coef_Recovery_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
       
@@ -261,10 +264,11 @@ plot_parameter_recovery_func <- function(outpath,
       scale_fill_manual(values = fill.colours) +
       theme_bw()
     
-    GRF_CI_width_plot <- ggarrange(g1.CI.width, g2.CI.width, common.legend = T, ncol = 2, nrow = 1)
     
     if(save == TRUE) {
 
+      GRF_CI_width_plot <- ggarrange(g1.CI.width, g2.CI.width, common.legend = T, ncol = 2, nrow = 1)
+      
        ggsave(plot = GRF_CI_width_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_GRF_CI_Width_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
       
       
@@ -650,7 +654,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
   
 }
 
-
+}
 
 
 
