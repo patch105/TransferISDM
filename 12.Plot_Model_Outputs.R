@@ -349,36 +349,311 @@ plot_parameter_recovery_func <- function(outpath,
   
    
 
-# PLOT VALIDATION CONTINUOUS EXTRAPOLATION --------------------------------
+# PLOT parameter recovery CONTINUOUS --------------------------------
 
-plot_parameter_recovery_continuous_EXTRAP_func <- function(extrap.scenario.df,
-                                                  save,
-                                                  outpath,
-                                                  scenario_name,
-                                                  mod.type) {
-  # Plot the validation
-
-  b1 <- extrap.scenario.df %>%
+plot_parameter_recovery_continuous_func <- function(outpath,
+                                                    scenario_name,
+                                                    extrap.scenario.df,
+                                                    save,
+                                                    beta1,
+                                                    beta2,
+                                                    beta0,
+                                                    scal,
+                                                    variance,
+                                                    mod.type) {
+  
+  # Set values for fill for each model 
+  fill.colours = c("m.int" = "purple", 
+                   "m.int.GRF" = "purple4",
+                   "m.int.bias" = "pink",
+                   "m.int.GRF.bias" = "pink4",
+                   "m.PO" = "skyblue",
+                   "m.PO.GRF" = "skyblue4",
+                   "m.PO.bias" = "green3",
+                   "m.PO.GRF.bias" = "green4",
+                   "m.PA" = "orange",
+                   "m.PA.GRF" = "orange3")
+  
+  
+  ##### Plot the mean of coefficients #####
+  
+  b1 <- extrap.scenario.df %>% 
     ggplot(aes(x = extrap.median, y = beta1.mean, color = mod.type)) +
-    geom_point(alpha = 0.5) +
-    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-    geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
-    labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
-    scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-    coord_cartesian(xlim = c(NA, 50)) +
-    theme_bw()
-
-  extrap.scenario.df %>%
-    ggplot(aes(x = extrap.median, y = beta2.mean, color = mod.type)) +
-    geom_point(alpha = 0.5) +
-    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-    geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
-    labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type") +
-    scale_color_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
-    scale_fill_manual(values = c("Integrated.GRF" = "purple", "PO.GRF" = "skyblue", "PA.GRF" = "orange")) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    geom_hline(yintercept = beta1, linetype = "dashed", color = "red", linewidth = 1) +
+    labs(x = "Extrapolation", y = expression(beta[1]), fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +
     theme_bw()
-
+  
+  b2 <- extrap.scenario.df %>% 
+    ggplot(aes(x = extrap.median, y = beta2.mean, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    geom_hline(yintercept = beta2, linetype = "dashed", color = "red", linewidth = 1) +
+    labs(x = "Extrapolation", y = expression(beta[2]), fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  beta_plot <- ggarrange(b1 , b2, common.legend = T,  ncol = 2, nrow = 1)
+  
+  ggsave(plot = beta_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Coef_Recovery_plot.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+  
+  ##### Plot the mean width of the credible interval #####
+  
+  extrap.scenario.df.CI <- extrap.scenario.df %>% 
+    mutate(beta1.cred.int = beta1_975 - beta1_25,
+           beta2.cred.int = beta2_975 - beta2_25,
+           beta1.cred.int.true = ifelse(beta1 >= beta1_25 &  beta1 <= beta1_975, 1, 0),
+           beta2.cred.int.true = ifelse(beta2 >= beta2_25 & beta2 <= beta2_975, 1, 0))
+  
+  
+  b1.CI.width <- extrap.scenario.df.CI %>% 
+    ggplot(aes(x = extrap.type, y = beta1.cred.int, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = "Extrapolation", y = bquote(beta[1] ~ " Credible Interval Width"), fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  
+  b2.CI.width <- extrap.scenario.df.CI %>% 
+    ggplot(aes(x = extrap.type, y = beta2.cred.int, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = "Extrapolation", y = bquote(beta[2] ~ " Credible Interval Width"), fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  if(save == TRUE) {
+    
+    beta_CI_width_plot <- ggarrange(b1.CI.width , b2.CI.width, common.legend = T,  ncol = 2, nrow = 1)
+    
+    ggsave(plot = beta_CI_width_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Beta_CI_Width_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    
+  } else {print(beta_CI_width_plot)}
+  
+  
+  ##### Plot the intercepts #####
+  
+  po.int <- extrap.scenario.df %>%
+    filter(!is.na(PO_intercept)) %>% 
+    ggplot(aes(x = extrap.type, y = PO_intercept, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
+    labs(x = "Extrapolation", y = expression(beta[0]), fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw() +
+    ggtitle('PO Intercept')
+  
+  pa.int <- extrap.scenario.df %>%
+    filter(!is.na(PA_intercept)) %>%
+    ggplot(aes(x = extrap.type, y = PA_intercept, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
+    labs(x = "Extrapolation", y = expression(beta[0]), fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw() +
+    ggtitle('PA Intercept')
+  
+  
+  
+  if(save == TRUE) {
+    
+    intercepts_plot <- ggarrange(po.int , pa.int,  ncol = 2, nrow = 1)
+    
+    ggsave(plot = intercepts_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Intercepts_Plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    
+  } else {print(intercepts_plot)}
+  
+  ##### Plot the marginal likelihood #####
+  
+  m.lik <- extrap.scenario.df %>% 
+    ggplot(aes(x = extrap.type, y = marg_lik, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = "Extrapolation", y = "Marginal Likelihood", fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  if(save == TRUE) {
+    
+    ggsave(plot = m.lik, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Marginal_Likelihood_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    
+  } else {print(m.lik)}
+  
+  
+  
+  
+  
+  # If there are spatial models ------------------------------------------
+  
+  if(sum(grepl("spatial", mod.type, fixed = T)) > 0) {
+    
+    g1 <- extrap.scenario.df %>% 
+      filter(!is.na(GRF.range.mean)) %>%
+      ggplot(aes(x = extrap.type, y = GRF.range.mean, color = mod.type)) +
+      geom_point(alpha = 0.3) +
+      geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+      geom_hline(yintercept = scal, linetype = "dashed", color = "red") +
+      labs(x = "Extrapolation", y = "GRF range", fill = "Model Type", color = "Model Type") +
+      scale_color_manual(values = fill.colours) +
+      scale_fill_manual(values = fill.colours) +
+      # coord_cartesian(xlim = c(NA, 50)) +
+      theme_bw()
+    
+    g2 <- extrap.scenario.df %>% 
+      filter(!is.na(GRF.sd.mean)) %>% 
+      ggplot(aes(x = extrap.type, y = GRF.sd.mean^2, color = mod.type)) +
+      geom_point(alpha = 0.3) +
+      geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+      geom_hline(yintercept = variance, linetype = "dashed", color = "red") +
+      labs(x = "Extrapolation", y = "GRF svar", fill = "Model Type", color = "Model Type") +
+      scale_color_manual(values = fill.colours) +
+      scale_fill_manual(values = fill.colours) +
+      # coord_cartesian(xlim = c(NA, 50)) +
+      theme_bw()
+    
+    
+    if(save == TRUE) {
+      
+      GRF_plot <- ggarrange(g1, g2, common.legend = T, ncol = 2, nrow = 1)
+      
+      ggsave(plot = GRF_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_GRF_Coef_Recovery_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+      
+    } else {
+      
+      print(GRF_plot)
+    }
+    
+    
+    ##### Plot the mean width of the credible interval #####
+    
+    extrap.scenario.df.CI <- extrap.scenario.df %>% 
+      mutate(GRF.range.cred.int = GRF.range_975 - GRF.range_25,
+             GRF.var.cred.int = (GRF.sd_975)^2 - (GRF.sd_25)^2,
+             GRF.range.cred.int.true = ifelse(scal >= GRF.range_25 &  scal <= GRF.range_975, 1, 0),
+             GRF.var.cred.int.true = ifelse(variance >= (GRF.sd_25)^2 &  variance <= (GRF.sd_975)^2, 1, 0))
+    
+    g1.CI.width <- extrap.scenario.df.CI %>% 
+      filter(!is.na(GRF.range.cred.int)) %>% 
+      ggplot(aes(x = extrap.type, y = GRF.range.cred.int, color = mod.type)) +
+      geom_point(alpha = 0.3) +
+      geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+      labs(x = "Extrapolation", y = "GRF range Credible Interval Width", fill = "Model Type", color = "Model Type") +
+      scale_color_manual(values = fill.colours) +
+      scale_fill_manual(values = fill.colours) +
+      # coord_cartesian(xlim = c(NA, 50)) +
+      theme_bw()
+    
+    g2.CI.width <- extrap.scenario.df.CI %>%
+      filter(!is.na(GRF.var.cred.int)) %>% 
+      ggplot(aes(x = extrap.type, y = GRF.var.cred.int, color = mod.type)) +
+      geom_point(alpha = 0.3) +
+      geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+      labs(x = "Extrapolation", y = "GRF var Credible Interval Width", fill = "Model Type", color = "Model Type") +
+      scale_color_manual(values = fill.colours) +
+      scale_fill_manual(values = fill.colours) +
+      # coord_cartesian(xlim = c(NA, 50)) +
+      theme_bw()
+    
+    
+    if(save == TRUE) {
+      
+      GRF_CI_width_plot <- ggarrange(g1.CI.width, g2.CI.width, common.legend = T, ncol = 2, nrow = 1)
+      
+      ggsave(plot = GRF_CI_width_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_GRF_CI_Width_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+      
+      
+    } else {
+      
+      print(GRF_CI_width_plot)
+    }
+    
+    
   }
+  
+  
+  # If there are bias models  ------------------------------------------
+  
+  if(sum(grepl("bias", mod.type, fixed = T)) > 0) {
+    
+    bias_plot <- extrap.scenario.df %>% 
+      filter(!is.na(bias.coef.mean)) %>%
+      ggplot(aes(x = extrap.type, y = bias.coef.mean, color = mod.type)) +
+      geom_point(alpha = 0.3) +
+      geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+      labs(x = "Extrapolation", y = "Bias coef", fill = "Model Type", color = "Model Type") +
+      scale_color_manual(values = fill.colours) +
+      scale_fill_manual(values = fill.colours) +
+      # coord_cartesian(xlim = c(NA, 50)) +
+      theme_bw()
+    
+    
+    if(save == TRUE) {
+      
+      ggsave(plot = bias_plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Bias_Coef_Recovery_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+      
+    } else {
+      
+      print(bias_plot)
+    }
+    
+    
+    ##### Plot the mean width of the credible interval #####
+    
+    extrap.scenario.df.CI <- extrap.scenario.df %>% 
+      mutate(bias.coef.cred.int = bias.coef_975 - bias.coef_25)
+    
+    bias.CI.width.plot <- extrap.scenario.df.CI %>% 
+      filter(!is.na(bias.coef.cred.int)) %>% 
+      ggplot(aes(x = extrap.type, y = bias.coef.cred.int, color = mod.type)) +
+      geom_point(alpha = 0.3) +
+      geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+      labs(x = "Extrapolation", y = "Bias Credible Interval Width", fill = "Model Type", color = "Model Type") +
+      scale_color_manual(values = fill.colours) +
+      scale_fill_manual(values = fill.colours) +
+      # coord_cartesian(xlim = c(NA, 50)) +
+      theme_bw()
+    
+    
+    if(save == TRUE) {
+      
+      ggsave(plot = bias.CI.width.plot, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Bias_CI_Width_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+      
+      
+    } else {
+      
+      print(bias.CI.width.plot)
+    }
+    
+    
+  
+}
+
+
+
+
+
+
+
 
