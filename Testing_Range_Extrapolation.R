@@ -7,19 +7,6 @@ library(purrr)
 library(RISDM)
 library(flexsdm)
 
-# OUTPUT FOLDER & SCENARIO NAME -------------------------------------------
-
-outpath <- file.path(getwd(), "output")
-
-scenario_name = "Test_Oct3"
-
-# Make dir if not already there
-if(!dir.exists(file.path(outpath, scenario_name))) {
-  
-  dir.create(file.path(outpath, scenario_name), recursive = TRUE)
-  
-}
-
 
 # Number of cores ---------------------------------------------------------
 
@@ -71,33 +58,14 @@ colnames(coords) <- c("eastings", "northings")
 
 # Run setup for replicates ------------------------------------------------
 
-
-beta0 <- -2 # Intercept
-beta1 <- 2 # Coefficient for cov 1
-beta2 <- 0.1 # Coefficient for cov 2
-
-scal <- 20 # Scale parameter (range of spatial effect)
 variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
 
-mod.type = "spatial"
-
-latent.type = "lgcp" # OR "ipp"
-
-# If doing a spatial model, choose whether to predict the GRF and the Fixed effect
-pred.GRF <- TRUE 
-pred.fixed <- TRUE
-
-# Number of posterior samples to take * note that it slows things down
-posterior_nsamps <- 500
-
-# Choosing thinning or bias for PO sampling -------------------------------
-
-bias <- TRUE
-detect.prob <- 0.2
-maxprob <- 0.2
-
+# Size of the two Reference and Target sites
 rast_cellsA <- c(50, 50)
 rast_cellsB <- c(50,50)
+
+# Number of replicates per range
+nreps <- 10
 
 # 1. Simulate Covariates -------------------------------------------------
 
@@ -118,7 +86,7 @@ crs(landscape.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator project
 xSeq <- terra::xFromCol(landscape.rast)
 ySeq <- terra::yFromRow(landscape.rast)
 
-nreps <- 10
+
 
 
 cov.list <- list()
@@ -137,6 +105,7 @@ cov.list <- imap(scal.list, function(scal, i) {
   
 })
 
+## This function creates two grids and calulcates the extrapolation metric (mean, median) between them
 
 # For every range level in cov.list
 extrap.reps.out <- imap(cov.list ,  function(cov.reps, i) {
@@ -299,6 +268,7 @@ extrap.reps.out <- imap(cov.list ,  function(cov.reps, i) {
   }) 
 })
   
+
 # Set up saving dataframe
 merged.df <- data.frame(range_cov = unlist(map(scal.list, function(x) rep(x, each = nreps))),
                  median = rep(NA, length(scal.list)*nreps)) 
