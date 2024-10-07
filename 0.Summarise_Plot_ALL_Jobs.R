@@ -13,7 +13,7 @@ library(readr)
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Testing_spatialAuto"
+scenario_name = "Testing_spatialAutoB"
 
 outpath <- file.path(getwd(), "output")
 

@@ -130,13 +130,20 @@ plot_validation_SiteA_func <- function(true.validation.df,
     
     x.label <- "Environmental dissimilarity"
     
+    x.discrete.label <- c("Low", "Mod", "High")
+    
   }
   
   if(scenario.type == "Spatial.Auto") {
     
     x.label <- "Spatial autocorrelation range"
     
+    scal.list <- scal
+    
+    x.discrete.label <- c(as.character(scal))
+    
   }
+  
   
   
   # Set values for fill for each model 

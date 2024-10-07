@@ -26,12 +26,12 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Testing_spatialAuto"
+scenario_name = "Testing_spatialAutoB"
 
 # "Enviro.Extrap" or "Spatial.Auto"
 scenario.type = "Spatial.Auto"
 
-nreps <- 2 # Replicates per extrapolation type
+nreps <- 1 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
 latent.type = "lgcp" 
