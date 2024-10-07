@@ -221,7 +221,7 @@ plot_validation_SiteA_func <- function(true.validation.df,
   
   # If there are spatial models ------------------------------------------
   
-  if(grepl("spatial", mod.type, fixed = T)) {
+  if(sum(grepl("spatial", mod.type, fixed = T)) > 0) {
     
     ### IF Predicted GRF, plot the Correlation
     if(pred.GRF == TRUE) {
