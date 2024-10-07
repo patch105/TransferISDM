@@ -150,7 +150,7 @@ plot_data_func <- function(reps.setup.list,
         scale_color_identity() +
         geom_text(data = df_extents, aes(x = label_x, y = label_y, label = label), 
                   color = "black", size = 5, vjust = 0) +
-        ggtitle('Covariate 1')
+        ggtitle('Covariate 2')
      
       E <- ggarrange(C, D, ncol = 1, nrow = 2)
       

@@ -26,12 +26,15 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_Oct1"
+scenario_name = "Testing_spatialAuto"
 
-nreps <- 1 # Replicates per extrapolation type
+# "Enviro.Extrap" or "Spatial.Auto"
+scenario.type = "Spatial.Auto"
+
+nreps <- 2 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
-latent.type = "ipp" 
+latent.type = "lgcp" 
 
 # Bias in PO sampling?
 bias <- FALSE
@@ -39,7 +42,8 @@ bias <- FALSE
 # Model choices -----------------------------------------------------------
 
 # Model types to run
-mod.type = c("no-GRF", "spatial", "no-GRF.bias", "spatial.bias")
+# Options are "no-GRF" "spatial" "no-GRF.bias" "spatial.bias"
+mod.type = c("no-GRF", "spatial")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
@@ -53,7 +57,16 @@ beta0 <- -2 # Intercept
 beta1 <- 2 # Coefficient for cov 1
 beta2 <- 0.1 # Coefficient for cov 2
 
-scal <- 20 # Scale parameter (range of spatial effect)
+if(scenario.type == "Spatial.Auto") {
+  
+  scal <- list(20, 100, 200) # List of range parameters for spatial autocorr scenario
+  
+} else {
+  
+  scal <- 20 # Scale parameter (range of spatial effect)
+  
+}
+
 variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
 
 # PO sampling values
@@ -125,11 +138,24 @@ colnames(coords) <- c("eastings", "northings")
 
 # Run setup for replicates ------------------------------------------------
 
-source("0b.Run_Replicate.R")
+# Depending on your scenario type, source 1 of 2 R scripts for running replicates
+
+if(scenario.type == "Enviro.Extrap") {
+  
+  source("0b.Run_Replicate.R")
+  
+}
+
+if(scenario.type == "Spatial.Auto") {
+  
+  source("0b.Run_Replicate_SA.R")
+  
+}
 
 Run_Replicate_Func(n_cores = n_cores,
                    outpath = outpath,
                    scenario_name = scenario_name,
+                   scenario.type = scenario.type,
                    ncol = ncol,
                    nrow =nrow,
                    res = res,
@@ -162,6 +188,6 @@ Run_Replicate_Func(n_cores = n_cores,
 
 
 # Save the input parameters for this job ----------------------------------
-save(mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
+save(scenario.type, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
 

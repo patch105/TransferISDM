@@ -2,6 +2,7 @@
 Run_Replicate_Func <- function(n_cores,
                                outpath,
                                scenario_name,
+                               scenario.type,
                                ncol,
                                nrow,
                                res,
@@ -275,6 +276,7 @@ Run_Replicate_Func <- function(n_cores,
   # 6b. Save Scenario Information -------------------------------------------
   
   scenario_info.df <- tibble(scenario_name = scenario_name,
+                             scenario.type = scenario.type,
                              nreps = nreps,
                              range_cov1 = range_cov1,
                              range_cov2 = range_cov2,

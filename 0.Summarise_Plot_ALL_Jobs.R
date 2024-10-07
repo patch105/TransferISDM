@@ -13,7 +13,7 @@ library(readr)
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Test_Oct1B"
+scenario_name = "Testing_spatialAuto"
 
 outpath <- file.path(getwd(), "output")
 
@@ -88,6 +88,7 @@ plot_validation_SiteB_func(true.validation.df = true.validation.df,
                            save = TRUE,
                            outpath = outpath,
                            scenario_name = scenario_name,
+                           scenario.type = scenario.type,
                            mod.type = mod.type)  
 
 
@@ -102,6 +103,7 @@ source("12.Plot_Model_Outputs.R")
 plot_parameter_recovery_func(extrap.scenario.df = extrap.scenario.df,
                              outpath = outpath,
                              scenario_name = scenario_name,
+                             scenario.type = scenario.type,
                              save = TRUE,
                              beta1 = beta1,
                              beta2 = beta2,
@@ -111,17 +113,21 @@ plot_parameter_recovery_func(extrap.scenario.df = extrap.scenario.df,
                              mod.type = mod.type)
 
 # OPTIONAL - PLOT CONTINUOUS OUTPUTS TOO
+if(scenario.type == "Enviro.Extrap") {
+  
+  plot_parameter_recovery_continuous_func(extrap.scenario.df = extrap.scenario.df,
+                                          outpath = outpath,
+                                          scenario_name = scenario_name,
+                                          save = TRUE,
+                                          beta1 = beta1,
+                                          beta2 = beta2,
+                                          beta0 = beta0,
+                                          scal = scal,
+                                          variance = variance,
+                                          mod.type = mod.type)
+  
+}
 
-plot_parameter_recovery_continuous_func(extrap.scenario.df = extrap.scenario.df,
-                                        outpath = outpath,
-                                        scenario_name = scenario_name,
-                                        save = TRUE,
-                                        beta1 = beta1,
-                                        beta2 = beta2,
-                                        beta0 = beta0,
-                                        scal = scal,
-                                        variance = variance,
-                                        mod.type = mod.type)
 
 # OPTIONAL - PREDICT TO AND VALIDATE SITE A -------------------------------
 
@@ -129,16 +135,8 @@ plot_validation_SiteA_func(true.validation.df = true.validation.SiteA.df,
                            save = TRUE,
                            outpath = outpath,
                            scenario_name = scenario_name,
+                           scenario.type = scenario.type,
                            mod.type = mod.type,
                            pred.GRF = pred.GRF,
                            pred.fixed = pred.fixed)
-
-
-
-### OPTIONAL
-plot_parameter_recovery_continuous_EXTRAP_func(extrap.scenario.df = extrap.scenario.df, 
-                                               save = TRUE,
-                                               outpath = outpath,
-                                               scenario_name = scenario_name,
-                                               mod.type = mod.type)
 

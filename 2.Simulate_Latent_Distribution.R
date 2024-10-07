@@ -15,6 +15,7 @@ sim_latent_dist_func <- function(beta0,
                                  plot.mu = FALSE,
                                  plot.lg.s = FALSE,
                                  latent.type) {
+  print(scal)
   
   nu <- 1/2 # Smoothness parameter - ONLY FOR MATERN
   
@@ -33,6 +34,8 @@ sim_latent_dist_func <- function(beta0,
   
   mu <- cov1.df %>% mutate(cov = fe)
   mu <- spatstat.geom::as.im(mu)
+  
+  plot(mu)
   
   if(latent.type == "lgcp") {
     
@@ -83,8 +86,6 @@ sim_latent_dist_func <- function(beta0,
     
   }
   
-  
-  
   if(plot.mu == TRUE) {
     
     mu.plot <- plot(mu)
@@ -102,6 +103,7 @@ sim_latent_dist_func <- function(beta0,
   return(latent.list)
     
 }
+
 
 
 # TO DOs ------------------------------------------------------------------

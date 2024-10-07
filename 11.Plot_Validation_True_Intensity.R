@@ -7,7 +7,30 @@ plot_validation_SiteB_func <- function(true.validation.df,
                                        save = FALSE,
                                        outpath,
                                        scenario_name,
+                                       scenario.type,
                                        mod.type) { 
+  
+  # Set the label for the x axis based on the scenario type 
+  # "Spatial autocorrelation range" or "Environmental dissimilarity"
+  
+  if(scenario.type == "Enviro.Extrap") {
+    
+    x.label <- "Environmental dissimilarity"
+    
+    x.discrete.label <- c("Low", "Mod", "High")
+    
+  }
+  
+  if(scenario.type == "Spatial.Auto") {
+    
+    x.label <- "Spatial autocorrelation range"
+    
+    scal.list <- scal
+    
+    x.discrete.label <- c(as.character(scal))
+    
+  }
+  
   
   # Set values for fill for each model 
   fill.colours = c("m.int" = "purple", 
@@ -27,24 +50,24 @@ plot_validation_SiteB_func <- function(true.validation.df,
   cor <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = correlation, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "Correlation", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "Correlation", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
   MAE <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = MAE, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "MAE", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "MAE", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
   RMSE <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = RMSE, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "RMSE", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "RMSE", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
@@ -53,16 +76,16 @@ plot_validation_SiteB_func <- function(true.validation.df,
   Int.score.mean <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = Mean.Int.Score, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "Mean Interval Score", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "Mean Interval Score", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
   Int.score.sum <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = Sum.Int.Score, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "Sum Interval Score", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "Sum Interval Score", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
@@ -95,9 +118,25 @@ plot_validation_SiteA_func <- function(true.validation.df,
                                        save = FALSE,
                                        outpath,
                                        scenario_name,
+                                       scenario.type,
                                        mod.type,
                                        pred.GRF = FALSE,
                                        pred.fixed = FALSE) {
+  
+  # Set the label for the x axis based on the scenario type 
+  # "Spatial autocorrelation range" or "Environmental dissimilarity"
+  
+  if(scenario.type == "Enviro.Extrap") {
+    
+    x.label <- "Environmental dissimilarity"
+    
+  }
+  
+  if(scenario.type == "Spatial.Auto") {
+    
+    x.label <- "Spatial autocorrelation range"
+    
+  }
   
   
   # Set values for fill for each model 
@@ -121,24 +160,24 @@ plot_validation_SiteA_func <- function(true.validation.df,
   cor <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = correlation, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "Correlation", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "Correlation", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
   MAE <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = MAE, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "MAE", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "MAE", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
   RMSE <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = RMSE, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "RMSE", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "RMSE", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
@@ -147,16 +186,16 @@ plot_validation_SiteA_func <- function(true.validation.df,
   Int.score.mean <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = Mean.Int.Score, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "Mean Interval Score", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "Mean Interval Score", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
   Int.score.sum <- true.validation.df %>% 
     ggplot(aes(x = extrap.type, y = Sum.Int.Score, fill = mod.type)) +
     geom_boxplot() +
-    labs(x = "Extrapolation", y = "Sum Interval Score", fill = "Model Type") +
-    scale_x_discrete(labels = c("Low", "Mod", "High")) +
+    labs(x = x.label, y = "Sum Interval Score", fill = "Model Type") +
+    scale_x_discrete(labels = x.discrete.label) +
     scale_fill_manual(values = fill.colours) +
     theme_bw()
   
@@ -191,8 +230,8 @@ plot_validation_SiteA_func <- function(true.validation.df,
         filter(!is.na(cor.GRF)) %>% 
         ggplot(aes(x = extrap.type, y = cor.GRF, fill = mod.type)) +
         geom_boxplot() +
-        labs(x = "Extrapolation", y = "Correlation GRF", fill = "Model Type") +
-        scale_x_discrete(labels = c("Low", "Mod", "High")) +
+        labs(x = x.label, y = "Correlation GRF", fill = "Model Type") +
+        scale_x_discrete(labels = x.discrete.label) +
         scale_fill_manual(values = fill.colours) +
         theme_bw()
       
@@ -211,8 +250,8 @@ plot_validation_SiteA_func <- function(true.validation.df,
         filter(!is.na(cor.FIXED)) %>%
         ggplot(aes(x = extrap.type, y = cor.FIXED, fill = mod.type)) +
         geom_boxplot() +
-        labs(x = "Extrapolation", y = "Correlation FIXED", fill = "Model Type") +
-        scale_x_discrete(labels = c("Low", "Mod", "High")) +
+        labs(x = x.label, y = "Correlation FIXED", fill = "Model Type") +
+        scale_x_discrete(labels = x.discrete.label) +
         scale_fill_manual(values = fill.colours) +
         theme_bw()
       
@@ -229,47 +268,62 @@ plot_validation_SiteA_func <- function(true.validation.df,
 
 # PLOT VALIDATION CONTINUOUS EXTRAPOLATION --------------------------------
 
-# plot_validation_SiteB_continuous_func <- function(true.validation.df,
-#                                                   save = FALSE,
-#                                                   outpath,
-#                                                   scenario_name,
-#                                                   mod.type) {
-#   
-#   fill.colours = c("m.int" = "purple", 
-#                    "m.int.GRF" = "purple4",
-#                    "m.int.bias" = "pink",
-#                    "m.int.GRF.bias" = "pink4",
-#                    "m.PO" = "skyblue",
-#                    "m.PO.GRF" = "skyblue4",
-#                    "m.PO.bias" = "green3",
-#                    "m.PO.GRF.bias" = "green4",
-#                    "m.PA" = "orange",
-#                    "m.PA.GRF" = "orange3")
-#   
-#   # Plot the validation
-# 
-#   cor <- true.validation.df %>%
-#     ggplot(aes(x = extrap.median, y = correlation, color = mod.type)) +
-#     geom_point(alpha = 0.1) +
-#     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-#     labs(x = "Extrapolation", y = "Correlation", fill = "Model Type") +
-#     scale_color_manual(values = fill.colours) +
-#     scale_fill_manual(values = fill.colours) +
-#     # coord_cartesian(xlim = c(NA, 50)) +
-#     theme_bw()
-# 
-#   true.validation.df %>%
-#     ggplot(aes(x = extrap.median, y = MAE, color = mod.type)) +
-#     geom_point(alpha = 0.5) +
-#     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-#         labs(x = "Extrapolation", y = "MAE", fill = "Model Type") +
-#     scale_color_manual(values = fill.colours) +
-#     scale_fill_manual(values = fill.colours) +
-#     coord_cartesian(xlim = c(NA, 50)) +
-#     theme_bw()
-# 
-# 
-#   }
-#   
+plot_validation_SiteB_continuous_func <- function(true.validation.df,
+                                                  save = FALSE,
+                                                  outpath,
+                                                  scenario_name,
+                                                  scenario.type,
+                                                  mod.type) {
+
+  if(scenario.type == "Enviro.Extrap") {
+    
+    x.label <- "Environmental dissimilarity"
+    
+  }
+  
+  if(scenario.type == "Spatial.Auto") {
+    
+    x.label <- "Spatial autocorrelation range"
+    
+    scal.list <- scal
+    
+  }
+  
+  fill.colours = c("m.int" = "purple",
+                   "m.int.GRF" = "purple4",
+                   "m.int.bias" = "pink",
+                   "m.int.GRF.bias" = "pink4",
+                   "m.PO" = "skyblue",
+                   "m.PO.GRF" = "skyblue4",
+                   "m.PO.bias" = "green3",
+                   "m.PO.GRF.bias" = "green4",
+                   "m.PA" = "orange",
+                   "m.PA.GRF" = "orange3")
+
+  # Plot the validation
+
+  cor <- true.validation.df %>%
+    ggplot(aes(x = extrap.median, y = correlation, color = mod.type)) +
+    geom_point(alpha = 0.1) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
+    labs(x = x.label, y = "Correlation", fill = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+
+  true.validation.df %>%
+    ggplot(aes(x = extrap.median, y = MAE, color = mod.type)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
+        labs(x = x.label, y = "MAE", fill = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+
+
+  }
+
   
 

@@ -1,7 +1,8 @@
-library(NLMR)
-library(landscapetools)
-library(RandomFields) # See below for download from archived files.
-library(RISDM)
+
+# library(NLMR,lib.loc=lib_loc)
+# library(landscapetools,lib.loc=lib_loc)
+# library(RandomFields,lib.loc=lib_loc) # See below for download from archived files.
+library(RISDM,lib.loc=lib_loc)
 
 # 1.Simulate_Covariates ---------------------------------------------------
 
@@ -58,6 +59,19 @@ sim_covariates_func <- function(plot,
   
   crs(landscape.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
   
+    #### Make a spatially structured Cov 1 #####
+  
+  xSeq <- terra::xFromCol(landscape.rast)
+  ySeq <- terra::yFromRow(landscape.rast)
+  
+  cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov1, nu = 1/2) 
+  
+  cov1 <- rast(cov1)
+  
+  crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+  
+  names(cov1) <- "cov"
+  
   #### Make a simple Cov 1 #####
   
   # Generate a matrix of continuous values from 0 to 1, going left to right
@@ -65,8 +79,8 @@ sim_covariates_func <- function(plot,
   
   # # Flatten the matrix into a vector to match the expected input format for 'vals'
   covariate_vals <- as.vector(covariate_matrix)
-
-  cov1 <- rast(nrows = nrow,
+  
+  cov2 <- rast(nrows = nrow,
                ncols = ncol,
                xmin = east_min,
                xmax = east_max,
@@ -76,9 +90,9 @@ sim_covariates_func <- function(plot,
                vals = covariate_vals,
                names = c("cov")
   )
-  crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
-
-  names(cov1) <- "cov"
+  crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+  
+  names(cov2) <- "cov"
   # 
   # # ##### BETA DISTRIBUTION
   # 
@@ -99,19 +113,6 @@ sim_covariates_func <- function(plot,
   # names(cov1) <- "cov"
   # 
   # plot(cov1)
-  
-  #### Make a spatially structured Cov 2 #####
-  
-  xSeq <- terra::xFromCol(landscape.rast)
-  ySeq <- terra::yFromRow(landscape.rast)
-  
-  cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov2, nu = 1/2) 
-  
-  cov2 <- rast(cov2)
-  
-  crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
-  
-  names(cov2) <- "cov"
   
   
   covs <- c(cov1, cov2)
@@ -182,3 +183,7 @@ sim_covariates_func <- function(plot,
   
   
 }
+
+
+
+
