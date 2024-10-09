@@ -1,11 +1,46 @@
 ---
 title: "Testing bias scenarios"
-format: html
-editor: visual
+output: 
+  html_document:
+    self-contained: true
+author: "Charlotte Patterson"
+date: "`r Sys.Date()`"
+execute: 
+  cache: false
+toc: true
+format: 
+  html:
+    self-contained: true
+    code-tools: true
+    df-print: paged
+    code-line-numbers: true
+    code-overflow: scroll
+  pdf:
+    geometry: 
+      - top=30mm
+      - left=30mm
+editor:
+  source
 ---
+
+```{r}
+#| label: img_params
+#| code-summary: "Setting image parameters"
+#| include: false
+
+knitr::opts_chunk$set(echo = TRUE,
+                      dev = 'png',
+                      dpi = 300)
+```
 
 
 ```{r}
+
+#| label: packages
+#| code-summary: "Loading packages"
+#| message: false
+#| warning: false
+
 library(ggplot2)
 library(dplyr)
 library(terra)
@@ -76,6 +111,9 @@ nreps <- 3
 ## 1. Simulate covariate
 
 ```{r}
+
+#| message: false
+#| warning: false
 
 landscape.rast <- terra::rast(xmin = east_min, 
                               xmax = east_max, 
@@ -150,6 +188,10 @@ spp_process <- cbind(x = ipp$x, y = ipp$y)
 ## 3. Choose Reference and Target sites
 
 ```{r}
+
+#| message: false
+#| warning: false
+
 # Set size of grid (number of cells) for Site A (Reference)
 # NOTE - must be smaller than total cell number in x y directions
 rast_sizeA <- c(rast_cellsA[1]*bau_east_step, rast_cellsA[2]*bau_north_step)
@@ -363,6 +405,8 @@ po.rand.gridA <- po.rand.gridA[, c("x", "y")]
 
 ```{r}
 
+#| message: false
+#| warning: false
 
 # Set size of grid (number of cells) for PA grid in Site A (Reference)
 # NOTE - must be smaller than total cell number in x y directions
@@ -555,6 +599,8 @@ ggarrange(A, B, ncol = 1, nrow = 2)
 ## 7. Run models
 
 ```{r}
+#| message: false
+#| warning: false
 
 # Set model control parameters
 prior.mean <- 0
