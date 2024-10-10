@@ -552,7 +552,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           p8b <- reps.setup.list[[name]][[rep]]$pred.FIXED.plot.m.PA.GRF +
             ggtitle('Median predicted FIXED - PA GRF')
           
-          FIXED.pred.plot.list$SITEA_FIXED.prediction.plot.bias <- ggarrange(p5, p6b, p7c, p8d, ncol = 2, nrow = 2)
+          FIXED.pred.plot.list$SITEA_FIXED.prediction.plot.bias <- ggarrange(p5, p6b, p7b, p8b, ncol = 2, nrow = 2)
           
         }
         
