@@ -458,6 +458,7 @@ plot_parameter_recovery_continuous_func <- function(outpath,
                                                     variance,
                                                     mod.type) {
   
+  
   # Set values for fill for each model 
   fill.colours = c("m.int" = "purple", 
                    "m.int.GRF" = "purple4",

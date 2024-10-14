@@ -26,24 +26,24 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Testing_spatialAutoB"
+scenario_name = "Test_Extrap&Bias_BA"
 
 # "Enviro.Extrap" or "Spatial.Auto"
-scenario.type = "Spatial.Auto"
+scenario.type = "Enviro.Extrap"
 
-nreps <- 1 # Replicates per extrapolation type
+nreps <- 10 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
-latent.type = "lgcp" 
+latent.type = "ipp" 
 
 # Bias in PO sampling?
-bias <- FALSE
+bias <- TRUE
 
 # Model choices -----------------------------------------------------------
 
 # Model types to run
 # Options are "no-GRF" "spatial" "no-GRF.bias" "spatial.bias"
-mod.type = c("no-GRF", "spatial")
+mod.type = c("no-GRF", "no-GRF.bias")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
@@ -152,6 +152,10 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
+# Save the input parameters for this job ----------------------------------
+save(scenario.type, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
+
+
 Run_Replicate_Func(n_cores = n_cores,
                    outpath = outpath,
                    scenario_name = scenario_name,
@@ -187,7 +191,5 @@ Run_Replicate_Func(n_cores = n_cores,
                    job_index = job_index)
 
 
-# Save the input parameters for this job ----------------------------------
-save(scenario.type, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
 

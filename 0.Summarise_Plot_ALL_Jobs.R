@@ -13,7 +13,7 @@ library(readr)
 #***NOTE - make sure that you match outpath and scenario_name to Run_ALL_Replicates file!!
 #****
 
-scenario_name = "Testing_spatialAutoB"
+scenario_name = "Test_Oct2C"
 
 outpath <- file.path(getwd(), "output")
 
@@ -91,6 +91,17 @@ plot_validation_SiteB_func(true.validation.df = true.validation.df,
                            scenario.type = scenario.type,
                            mod.type = mod.type)  
 
+# OPTIONAL - PLOT CONTINUOUS OUTPUTS TOO
+if(scenario.type == "Enviro.Extrap") { 
+  
+plot_validation_SiteB_continuous_func(true.validation.df = true.validation.df,
+                                      save = TRUE,
+                                      outpath = outpath,
+                                      scenario_name = scenario_name,
+                                      scenario.type = scenario.type,
+                                      mod.type = mod.type) 
+  
+}
 
 # 12. Plot Model Outputs --------------------------------------------------
 

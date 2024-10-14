@@ -27,7 +27,8 @@ extract_model_results_func <- function(reps.setup.list,
       Model <- reps.setup.list[[name]][[rep]]$models$Model
       
       # Extract the median extrapolation amount
-      extrap.median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
+      BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
+      BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
       
       # Extract the distance between the sites
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
@@ -38,7 +39,8 @@ extract_model_results_func <- function(reps.setup.list,
         
           results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
-          extrap.median = extrap.median,
+          BA = BA,
+          BD = BD,
           Site.distance = Site.distance,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),

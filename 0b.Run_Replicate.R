@@ -98,7 +98,7 @@ Run_Replicate_Func <- function(n_cores,
     
     # 3.Simulate Environmental Extrapolation ------------------------------------
     
-    source("3.Simulate_Enviro_Extrapolation.R")
+    source("3.Simulate_Enviro_Extrapolation_BA.R")
     
     # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
     # NOTE - must be smaller than total cell number in x y directions
@@ -392,13 +392,13 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   
   # 12C. Plot Predictions ---------------------------------------------------
   
-  source("12C.Plot_Predictions.R")
-
-  plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
-                              outpath = outpath,
-                              scenario_name = scenario_name,
-                              mod.type = mod.type,
-                              job_index = job_index)
+  # source("12C.Plot_Predictions.R")
+  # 
+  # plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
+  #                             outpath = outpath,
+  #                             scenario_name = scenario_name,
+  #                             mod.type = mod.type,
+  #                             job_index = job_index)
 
   
   # OPTIONAL - predict to and validate Site A -------------------------------
@@ -411,14 +411,14 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
                                                     pred.fixed = pred.fixed,
                                                     mod.type = mod.type,
                                                     posterior_nsamps = posterior_nsamps)
-
-  plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
-                              outpath = outpath,
-                              scenario_name = scenario_name,
-                              pred.GRF = pred.GRF,
-                              pred.fixed = pred.fixed,
-                              mod.type = mod.type,
-                              job_index = job_index)
+# 
+#   plot_predictions_SiteA_func(reps.setup.list = reps.setup.list,
+#                               outpath = outpath,
+#                               scenario_name = scenario_name,
+#                               pred.GRF = pred.GRF,
+#                               pred.fixed = pred.fixed,
+#                               mod.type = mod.type,
+#                               job_index = job_index)
   
   # *Optional* - run validation for Site A
   true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list,

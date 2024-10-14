@@ -279,23 +279,9 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
                                                   save = FALSE,
                                                   outpath,
                                                   scenario_name,
-                                                  scenario.type,
                                                   mod.type) {
 
-  if(scenario.type == "Enviro.Extrap") {
-    
-    x.label <- "Environmental dissimilarity"
-    
-  }
-  
-  if(scenario.type == "Spatial.Auto") {
-    
-    x.label <- "Spatial autocorrelation range"
-    
-    scal.list <- scal
-    
-  }
-  
+ 
   fill.colours = c("m.int" = "purple",
                    "m.int.GRF" = "purple4",
                    "m.int.bias" = "pink",
@@ -308,29 +294,79 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
                    "m.PA.GRF" = "orange3")
 
   # Plot the validation
-
-  cor <- true.validation.df %>%
+  
+  cor <- true.validation.df %>% 
     ggplot(aes(x = extrap.median, y = correlation, color = mod.type)) +
-    geom_point(alpha = 0.1) +
-    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-    labs(x = x.label, y = "Correlation", fill = "Model Type") +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = x.label, y = "Correlation", fill = "Model Type", color = "Model Type") +
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +
     theme_bw()
-
-  true.validation.df %>%
+  
+  MAE <- true.validation.df %>% 
     ggplot(aes(x = extrap.median, y = MAE, color = mod.type)) +
-    geom_point(alpha = 0.5) +
-    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.2) +
-        labs(x = x.label, y = "MAE", fill = "Model Type") +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = x.label, y = "MAE", fill = "Model Type", color = "Model Type") +
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
-    coord_cartesian(xlim = c(NA, 50)) +
+    # coord_cartesian(xlim = c(NA, 50)) +
     theme_bw()
+  
+  RMSE <- true.validation.df %>% 
+    ggplot(aes(x = extrap.median, y = RMSE, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = x.label, y = "RMSE", fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  ## Smaller values of interval score are better
+  
+  Int.score.mean <-  true.validation.df %>% 
+    ggplot(aes(x = extrap.median, y = Mean.Int.Score, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = x.label, y = "Mean Interval Score", fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  Int.score.sum <- true.validation.df %>% 
+    ggplot(aes(x = extrap.median, y = Sum.Int.Score, color = mod.type)) +
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
+    labs(x = x.label, y = "Sum Interval Score", fill = "Model Type", color = "Model Type") +
+    scale_color_manual(values = fill.colours) +
+    scale_fill_manual(values = fill.colours) +
+    # coord_cartesian(xlim = c(NA, 50)) +
+    theme_bw()
+  
+  p1 <- ggarrange(RMSE, MAE, common.legend = T,  ncol = 2, nrow = 1)
+  
+  p2 <- ggarrange(Int.score.mean, Int.score.sum, common.legend = T,  ncol = 2, nrow = 1)
+  
+  if(save == TRUE) {
+    
+    ggsave(plot = p1, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_RMSE_MAE_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    ggsave(plot = p2, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_Int_Score_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    ggsave(plot = cor, filename = paste0(file.path(outpath, scenario_name),"/Scenario_", scenario_name, "_COR_plot_CONTINUOUS.png"), w = 21.5, h = 15, units = "cm", dpi = 400, device = "png")
+    
+    
+  } else{print(p1) 
+    
+    print(p2) 
+    
+    print(cor)}
 
 
   }
 
-  
 
