@@ -441,47 +441,85 @@ run_extrap_func_Spat_Auto <- function(n_cores,
 
 
         # Calculating Overlap of Environment - Whole Grid -------------------------
-
-        # Shape approach ----------------------------------------------------------
-
-        # Adding presence column due to extra_eval requirements
-        # Trimming so just the covariates
-        training <- covs.SiteA %>%
-          mutate(Presence = 1) %>%
-          .[,c("cov1", "cov2", "Presence")]
-
-        projection <- covs.SiteB %>%
+        
+        
+        # Batthacharyya's Affinity ------------------------------------------------
+        
+        training <- covs.SiteA %>% 
+          .[,c("cov1", "cov2")]
+        
+        projection <- covs.SiteB %>% 
           .[,c("cov1", "cov2")]
 
-        shape_extrap <- flexsdm::extra_eval(training_data = training,
-                                            pr_ab = "Presence",
-                                            projection_data = projection,
-                                            metric = "mahalanobis",
-                                            univar_comb = F,
-                                            n_cores = n_cores)
+        xmin <- min(c(training$cov1, projection$cov1)) - 0.5
+        xmax <- max(c(training$cov1, projection$cov1)) + 0.5
+        ymin <- min(c(training$cov2, projection$cov2)) - 0.5
+        ymax <- max(c(training$cov2, projection$cov2)) + 0.5
+        
+        xmin <- min(c(training$cov1, projection$cov1))
+        xmax <- max(c(training$cov1, projection$cov1)) 
+        ymin <- min(c(training$cov2, projection$cov2)) 
+        ymax <- max(c(training$cov2, projection$cov2))
+        
+        # How many grid points to evaluate against?
+        eval.grid.res <- 150
+        
+        # Set up a shared grid domain
+        domain <- rast(xmin = xmin, 
+                       xmax = xmax, 
+                       ymin = ymin, 
+                       ymax = ymax, 
+                       ncols = eval.grid.res, 
+                       nrows = eval.grid.res,
+                       vals = 1) %>% 
+          as.data.frame(xy = T) %>% 
+          .[,c("x", "y")]
 
-        shape_extrap <- cbind(shape_extrap, covs.SiteB[, c("x", "y")])
+        Ref_density <- ks::kde(x = training, eval.points = domain)
+        
+        Target_density <- ks::kde(x = projection, eval.points = domain)
+        
+        Ref_data <- data.frame(
+          cov1 = Ref_density$eval.points[[1]],
+          cov2 = Ref_density$eval.points[[2]],
+          density = as.vector(Ref_density$estimate)
+        ) %>% rast()
+        
+        
+        Target_data <- data.frame(
+          cov1 = Target_density$eval.points[[1]],
+          cov2 = Target_density$eval.points[[2]],
+          density = as.vector(Target_density$estimate)
+        ) %>% rast()
+        
+        
+        # Normalise the densities to sum to 1
+        tot <- global(Ref_data, "sum")$sum
+        Ref_data <- Ref_data / tot
+        global(Ref_data, "sum")
+        
+        tot <- global(Target_data, "sum")$sum
+        Target_data <- Target_data / tot
+        global(Target_data, "sum")
+        
 
-        summary.extrap = data.frame(mean = mean(shape_extrap$extrapolation),
-                                    median = median(shape_extrap$extrapolation),
-                                    min = min(shape_extrap$extrapolation),
-                                    max = max(shape_extrap$extrapolation))
-
-        print(median(shape_extrap$extrapolation))
-
+        # Calculate the Bhattacharyya Affinity  ------------------------------------
+        
+        BA <- sum(sqrt(abs(values(Ref_data))) * 
+                    sqrt(abs(values(Target_data))))
+        
+        # Calculate the Bhattacharyya Distance  ------------------------------------
+        BD <- -log(BA)
+        
+        summary.extrap = data.frame(BA = BA,
+                                    BD = BD)
+        
         # Classify extrapolation type
-
-        env.extrap <- ifelse(summary.extrap$median <= 5 , "Low", "Very High")
-
-
-        # Plotting data in covariate space with extrapolation  ------------------------
-
-        extrap.plot <- ggplot() +
-          geom_point(data = covs.SiteA, aes(x = cov1, y = cov2), color = "grey") +
-          geom_point(data = shape_extrap, aes(x = cov1, y = cov2, color = extrapolation)) +
-          scale_color_viridis(option = "magma", direction = -1) +
-          theme_bw() +
-          theme(legend.ticks = element_blank())
+        # If median extrap is less than or = to 50, low
+        # If median extrap is not less than or = to 50, but is less than or = to 100, moderate
+        # If median extrap is not less than or = to 100, high
+        
+        env.extrap <- ifelse(summary.extrap$BA <= 1/3 , "Low", "Very High")
 
         extrap.reps.out <-list(rand.gridA = rand.gridA,
                                rand.gridB = rand.gridB,
@@ -489,26 +527,24 @@ run_extrap_func_Spat_Auto <- function(n_cores,
                                covs.SiteB = covs.SiteB,
                                covs.SiteA.rast = covs.SiteA.rast,
                                covs.SiteB.rast = covs.SiteB.rast,
-                               extrap.plot = extrap.plot,
-                               extrap.df = shape_extrap,
                                summary.extrap = summary.extrap,
                                Site.distance = Site.distance)
 
         # If the output adds a required replicate to meet nreps, keep it
         # (x3 because there's a cov.list, latent.list, and extrap.reps.out)
-
+        
         if (env.extrap == "Very High") { # If above high threshold, don't save
-
+          
           saved <- 0
-
+          
         } else if(length(reps.setup.list[[extrap.type]]) < nreps) {
-
+          
           # Note that an output has been saved
           saved <- 1
-
+          
         } else {
           saved <- 0
-
+          
         }
 
         return(list(extrap.reps.out = extrap.reps.out, saved = saved, extrap.type = extrap.type))

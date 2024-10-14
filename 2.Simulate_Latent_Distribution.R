@@ -22,7 +22,7 @@ sim_latent_dist_func <- function(beta0,
   # Assumed intensity at mean of enviro. variables
   # log(lambda) = intercept + b1*(mean of cov1) + b2*(mean of cov2)
   # exp(answer) is intensity
-  exp(beta0 + beta1*(0.5) + beta2*(0.5))
+  exp(beta0 + beta1*(0) + beta2*(0))
   
   # Can do with one or two covariates
   

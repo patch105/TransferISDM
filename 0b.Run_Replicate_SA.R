@@ -53,7 +53,7 @@ Run_Replicate_Func <- function(n_cores,
     range_cov1 <<- 10 # Maximum range (raster units) of spatial autocorrelation
     
     # Set autocorrelation range Cov2
-    range_cov2 <<- 10 # Maximum range (raster units) of spatial autocorrelation
+    range_cov2 <<- 100 # Maximum range (raster units) of spatial autocorrelation
     
     print("Simulating new cov")
     
@@ -96,7 +96,7 @@ Run_Replicate_Func <- function(n_cores,
     
     # 3.Simulate Environmental Extrapolation ------------------------------------
     
-    source("3.Simulate_Enviro_Extrapolation.R")
+    source("3.Simulate_Enviro_Extrapolation_BA.R")
     
     # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
     # NOTE - must be smaller than total cell number in x y directions

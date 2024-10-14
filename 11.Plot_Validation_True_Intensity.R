@@ -282,6 +282,23 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
                                                   mod.type) {
 
  
+  # Set the label for the x axis based on the scenario type 
+  # "Spatial autocorrelation range" or "Environmental dissimilarity"
+  
+  if(scenario.type == "Enviro.Extrap") {
+    
+    x.label <- "Environmental dissimilarity"
+    
+  }
+  
+  if(scenario.type == "Spatial.Auto") {
+    
+    x.label <- "Spatial autocorrelation range"
+    
+    scal.list <- scal
+    
+  }
+  
   fill.colours = c("m.int" = "purple",
                    "m.int.GRF" = "purple4",
                    "m.int.bias" = "pink",
@@ -296,30 +313,33 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
   # Plot the validation
   
   cor <- true.validation.df %>% 
-    ggplot(aes(x = extrap.median, y = correlation, color = mod.type)) +
+    ggplot(aes(x = BA, y = correlation, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "Correlation", fill = "Model Type", color = "Model Type") +
+    scale_x_reverse() +  # Reverse x-axis from 1 to 0
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +
     theme_bw()
   
   MAE <- true.validation.df %>% 
-    ggplot(aes(x = extrap.median, y = MAE, color = mod.type)) +
+    ggplot(aes(x = BA, y = MAE, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "MAE", fill = "Model Type", color = "Model Type") +
+    scale_x_reverse() +  # Reverse x-axis from 1 to 0
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +
     theme_bw()
   
   RMSE <- true.validation.df %>% 
-    ggplot(aes(x = extrap.median, y = RMSE, color = mod.type)) +
+    ggplot(aes(x = BA, y = RMSE, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "RMSE", fill = "Model Type", color = "Model Type") +
+    scale_x_reverse() +  # Reverse x-axis from 1 to 0
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +
@@ -328,20 +348,22 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
   ## Smaller values of interval score are better
   
   Int.score.mean <-  true.validation.df %>% 
-    ggplot(aes(x = extrap.median, y = Mean.Int.Score, color = mod.type)) +
+    ggplot(aes(x = BA, y = Mean.Int.Score, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "Mean Interval Score", fill = "Model Type", color = "Model Type") +
+    scale_x_reverse() +  # Reverse x-axis from 1 to 0
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +
     theme_bw()
   
   Int.score.sum <- true.validation.df %>% 
-    ggplot(aes(x = extrap.median, y = Sum.Int.Score, color = mod.type)) +
+    ggplot(aes(x = BA, y = Sum.Int.Score, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "Sum Interval Score", fill = "Model Type", color = "Model Type") +
+    scale_x_reverse() +  # Reverse x-axis from 1 to 0
     scale_color_manual(values = fill.colours) +
     scale_fill_manual(values = fill.colours) +
     # coord_cartesian(xlim = c(NA, 50)) +

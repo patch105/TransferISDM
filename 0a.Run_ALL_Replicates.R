@@ -26,7 +26,7 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_Extrap&Bias_BA"
+scenario_name = "Test_14Oct"
 
 # "Enviro.Extrap" or "Spatial.Auto"
 scenario.type = "Enviro.Extrap"
