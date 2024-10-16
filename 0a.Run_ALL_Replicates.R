@@ -26,12 +26,12 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_14Oct"
+scenario_name = "Test_15Oct"
 
 # "Enviro.Extrap" or "Spatial.Auto"
 scenario.type = "Enviro.Extrap"
 
-nreps <- 10 # Replicates per extrapolation type
+nreps <- 3 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
 latent.type = "ipp" 
@@ -153,7 +153,7 @@ if(scenario.type == "Spatial.Auto") {
 }
 
 # Save the input parameters for this job ----------------------------------
-save(scenario.type, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
+save(scenario.type, pred.GRF, pred.fixed, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
 
 Run_Replicate_Func(n_cores = n_cores,

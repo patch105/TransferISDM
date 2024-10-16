@@ -5,6 +5,7 @@
 # # Install flexsdm
 # remotes::install_github("sjevelazco/flexsdm")
 library(flexsdm, lib.loc = lib_loc)
+library(ks)
 
 run_extrap_func <- function(n_cores,
                             nreps,
@@ -165,6 +166,7 @@ run_extrap_func <- function(n_cores,
     projection <- covs.SiteB %>% 
       .[,c("cov1", "cov2")]
     
+    # 1. 'Shape' metric
     shape_extrap <- flexsdm::extra_eval(training_data = training,
                                         pr_ab = "Presence",
                                         projection_data = projection,
@@ -181,14 +183,67 @@ run_extrap_func <- function(n_cores,
     
     print(median(shape_extrap$extrapolation))
     
+    # 2. KL Divergence
+    
+    training <- covs.SiteA %>% 
+      .[,c("cov1", "cov2")]
+    
+    projection <- covs.SiteB %>% 
+      .[,c("cov1", "cov2")]
+    
+    # Define boundaries of covariate space
+    xmin <- min(c(training$cov1, projection$cov1)) - 0.5
+    xmax <- max(c(training$cov1, projection$cov1)) + 0.5
+    ymin <- min(c(training$cov2, projection$cov2)) - 0.5
+    ymax <- max(c(training$cov2, projection$cov2)) + 0.5
+    
+    xmin <- min(c(training$cov1, projection$cov1))
+    xmax <- max(c(training$cov1, projection$cov1)) 
+    ymin <- min(c(training$cov2, projection$cov2)) 
+    ymax <- max(c(training$cov2, projection$cov2))
+    
+    # How many grid points to evaluate against?
+    eval.grid.res <- 150
+    
+    # Set up a shared grid domain
+    domain <- rast(xmin = xmin, 
+                   xmax = xmax, 
+                   ymin = ymin, 
+                   ymax = ymax, 
+                   ncols = eval.grid.res, 
+                   nrows = eval.grid.res,
+                   vals = 1) %>% 
+      as.data.frame(xy = T) %>% 
+      .[,c("x", "y")]
+    
+    Ref_density <- ks::kde(x = training, eval.points = domain)
+    
+    Target_density <- ks::kde(x = projection, eval.points = domain)
+    
+    Ref_data <- data.frame(
+      cov1 = Ref_density$eval.points[[1]],
+      cov2 = Ref_density$eval.points[[2]],
+      density = as.vector(Ref_density$estimate)
+    ) %>% rast()
+    
+    
+    Target_data <- data.frame(
+      cov1 = Target_density$eval.points[[1]],
+      cov2 = Target_density$eval.points[[2]],
+      density = as.vector(Target_density$estimate)
+    ) %>% rast()
+    
+    KL <- sum(values(Ref_data)*log(values(Ref_data) / values(Target_data)))
+    
     # Classify extrapolation type
     # If median extrap is less than or = to 50, low
     # If median extrap is not less than or = to 50, but is less than or = to 100, moderate
     # If median extrap is not less than or = to 100, high
     
-    extrap.type <- ifelse(summary.extrap$median <= 5 , "Low", 
-                          ifelse(summary.extrap$median <= 10, "Moderate", 
-                                 ifelse(summary.extrap$median <= 15, "High", "Very High")))
+    extrap.type <- ifelse(KL <= 5 , "Low", 
+                          ifelse(KL <= 10, "Moderate", 
+                                 ifelse(KL <= 15, "High", "Very High")))
+
     
     # Plotting data in covariate space with extrapolation  ------------------------
     
@@ -208,6 +263,7 @@ run_extrap_func <- function(n_cores,
                            extrap.plot = extrap.plot,
                            extrap.df = shape_extrap,
                            summary.extrap = summary.extrap,
+                           KL = KL,
                            Site.distance = Site.distance)
     
     
@@ -416,6 +472,7 @@ run_extrap_func_Spat_Auto <- function(n_cores,
         projection <- covs.SiteB %>%
           .[,c("cov1", "cov2")]
 
+        # 1. 'Shape' metric
         shape_extrap <- flexsdm::extra_eval(training_data = training,
                                             pr_ab = "Presence",
                                             projection_data = projection,
@@ -432,10 +489,61 @@ run_extrap_func_Spat_Auto <- function(n_cores,
 
         print(median(shape_extrap$extrapolation))
 
+        # 2. KL Divergence
+        
+        training <- covs.SiteA %>% 
+          .[,c("cov1", "cov2")]
+        
+        projection <- covs.SiteB %>% 
+          .[,c("cov1", "cov2")]
+        
+        # Define boundaries of covariate space
+        xmin <- min(c(training$cov1, projection$cov1)) - 0.5
+        xmax <- max(c(training$cov1, projection$cov1)) + 0.5
+        ymin <- min(c(training$cov2, projection$cov2)) - 0.5
+        ymax <- max(c(training$cov2, projection$cov2)) + 0.5
+        
+        xmin <- min(c(training$cov1, projection$cov1))
+        xmax <- max(c(training$cov1, projection$cov1)) 
+        ymin <- min(c(training$cov2, projection$cov2)) 
+        ymax <- max(c(training$cov2, projection$cov2))
+        
+        # How many grid points to evaluate against?
+        eval.grid.res <- 150
+        
+        # Set up a shared grid domain
+        domain <- rast(xmin = xmin, 
+                       xmax = xmax, 
+                       ymin = ymin, 
+                       ymax = ymax, 
+                       ncols = eval.grid.res, 
+                       nrows = eval.grid.res,
+                       vals = 1) %>% 
+          as.data.frame(xy = T) %>% 
+          .[,c("x", "y")]
+        
+        Ref_density <- ks::kde(x = training, eval.points = domain)
+        
+        Target_density <- ks::kde(x = projection, eval.points = domain)
+        
+        Ref_data <- data.frame(
+          cov1 = Ref_density$eval.points[[1]],
+          cov2 = Ref_density$eval.points[[2]],
+          density = as.vector(Ref_density$estimate)
+        ) %>% rast()
+        
+        
+        Target_data <- data.frame(
+          cov1 = Target_density$eval.points[[1]],
+          cov2 = Target_density$eval.points[[2]],
+          density = as.vector(Target_density$estimate)
+        ) %>% rast()
+        
+        KL <- sum(values(Ref_data)*log(values(Ref_data) / values(Target_data)))
+
         # Classify extrapolation type
 
-        env.extrap <- ifelse(summary.extrap$median <= 5 , "Low", "Very High")
-
+        env.extrap <- ifelse(KL <= 5 , "Low", "Very High")
 
         # Plotting data in covariate space with extrapolation  ------------------------
 
@@ -455,6 +563,7 @@ run_extrap_func_Spat_Auto <- function(n_cores,
                                extrap.plot = extrap.plot,
                                extrap.df = shape_extrap,
                                summary.extrap = summary.extrap,
+                               KL = KL,
                                Site.distance = Site.distance)
 
         # If the output adds a required replicate to meet nreps, keep it

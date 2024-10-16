@@ -279,6 +279,7 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
                                                   save = FALSE,
                                                   outpath,
                                                   scenario_name,
+                                                  scenario.type,
                                                   mod.type) {
 
  
