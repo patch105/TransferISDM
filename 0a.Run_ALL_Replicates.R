@@ -26,29 +26,29 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_15Oct"
+scenario_name = "Test_Oct19b"
 
 # "Enviro.Extrap" or "Spatial.Auto"
-scenario.type = "Enviro.Extrap"
+scenario.type = "Spatial.Auto"
 
-nreps <- 3 # Replicates per extrapolation type
+nreps <- 1 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
-latent.type = "ipp" 
+latent.type = "lgcp" 
 
 # Bias in PO sampling?
-bias <- TRUE
+bias <- FALSE
 
 # Model choices -----------------------------------------------------------
 
 # Model types to run
 # Options are "no-GRF" "spatial" "no-GRF.bias" "spatial.bias"
-mod.type = c("no-GRF", "no-GRF.bias")
+mod.type = c("no-GRF", "spatial")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
-pred.GRF <- FALSE
-pred.fixed <- FALSE
+pred.GRF <- TRUE
+pred.fixed <- TRUE
 
 
 # Parameters --------------------------------------------------------------

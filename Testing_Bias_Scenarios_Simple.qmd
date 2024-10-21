@@ -1,0 +1,952 @@
+---
+title: "Testing bias scenarios"
+output: 
+  html_document:
+    self-contained: true
+author: "Charlotte Patterson"
+date: "`r Sys.Date()`"
+execute: 
+  cache: false
+  warning: false
+toc: true
+format: 
+  html:
+    self-contained: true
+    code-tools: true
+    df-print: paged
+    code-line-numbers: true
+    code-overflow: scroll
+  pdf:
+    geometry: 
+      - top=30mm
+      - left=30mm
+editor:
+  source
+---
+
+```{r}
+#| label: img_params
+#| code-summary: "Setting image parameters"
+#| include: false
+
+knitr::opts_chunk$set(echo = TRUE,
+                      dev = 'png',
+                      dpi = 300)
+```
+
+
+```{r}
+
+#| label: packages
+#| code-summary: "Loading packages"
+#| message: false
+#| warning: false
+
+library(ggplot2)
+library(dplyr)
+library(terra)
+library(purrr)
+library(RISDM)
+library(viridis)
+library(spatstat)
+library(ggpubr)
+```
+
+## Domain setup
+
+```{r}
+
+# DOMAIN SETUP ------------------------------------------------------------
+
+# START with set up of resolution and north/east step length for later Site A and B grid creation.
+
+# Set ncol
+ncol <- 300
+nrow <- 300
+res <- 1
+
+# Create a bounded domain on [0, 10] x [0, 10]
+
+east_min <- 0
+east_max <- 300
+north_min <- 0
+north_max <- 300
+
+
+# We generate the grid resolution from min, max dimensions and the number of pixels
+
+# Set number of pixels (100 x 100)
+n_bau_east <- ncol
+n_bau_north <- nrow
+# so now we have n_bau_est x n_bau_north grid cells
+
+# Obtain the cell resolution
+bau_east_step <- (east_max - east_min) / n_bau_east
+bau_north_step <- (north_max - north_min) / n_bau_north 
+
+# Generate grid centroid coordinates
+# We do this so that our centroid begins in the centre of a cell (hence, bau_east_step/2))
+
+eastings <- seq(east_min + bau_east_step/2, east_max - bau_east_step/2, by = bau_east_step)
+northings <- seq(north_min + bau_north_step/2, north_max - bau_north_step/2, by = bau_north_step)
+
+coords <- as.matrix(expand.grid(eastings, northings))
+colnames(coords) <- c("eastings", "northings")
+
+
+# Run setup for replicates ------------------------------------------------
+
+variance <- 2 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+scal <- 20 # Range of the Gaussian field 
+
+# Number of replicates per range
+nreps <- 3
+
+
+```
+
+## 1. Simulate covariate
+
+```{r}
+
+#| message: false
+#| warning: false
+
+landscape.rast <- terra::rast(xmin = east_min, 
+                              xmax = east_max, 
+                              ymin = north_min,  
+                              ymax = north_max, 
+                              nrows = nrow,
+                              ncols = ncol,
+                              vals = 1:1000)
+
+crs(landscape.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+
+xSeq <- terra::xFromCol(landscape.rast)
+ySeq <- terra::yFromRow(landscape.rast)
+
+# Simulate a covariate
+cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = 100, nu = 1/2) %>% rast()
+crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+names(cov1) <- "cov"
+
+# Get coords of original raster
+coords <- xyFromCell(cov1, 1:ncell(cov1))
+
+# Convert raster to matrix object
+cov1.df <- as.data.frame(cov1, xy = T)
+cov1.mat <- as.matrix(cov1.df)
+colnames(cov1.df) <- c("x", "y", "cov")
+colnames(cov1.mat) <- c("x", "y", "cov")
+
+cov1 %>% 
+  as.data.frame(xy = T) %>%  
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Covariate 1')
+
+
+```
+
+## 2. Simulate latent distribution
+
+```{r}
+
+beta0 <- -3 # Intercept
+beta1 <- 2 # Coefficient for cov 1
+# beta2 <- 0.1 # Coefficient for cov 2
+
+scal <- 20 # Scale parameter (range of spatial effect)
+variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+
+nu <- 1/2 # Smoothness parameter for Matern covariance function
+
+# Print the expected mean intensity (assuming mean of covariate is 0)
+exp(beta0 + beta1*(0))
+
+fe <- beta0 + beta1*cov1.mat[, "cov"] 
+
+mu <- cov1.df %>% mutate(cov = fe)
+mu <- spatstat.geom::as.im(mu)
+
+# Create IPP with environmental covariate
+ipp <- rpoispp(exp(mu))
+
+spp_process <- cbind(x = ipp$x, y = ipp$y)
+```
+
+## 3. PO sampling
+
+
+```{r}
+
+maxprob <- 0.2
+
+# Thin the process by the bias field
+minprob <- maxprob/10 
+
+probseq <-  exp(seq(log(minprob), log(maxprob), length.out = nrow))
+
+# Generate a matrix of continuous values from minprob to maxprob, going left to right
+bias_matrix <- matrix(rep(probseq, each = nrow), nrow = nrow, ncol = ncol, byrow = TRUE)
+
+# Flatten the matrix into a vector to match the expected input format for 'vals'
+bias_vals <- as.vector(bias_matrix)
+
+bias <- rast(nrows = nrow,
+             ncols = ncol,
+             xmin = east_min,
+             xmax = east_max,
+             ymin = north_min,
+             ymax = north_max,
+             resolution = res,
+             vals = bias_vals,
+             names = c("bias")
+)
+
+crs(bias) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+names(bias) <- "bias"
+
+# Plot bias field
+bias %>% 
+  as.data.frame(xy = T) %>% 
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = bias)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Bias Field')
+
+# Add spatial bias info to PP data
+po <- cbind(spp_process, bias = terra::extract(bias, spp_process[,1:2]))
+
+# Thin the process by the bias field
+po <- cbind(po, presence = rbinom(nrow(po), 1, po[, "bias"]))
+
+po <- po[po$presence == 1, ]
+
+# Turn back into a matrix
+po <- as.matrix(po)
+
+# Trim to just xy
+po <- po[, c("x", "y")]
+```
+
+## 5. PA sampling
+
+```{r}
+
+#| message: false
+#| warning: false
+
+# Set size of grid (number of cells) for PA grid in Site A (Reference)
+# NOTE - must be smaller than total cell number in x y directions
+rast_cellsA <- c(50, 50)
+rast_sizeA <- c(rast_cellsA[1]*res, rast_cellsA[2]*res)
+
+# Get coords of overall grid domain boundary
+xmin <- east_min
+xmax <- east_max
+ymin <- north_min
+ymax <- north_max
+
+eastingsSITE <- crds(cov1)[,1]
+northingsSITE <- crds(cov1)[,2]
+
+# Set the limit for x and y coord so box is completely inside the domain
+rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
+
+xmin.randA <- eastingsSITE[which.min(abs(eastingsSITE - runif(1, min = round(xmin,2), max = round(rand.limA[1],2))))]
+ymin.randA <- northingsSITE[which.min(abs(northingsSITE - runif(1, min = round(ymin,2), max = round(rand.limA[2],2))))]
+
+xmax.randA <- eastingsSITE[which.min(abs(eastingsSITE - (xmin.randA + rast_sizeA[1])))]
+ymax.randA <- northingsSITE[which.min(abs(northingsSITE - (ymin.randA + rast_sizeA[2])))]
+
+PA.rand.gridA <- rast(xmin = xmin.randA, 
+                      xmax = xmax.randA, 
+                      ymin = ymin.randA, 
+                      ymax = ymax.randA, 
+                      nrows = rast_cellsA[1], 
+                      ncols = rast_cellsA[2],
+                      vals = 1:rast_cellsA[2]) # Just setting values for plotting and for converting to a dataframe
+
+crs(PA.rand.gridA) <- "epsg:3857"
+
+# SAMPLING PA DATA FROM RANDOM GRID A
+
+# Get the domain of region a
+dom_a_bbox <- c(east_min = xmin(PA.rand.gridA), east_max = xmax(PA.rand.gridA), north_min = ymin(PA.rand.gridA), north_max = ymax(PA.rand.gridA))
+
+# Choose a grid size number of rows (for PA sampling)
+PA_a_res <- 10
+dom_a_resE <- (dom_a_bbox["east_max"] - dom_a_bbox["east_min"]) / PA_a_res
+dom_a_resN <- (dom_a_bbox["north_max"] - dom_a_bbox["north_min"]) / PA_a_res
+
+
+# Set centroids of PA sampling grids
+east_seq <- seq(dom_a_bbox["east_min"] + dom_a_resE/2, 
+                dom_a_bbox["east_max"] - dom_a_resE/2, 
+                by = dom_a_resE)
+north_seq <- seq(dom_a_bbox["north_min"] + dom_a_resN/2, 
+                 dom_a_bbox["north_max"] - dom_a_resN/2, 
+                 by = dom_a_resN)
+
+
+# Create a blank PA dataset at Site A (all zeros), located on grids cells defined by random grid domain and our PA sampling grid size
+grid_a <- expand.grid(east_seq, north_seq)
+pa_a <- cbind(grid_a, 0)
+colnames(pa_a) <- c("x", "y", "presence")
+pa_a <- terra::rast(pa_a)
+
+# Random stratified sampling ----------------------------------------------
+
+# Create a reference grid for the 10x10 raster to identify each cell with a unique number
+ref_grid <- pa_a
+values(ref_grid) <- 1:ncell(ref_grid)  # Assign unique values (1 to 100) to each cell
+
+# Resample the reference grid to the resolution of the 50x30 raster
+# This doesn't change the resolution of the 50x30 raster but assigns the corresponding values from the 10x10 cells
+alignment_layer <- resample(ref_grid, PA.rand.gridA, method="near")
+
+names(alignment_layer) <- "strata"
+
+# Assign strata to PA.rand.grid.A cells
+PA.Strata <- c(PA.rand.gridA, alignment_layer)
+
+# Create a third layer in PA.Strata to store quadrats
+quadrats_layer <- PA.rand.gridA
+values(quadrats_layer) <- NA  # Initialize with NA
+
+# Loop through each unique stratum
+for (i in unique(values(PA.Strata$strata))) {
+  
+  # Find cells in PA.Strata that belong to the current stratum
+  strata_cells <- which(values(PA.Strata$strata) == i)
+  
+  # Randomly sample two cells from the strata
+  selected_cells <- sample(strata_cells, 1, replace = FALSE)
+  
+  # Assign a unique value to the selected cells (e.g., i or 1 for selected)
+  values(quadrats_layer)[selected_cells] <- 1  
+  
+}
+
+# Add quadrats layer to PA.Strata
+PA.Strata <- c(PA.Strata, quadrats_layer)
+names(PA.Strata)[nlyr(PA.Strata)] <- "quadrats"
+
+# Change spp_process to a spatvector for extract
+spp_process.vect <- vect(spp_process)
+
+match <- terra::extract(PA.Strata, spp_process.vect) %>% 
+  filter(quadrats == 1)
+
+# Set strata without presence to NA & update others to 1
+values(PA.Strata$strata)[!values(PA.Strata$strata) %in% match$strata] <- NA
+values(PA.Strata$strata)[values(PA.Strata$strata) > 1] <- 1
+
+# Mask the quadrats that have presence by saying, where strata == NA, quadrats stay as 1, otherwise set to 0
+temp <- mask(PA.Strata[["quadrats"]], PA.Strata[["strata"]], maskvalue = NA, updatevalue = 0)
+po_a <- mask(temp, PA.Strata[["quadrats"]], maskvalue = NA, updatevalue = NA)
+names(po_a) <- "presence"
+
+pa_a_df <- as.data.frame(po_a, xy = T)
+
+# pa - region a
+pa_a_df <- pa_a_df %>% 
+  mutate(area = 1)
+
+
+```
+
+## 6. Plot PO / PA data at Reference site
+
+White dots are latent species process before thinning with bias field. Red are points after thinning with bias field. Black square is the PA grid.
+
+```{r}
+
+# 6. Plot PO and PA data at Reference site --------------------------------
+
+# Get extent for plotting
+extPA <- ext(PA.rand.gridA) 
+
+df_extPA <- data.frame(
+  xmin = extPA[1],
+  xmax = extPA[2],
+  ymin = extPA[3],
+  ymax = extPA[4],
+  color = "black",
+  label = "PA Grid",
+  label_x = (extPA[1] + extPA[2]) / 2,  # Center of the extent for text placement
+  label_y = extPA[4] + (extPA[4] - extPA[3]) * 0.1  # Slightly above the top of the extent
+)
+
+
+# Plot PO data on grid A and B
+cov1 %>% 
+  as.data.frame(xy = T) %>% 
+  ggplot() +
+  geom_tile(aes(x = x, y = y, fill = cov)) +
+  scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+  coord_fixed() +
+  geom_point(data = spp_process, aes(x = x, y = y), color = "white", size = 1.5) +
+  geom_point(data = po, aes(x = x, y = y), color = "red", size = 1.5) +
+  geom_rect(data = df_extPA, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = color), 
+            fill = NA, linetype = "solid", linewidth = 1) +
+  geom_point(data = pa_a_df, aes(x=x, y=y, shape = factor(presence, levels = c(1,0))), size = 1.5) +
+  scale_shape_manual(values = c("0" = 4, "1" = 16),
+                     label = c("0" = "Absence", "1" = "Presence")) +
+  scale_color_identity() +
+  theme_bw() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank(),
+        plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines"),
+        plot.title = element_text(hjust = 0.5)) 
+
+
+```
+
+## 7. Run models
+
+```{r}
+#| message: false
+#| warning: false
+
+# Set model control parameters
+prior.mean <- 0
+int.sd <- 1000 # Intercept standard deviation
+other.sd <- 10 # Covariate effect standard deviation
+prior.range <- c(10, 0.1) # Prior chance 10% that parameter falls below range of 1km
+prior.space.sigma <- c(5, 0.1) # Prior chance 10% that parameter falls above SD of 5
+
+# Set mesh parameters
+max.n <- c(5000, 2500) # Default c(500,200)
+dep.range <- NULL # In raster projection units, default is 1/3 diagonal length of raster extent
+expans.mult <- 1.5 # Default, 1.5 x dep.range                         
+max.edge <- NULL # Default c(0.2, 0.5)*dep.range                         
+cutoff <- NULL # Default 0.2*max.edge1                         
+offset <- NULL # Default is dep.range                       
+doPlot <- FALSE                       
+
+# Set the distribution formula for the model
+distributionFormula <- ~0 + cov
+
+my.control <- list(coord.names = c("x", "y"),
+                   prior.mean = prior.mean,
+                   int.sd = int.sd, # Intercept standard deviation
+                   other.sd = other.sd, # Covariate effect standard deviation
+                   prior.range = prior.range, # Prior chance 10% that parameter falls below range of 1km
+                   prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
+                   addRandom = FALSE, # No random effect
+                   standardiseCovariates = FALSE) 
+
+# Load PA/PO occurrence data -------------------------------------------------
+
+PA_fit <- pa_a_df
+
+PO <- po
+names(PO) <- c("x", "y")
+
+# Load covariates ---------------------------------------------------------
+
+cov.rep <- cov1
+
+# Add bias covariate to covariate stack
+Bias.rast <- bias
+cov.rep <- c(cov.rep, Bias.rast)
+
+mesh.default <- makeMesh(cov.rep,
+                         max.n = max.n, # Default c(500,200)
+                         dep.range = dep.range, # In raster projection units, default is 1/3 diagonal length of raster extent
+                         expans.mult = expans.mult, # Default, 1.5 x dep.range
+                         max.edge = max.edge, # Default c(0.2, 0.5)*dep.range
+                         cutoff = cutoff, # Default 0.2*max.edge1
+                         offset = offset, # Default is dep.range
+                         doPlot = doPlot)
+
+#### Models without bias covariate
+
+m.int <- isdm(observationList = list(POdat = PO,
+                                     PAdat = PA_fit),
+              covars = cov.rep,
+              mesh = mesh.default,
+              responseNames = c(PO = NULL, PA = "presence"),
+              sampleAreaNames = c(PO = NULL, PA = "area"),
+              distributionFormula = distributionFormula,
+              biasFormula = ~1, # Intercept only
+              artefactFormulas = list(PA = ~1), # Intercept only
+              control = my.control)
+
+
+m.PO <- isdm(observationList = list(POdat = PO), 
+             covars = cov.rep,
+             mesh = mesh.default,
+             responseNames = NULL,
+             sampleAreaNames = NULL,
+             distributionFormula = distributionFormula, # Linear w one cov
+             biasFormula = ~1, # Intercept only
+             artefactFormulas = NULL,
+             control = my.control)
+
+
+#### Models with bias covariate
+
+m.int.bias <- isdm(observationList = list(POdat = PO,
+                                          PAdat = PA_fit),
+                   covars = cov.rep,
+                   mesh = mesh.default,
+                   responseNames = c(PO = NULL, PA = "presence"),
+                   sampleAreaNames = c(PO = NULL, PA = "area"),
+                   distributionFormula = distributionFormula,
+                   biasFormula = ~1 + bias, 
+                   artefactFormulas = list(PA = ~1), # Intercept only
+                   control = my.control)
+
+m.PO.bias <- isdm(observationList = list(POdat = PO), 
+                  covars = cov.rep,
+                  mesh = mesh.default,
+                  responseNames = NULL,
+                  sampleAreaNames = NULL,
+                  distributionFormula = distributionFormula, # Linear w one cov
+                  biasFormula = ~1 + bias, 
+                  artefactFormulas = NULL,
+                  control = my.control)
+```
+
+## Look at model summaries
+Integrated and PO have almost identical coefficients with and without bias covariate.
+Also I don't understand why the bias coefficient estimate is so high. 
+
+```{r}
+summary(m.int)
+summary(m.PO)
+summary(m.int.bias)
+summary(m.PO.bias)
+```
+
+## VERSION 2. No bias field, thinned IPP
+
+
+## Domain setup
+
+```{r}
+
+# DOMAIN SETUP ------------------------------------------------------------
+
+# START with set up of resolution and north/east step length for later Site A and B grid creation.
+
+# Set ncol
+ncol <- 300
+nrow <- 300
+res <- 1
+
+# Create a bounded domain on [0, 10] x [0, 10]
+
+east_min <- 0
+east_max <- 300
+north_min <- 0
+north_max <- 300
+
+
+# We generate the grid resolution from min, max dimensions and the number of pixels
+
+# Set number of pixels (100 x 100)
+n_bau_east <- ncol
+n_bau_north <- nrow
+# so now we have n_bau_est x n_bau_north grid cells
+
+# Obtain the cell resolution
+bau_east_step <- (east_max - east_min) / n_bau_east
+bau_north_step <- (north_max - north_min) / n_bau_north 
+
+# Generate grid centroid coordinates
+# We do this so that our centroid begins in the centre of a cell (hence, bau_east_step/2))
+
+eastings <- seq(east_min + bau_east_step/2, east_max - bau_east_step/2, by = bau_east_step)
+northings <- seq(north_min + bau_north_step/2, north_max - bau_north_step/2, by = bau_north_step)
+
+coords <- as.matrix(expand.grid(eastings, northings))
+colnames(coords) <- c("eastings", "northings")
+
+
+# Run setup for replicates ------------------------------------------------
+
+variance <- 2 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+scal <- 20 # Range of the Gaussian field 
+
+# Number of replicates per range
+nreps <- 3
+
+
+```
+
+## 1. Simulate covariate
+
+```{r}
+
+#| message: false
+#| warning: false
+
+landscape.rast <- terra::rast(xmin = east_min, 
+                              xmax = east_max, 
+                              ymin = north_min,  
+                              ymax = north_max, 
+                              nrows = nrow,
+                              ncols = ncol,
+                              vals = 1:1000)
+
+crs(landscape.rast) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+
+xSeq <- terra::xFromCol(landscape.rast)
+ySeq <- terra::yFromRow(landscape.rast)
+
+# Simulate a covariate
+cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = 100, nu = 1/2) %>% rast()
+crs(cov1) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+names(cov1) <- "cov"
+
+# Get coords of original raster
+coords <- xyFromCell(cov1, 1:ncell(cov1))
+
+# Convert raster to matrix object
+cov1.df <- as.data.frame(cov1, xy = T)
+cov1.mat <- as.matrix(cov1.df)
+colnames(cov1.df) <- c("x", "y", "cov")
+colnames(cov1.mat) <- c("x", "y", "cov")
+
+cov1 %>% 
+  as.data.frame(xy = T) %>%  
+  ggplot() + 
+  geom_tile(aes(x = x, y = y, fill = cov)) + 
+  scale_fill_viridis() +
+  coord_fixed() + 
+  theme_bw() + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank()) +
+  ggtitle('Covariate 1')
+
+
+```
+
+## 2. Simulate latent distribution
+
+```{r}
+
+beta0 <- -3 # Intercept
+beta1 <- 2 # Coefficient for cov 1
+# beta2 <- 0.1 # Coefficient for cov 2
+
+scal <- 20 # Scale parameter (range of spatial effect)
+variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+
+nu <- 1/2 # Smoothness parameter for Matern covariance function
+
+# Print the expected mean intensity (assuming mean of covariate is 0)
+exp(beta0 + beta1*(0))
+
+fe <- beta0 + beta1*cov1.mat[, "cov"] 
+
+mu <- cov1.df %>% mutate(cov = fe)
+mu <- spatstat.geom::as.im(mu)
+
+# Create IPP with environmental covariate
+ipp <- rpoispp(exp(mu))
+
+spp_process <- cbind(x = ipp$x, y = ipp$y)
+```
+
+## 3. PO sampling
+
+
+```{r}
+
+# Thin the process by the probability
+po <- cbind(spp_process, presence = rbinom(nrow(spp_process), 1, 0.2))
+
+ po <- po[po[, "presence"] == 1, ]
+
+# Trim to just xy
+po <- po[, c("x", "y")]
+```
+
+## 5. PA sampling
+
+```{r}
+
+#| message: false
+#| warning: false
+
+# Set size of grid (number of cells) for PA grid in Site A (Reference)
+# NOTE - must be smaller than total cell number in x y directions
+rast_cellsA <- c(50, 50)
+rast_sizeA <- c(rast_cellsA[1]*res, rast_cellsA[2]*res)
+
+# Get coords of overall grid domain boundary
+xmin <- east_min
+xmax <- east_max
+ymin <- north_min
+ymax <- north_max
+
+eastingsSITE <- crds(cov1)[,1]
+northingsSITE <- crds(cov1)[,2]
+
+# Set the limit for x and y coord so box is completely inside the domain
+rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
+
+xmin.randA <- eastingsSITE[which.min(abs(eastingsSITE - runif(1, min = round(xmin,2), max = round(rand.limA[1],2))))]
+ymin.randA <- northingsSITE[which.min(abs(northingsSITE - runif(1, min = round(ymin,2), max = round(rand.limA[2],2))))]
+
+xmax.randA <- eastingsSITE[which.min(abs(eastingsSITE - (xmin.randA + rast_sizeA[1])))]
+ymax.randA <- northingsSITE[which.min(abs(northingsSITE - (ymin.randA + rast_sizeA[2])))]
+
+PA.rand.gridA <- rast(xmin = xmin.randA, 
+                      xmax = xmax.randA, 
+                      ymin = ymin.randA, 
+                      ymax = ymax.randA, 
+                      nrows = rast_cellsA[1], 
+                      ncols = rast_cellsA[2],
+                      vals = 1:rast_cellsA[2]) # Just setting values for plotting and for converting to a dataframe
+
+crs(PA.rand.gridA) <- "epsg:3857"
+
+# SAMPLING PA DATA FROM RANDOM GRID A
+
+# Get the domain of region a
+dom_a_bbox <- c(east_min = xmin(PA.rand.gridA), east_max = xmax(PA.rand.gridA), north_min = ymin(PA.rand.gridA), north_max = ymax(PA.rand.gridA))
+
+# Choose a grid size number of rows (for PA sampling)
+PA_a_res <- 10
+dom_a_resE <- (dom_a_bbox["east_max"] - dom_a_bbox["east_min"]) / PA_a_res
+dom_a_resN <- (dom_a_bbox["north_max"] - dom_a_bbox["north_min"]) / PA_a_res
+
+
+# Set centroids of PA sampling grids
+east_seq <- seq(dom_a_bbox["east_min"] + dom_a_resE/2, 
+                dom_a_bbox["east_max"] - dom_a_resE/2, 
+                by = dom_a_resE)
+north_seq <- seq(dom_a_bbox["north_min"] + dom_a_resN/2, 
+                 dom_a_bbox["north_max"] - dom_a_resN/2, 
+                 by = dom_a_resN)
+
+
+# Create a blank PA dataset at Site A (all zeros), located on grids cells defined by random grid domain and our PA sampling grid size
+grid_a <- expand.grid(east_seq, north_seq)
+pa_a <- cbind(grid_a, 0)
+colnames(pa_a) <- c("x", "y", "presence")
+pa_a <- terra::rast(pa_a)
+
+# Random stratified sampling ----------------------------------------------
+
+# Create a reference grid for the 10x10 raster to identify each cell with a unique number
+ref_grid <- pa_a
+values(ref_grid) <- 1:ncell(ref_grid)  # Assign unique values (1 to 100) to each cell
+
+# Resample the reference grid to the resolution of the 50x30 raster
+# This doesn't change the resolution of the 50x30 raster but assigns the corresponding values from the 10x10 cells
+alignment_layer <- resample(ref_grid, PA.rand.gridA, method="near")
+
+names(alignment_layer) <- "strata"
+
+# Assign strata to PA.rand.grid.A cells
+PA.Strata <- c(PA.rand.gridA, alignment_layer)
+
+# Create a third layer in PA.Strata to store quadrats
+quadrats_layer <- PA.rand.gridA
+values(quadrats_layer) <- NA  # Initialize with NA
+
+# Loop through each unique stratum
+for (i in unique(values(PA.Strata$strata))) {
+  
+  # Find cells in PA.Strata that belong to the current stratum
+  strata_cells <- which(values(PA.Strata$strata) == i)
+  
+  # Randomly sample two cells from the strata
+  selected_cells <- sample(strata_cells, 1, replace = FALSE)
+  
+  # Assign a unique value to the selected cells (e.g., i or 1 for selected)
+  values(quadrats_layer)[selected_cells] <- 1  
+  
+}
+
+# Add quadrats layer to PA.Strata
+PA.Strata <- c(PA.Strata, quadrats_layer)
+names(PA.Strata)[nlyr(PA.Strata)] <- "quadrats"
+
+# Change spp_process to a spatvector for extract
+spp_process.vect <- vect(spp_process)
+
+match <- terra::extract(PA.Strata, spp_process.vect) %>% 
+  filter(quadrats == 1)
+
+# Set strata without presence to NA & update others to 1
+values(PA.Strata$strata)[!values(PA.Strata$strata) %in% match$strata] <- NA
+values(PA.Strata$strata)[values(PA.Strata$strata) > 1] <- 1
+
+# Mask the quadrats that have presence by saying, where strata == NA, quadrats stay as 1, otherwise set to 0
+temp <- mask(PA.Strata[["quadrats"]], PA.Strata[["strata"]], maskvalue = NA, updatevalue = 0)
+po_a <- mask(temp, PA.Strata[["quadrats"]], maskvalue = NA, updatevalue = NA)
+names(po_a) <- "presence"
+
+pa_a_df <- as.data.frame(po_a, xy = T)
+
+# pa - region a
+pa_a_df <- pa_a_df %>% 
+  mutate(area = 1)
+
+
+```
+
+## 6. Plot PO / PA data at Reference site
+
+White dots are latent species process before thinning with bias field. Red are points after thinning. Black square is the PA grid.
+
+```{r}
+
+# 6. Plot PO and PA data at Reference site --------------------------------
+
+# Get extent for plotting
+extPA <- ext(PA.rand.gridA) 
+
+df_extPA <- data.frame(
+  xmin = extPA[1],
+  xmax = extPA[2],
+  ymin = extPA[3],
+  ymax = extPA[4],
+  color = "black",
+  label = "PA Grid",
+  label_x = (extPA[1] + extPA[2]) / 2,  # Center of the extent for text placement
+  label_y = extPA[4] + (extPA[4] - extPA[3]) * 0.1  # Slightly above the top of the extent
+)
+
+
+# Plot PO data on grid A and B
+cov1 %>% 
+  as.data.frame(xy = T) %>% 
+  ggplot() +
+  geom_tile(aes(x = x, y = y, fill = cov)) +
+  scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+  coord_fixed() +
+  geom_point(data = spp_process, aes(x = x, y = y), color = "white", size = 1.5) +
+  geom_point(data = po, aes(x = x, y = y), color = "red", size = 1.5) +
+  geom_rect(data = df_extPA, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = color), 
+            fill = NA, linetype = "solid", linewidth = 1) +
+  geom_point(data = pa_a_df, aes(x=x, y=y, shape = factor(presence, levels = c(1,0))), size = 1.5) +
+  scale_shape_manual(values = c("0" = 4, "1" = 16),
+                     label = c("0" = "Absence", "1" = "Presence")) +
+  scale_color_identity() +
+  theme_bw() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.ticks = element_blank(),
+        legend.title = element_blank(),
+        plot.margin = unit(c(0.5, 0.1, 0.5, 0.1), "lines"),
+        plot.title = element_text(hjust = 0.5)) 
+
+
+```
+
+## 7. Run models
+
+```{r}
+#| message: false
+#| warning: false
+
+# Set model control parameters
+prior.mean <- 0
+int.sd <- 1000 # Intercept standard deviation
+other.sd <- 10 # Covariate effect standard deviation
+prior.range <- c(10, 0.1) # Prior chance 10% that parameter falls below range of 1km
+prior.space.sigma <- c(5, 0.1) # Prior chance 10% that parameter falls above SD of 5
+
+# Set mesh parameters
+max.n <- c(5000, 2500) # Default c(500,200)
+dep.range <- NULL # In raster projection units, default is 1/3 diagonal length of raster extent
+expans.mult <- 1.5 # Default, 1.5 x dep.range                         
+max.edge <- NULL # Default c(0.2, 0.5)*dep.range                         
+cutoff <- NULL # Default 0.2*max.edge1                         
+offset <- NULL # Default is dep.range                       
+doPlot <- FALSE                       
+
+# Set the distribution formula for the model
+distributionFormula <- ~0 + cov
+
+my.control <- list(coord.names = c("x", "y"),
+                   prior.mean = prior.mean,
+                   int.sd = int.sd, # Intercept standard deviation
+                   other.sd = other.sd, # Covariate effect standard deviation
+                   prior.range = prior.range, # Prior chance 10% that parameter falls below range of 1km
+                   prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
+                   addRandom = FALSE, # No random effect
+                   standardiseCovariates = FALSE) 
+
+# Load PA/PO occurrence data -------------------------------------------------
+
+PA_fit <- pa_a_df
+
+PO <- po
+names(PO) <- c("x", "y")
+
+# Load covariates ---------------------------------------------------------
+
+cov.rep <- cov1
+
+mesh.default <- makeMesh(cov.rep,
+                         max.n = max.n, # Default c(500,200)
+                         dep.range = dep.range, # In raster projection units, default is 1/3 diagonal length of raster extent
+                         expans.mult = expans.mult, # Default, 1.5 x dep.range
+                         max.edge = max.edge, # Default c(0.2, 0.5)*dep.range
+                         cutoff = cutoff, # Default 0.2*max.edge1
+                         offset = offset, # Default is dep.range
+                         doPlot = doPlot)
+
+#### Models without bias covariate
+
+m.int <- isdm(observationList = list(POdat = PO,
+                                     PAdat = PA_fit),
+              covars = cov.rep,
+              mesh = mesh.default,
+              responseNames = c(PO = NULL, PA = "presence"),
+              sampleAreaNames = c(PO = NULL, PA = "area"),
+              distributionFormula = distributionFormula,
+              biasFormula = ~1, 
+              artefactFormulas = list(PA = ~1), # Intercept only
+              control = my.control)
+
+
+m.PO <- isdm(observationList = list(POdat = PO), 
+             covars = cov.rep,
+             mesh = mesh.default,
+             responseNames = NULL,
+             sampleAreaNames = NULL,
+             distributionFormula = distributionFormula, # Linear w one cov
+             biasFormula = ~1,
+             artefactFormulas = NULL,
+             control = my.control)
+
+
+```
+
+## Look at model summaries
+Integrated and PO have almost identical coefficients with and without bias covariate.
+Also I don't understand why the bias coefficient estimate is so high. 
+
+```{r}
+summary(m.int)
+summary(m.PO)
+```
+
