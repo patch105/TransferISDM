@@ -9,6 +9,7 @@ sim_latent_dist_func <- function(beta0,
                                  variance,
                                  cov1,
                                  cov1.mat,
+                                 cov2,
                                  cov2.mat,
                                  cov1.df,
                                  response.type = "linear",
@@ -62,6 +63,13 @@ sim_latent_dist_func <- function(beta0,
     crs(GRF.rast) <- crs(cov1)
     names(GRF.rast) <- "GRF"
     
+    # Calculate the correlation between the GRF and the covariates
+    cor.GRF.cov1 <- cor(as.vector(GRF.rast), as.vector(cov1),
+                      method = "spearman")
+    
+    cor.GRF.cov2 <- cor(as.vector(GRF.rast), as.vector(cov2),
+                        method = "spearman")
+    
     # Save a version that just keeps fixed effects for plotting
     fixed.rast <- rast(mu)
     crs(fixed.rast) <- crs(cov1)
@@ -69,11 +77,12 @@ sim_latent_dist_func <- function(beta0,
     
     # Add fixed and random effects
     mu <- mu + GRF.mat[, "GRF"]
+  
     
     # Simulate the latent Gaussian field
     lg.s <- rpoispp(exp(mu))
     
-    latent.list <- list(mu = mu, lg.s = lg.s, fixed.rast = fixed.rast, GRF.rast = GRF.rast) 
+    latent.list <- list(mu = mu, lg.s = lg.s, fixed.rast = fixed.rast, GRF.rast = GRF.rast, cor.GRF.cov1 = cor.GRF.cov1, cor.GRF.cov2 = cor.GRF.cov2) 
     
   } 
   

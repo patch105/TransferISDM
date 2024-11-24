@@ -104,7 +104,11 @@ sim_covariates_func <- function(plot,
   colnames(cov2.df) <- c("x", "y", "cov")
   colnames(cov2.mat) <- c("x", "y", "cov")
   
-  cov.list <- list(cov1 = cov1, cov2 = cov2, covs = covs, coords = coords, cov1.df = cov1.df, cov2.df = cov2.df, cov1.mat = cov1.mat, cov2.mat = cov2.mat)
+  # Calculate the correlation between covariates
+  cor.covs <- cor(as.vector(cov1), as.vector(cov2),
+             method = "spearman")
+  
+  cov.list <- list(cov1 = cov1, cov2 = cov2, covs = covs, coords = coords, cov1.df = cov1.df, cov2.df = cov2.df, cov1.mat = cov1.mat, cov2.mat = cov2.mat, cor.covs = cor.covs)
   
   if(plot == TRUE) {
     

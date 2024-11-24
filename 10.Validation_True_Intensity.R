@@ -30,6 +30,9 @@ validation_SiteB_func <- function(reps.setup.list) {
       BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
       BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
       
+      # And site distance
+      Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
+      
       # Crop out the true log intensity from the Site B
       rand.gridB <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridB
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
@@ -49,7 +52,8 @@ validation_SiteB_func <- function(reps.setup.list) {
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB))
+        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB),
+                   method = "spearman")
         
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteB)))
         
@@ -74,6 +78,7 @@ validation_SiteB_func <- function(reps.setup.list) {
           extrap.type = name,
           BA = BA,
           BD = BD,
+          Site.distance = Site.distance,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,
@@ -126,6 +131,9 @@ validation_SiteA_func <- function(reps.setup.list,
       BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
       BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
       
+      # And site distance
+      Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
+      
       # Crop out the true log intensity from the Site A
       rand.gridA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridA
       true_log_int.rast <- reps.setup.list[[name]][[rep]]$true_log_int.rast
@@ -168,7 +176,8 @@ validation_SiteA_func <- function(reps.setup.list,
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteA))
+        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteA),
+                   method = "spearman")
         
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteA)))
         
@@ -191,7 +200,8 @@ validation_SiteA_func <- function(reps.setup.list,
           
           median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
           
-          cor.GRF <- cor(as.vector(median.GRF.pred), as.vector(GRF.rast.SiteA))
+          cor.GRF <- cor(as.vector(median.GRF.pred), as.vector(GRF.rast.SiteA), 
+                         method = "spearman")
           
         } else { cor.GRF = NA }
         
@@ -200,7 +210,8 @@ validation_SiteA_func <- function(reps.setup.list,
           
           median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
           
-          cor.FIXED <- cor(as.vector(median.FIXED.pred), as.vector(fixed.rast.SiteA))
+          cor.FIXED <- cor(as.vector(median.FIXED.pred), as.vector(fixed.rast.SiteA),
+                           method = "spearman")
           
         } else { cor.FIXED = NA }
         
@@ -210,6 +221,7 @@ validation_SiteA_func <- function(reps.setup.list,
           extrap.type = name,
           BA = BA,
           BD = BD,
+          Site.distance = Site.distance,
           rep = rep,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,

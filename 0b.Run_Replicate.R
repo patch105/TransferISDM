@@ -87,6 +87,7 @@ Run_Replicate_Func <- function(n_cores,
                                         scal = scal,
                                         variance = variance,
                                         cov1 = cov.list$cov1,
+                                        cov2 = cov.list$cov2,
                                         cov1.mat = cov.list$cov1.mat,
                                         cov2.mat = cov.list$cov2.mat,
                                         cov1.df = cov.list$cov1.df,
@@ -314,7 +315,8 @@ Run_Replicate_Func <- function(n_cores,
                                       rep = numeric(),
                                       n_po_gridA = numeric(),
                                       n_presence_gridA = numeric(),
-                                      n_absence_gridA = numeric())
+                                      n_absence_gridA = numeric(),
+                                      cor.covs = numeric())
   
   for(extrap.type in seq_along(reps.setup.list)) {
     
@@ -332,7 +334,16 @@ Run_Replicate_Func <- function(n_cores,
         rep = rep,
         n_po_gridA = reps.setup.list[[name]][[rep]]$n_po_gridA,
         n_presence_gridA = reps.setup.list[[name]][[rep]]$n_presence_gridA,
-        n_absence_gridA = reps.setup.list[[name]][[rep]]$n_absence_gridA)
+        n_absence_gridA = reps.setup.list[[name]][[rep]]$n_absence_gridA,
+        cor.covs = reps.setup.list[[name]][[rep]]$cov.list$cor.covs)
+      
+      if(latent.type == "lgcp") {
+        
+        replicate_info.df <- replicate_info.df %>% 
+          mutate(cor.GRF.cov1 = reps.setup.list[[name]][[rep]]$latent.list$cor.GRF.cov1,
+                 cor.GRF.cov2 = reps.setup.list[[name]][[rep]]$latent.list$cor.GRF.cov2)
+        
+      }
       
       write_csv(replicate_info.df, paste0(rep_path, "/Replicate_Info_Scenario_", scenario_name, "_Rep_", name, "_", rep, "_Job_", job_index, ".csv"))
       

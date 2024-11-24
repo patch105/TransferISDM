@@ -26,10 +26,10 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "Test_Oct19b"
+scenario_name = "test"
 
 # "Enviro.Extrap" or "Spatial.Auto"
-scenario.type = "Spatial.Auto"
+scenario.type = "Enviro.Extrap"
 
 nreps <- 1 # Replicates per extrapolation type
 
@@ -47,15 +47,15 @@ mod.type = c("no-GRF", "spatial")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
-pred.GRF <- TRUE
-pred.fixed <- TRUE
+pred.GRF <- FALSE
+pred.fixed <- FALSE
 
 
 # Parameters --------------------------------------------------------------
 
 beta0 <- -2 # Intercept
-beta1 <- 2 # Coefficient for cov 1
-beta2 <- 0.1 # Coefficient for cov 2
+beta1 <- 0.1 # Coefficient for cov 1
+beta2 <- 2 # Coefficient for cov 2
 
 if(scenario.type == "Spatial.Auto") {
   
@@ -67,7 +67,7 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
-variance <- 0.5 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+variance <- 2 # Variance of the Gaussian field at distance zero (changed  from 0.5)
 
 # PO sampling values
 detect.prob <- 0.2
