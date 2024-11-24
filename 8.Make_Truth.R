@@ -20,23 +20,27 @@ make_truth_func <- function(reps.setup.list) {
       # NOTE because log(intensity) = mu (when using rpoispp), the true_log_int = mu
       true_log_int <- rep$latent.list$mu
       
-      # Reverse the row order
-      true_log_int <- apply(true_log_int, 2, rev)
+      # # Reverse the row order
+      # true_log_int <- apply(true_log_int, 2, rev)
+      # 
+      # # Transpose the matrix to match the raster layout
+      # true_log_int <- t(true_log_int)
+      # 
+      # # Melt into xy dataframe
+      # true_log_int.melt <- true_log_int %>% 
+      #   reshape2::melt(c("x", "y"), value.name = "int") 
+      # 
+      # # Create a raster  
+      # true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
       
-      # Transpose the matrix to match the raster layout
-      true_log_int <- t(true_log_int)
-      
-      # Melt into xy dataframe
-      true_log_int.melt <- true_log_int %>% 
-        reshape2::melt(c("x", "y"), value.name = "int") 
-      
-      # Create a raster  
-      true_log_int.rast <- cbind(x = coords[,1], y = coords[,2], true.int = true_log_int.melt["int"]) %>% rast(.)
+      true_log_int.rast <- rast(true_log_int)
       
       # Get covariates
       covs <- rep$cov.list$covs
       
       crs(true_log_int.rast) <- crs(covs) 
+      
+      names(true_log_int.rast) <- "int"
       
       # Extract cell size because RISDM predictions are with reference to cell area
       log.cell_size <- log(cellSize(covs))

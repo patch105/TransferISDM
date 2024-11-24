@@ -111,7 +111,7 @@ po_sampling_func <- function(reps.setup.list,
                     PO_GridB = po.rand.gridB,
                     n_po_gridA = nrow(po.rand.gridA),
                     n_po_gridB = nrow(po.rand.gridB),
-                    Bias.rast = bias))
+                    Bias.rast = log(bias))) # Log the bias raster
         
         }
        

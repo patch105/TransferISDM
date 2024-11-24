@@ -301,7 +301,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
               as.data.frame(xy = T) %>%  
               ggplot() + 
               geom_tile(aes(x = x, y = y, fill = Median)) + 
-              scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.GRF.rast) +
+              scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range.GRF.rast) + 
               coord_fixed() + 
               theme_bw() + 
               theme(axis.title.x = element_blank(),
@@ -498,7 +498,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
           plot.name <- plot.names[x]
           
-          ggsave(plot = pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+          ggsave(plot = GRF.pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
           
         }
         
@@ -565,7 +565,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
           plot.name <- plot.names[x]
           
-          ggsave(plot = pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
+          ggsave(plot = FIXED.pred.plot.list[[x]], filename = paste0(rep_path, "/", plot.name, ".png"), width = 21, height = 25, units = "cm", dpi = 400, device = "png")
           
         }
         
