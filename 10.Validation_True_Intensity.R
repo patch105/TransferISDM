@@ -62,11 +62,11 @@ validation_SiteB_func <- function(reps.setup.list) {
         
         ### Calculating the Interval Score ###
         
-        interval_score <- interval_score(true_values = as.vector(true_log_int.rast.SiteB),
-                                                       lower = as.vector(lower.int.pred), 
-                                                       upper = as.vector(upper.int.pred),
-                                                       interval_range = 95,
-                                                       weigh = TRUE)
+        interval_score <- scoringutils:::interval_score(observed = as.vector(true_log_int.rast.SiteB),
+                                                        lower = as.vector(lower.int.pred), 
+                                                        upper = as.vector(upper.int.pred),
+                                                        interval_range = 95,
+                                                        weigh = TRUE)
         
         Sum.Int.Score <- sum(interval_score)
         
@@ -186,11 +186,11 @@ validation_SiteA_func <- function(reps.setup.list,
         
         ### Calculating the Interval Score ###
         
-        interval_score <- interval_score(true_values = as.vector(true_log_int.rast.SiteA),
-                                                       lower = as.vector(lower.int.pred), 
-                                                       upper = as.vector(upper.int.pred),
-                                                       interval_range = 95,
-                                                       weigh = TRUE)
+        interval_score <- scoringutils:::interval_score(observed = as.vector(true_log_int.rast.SiteA),
+                                                        lower = as.vector(lower.int.pred), 
+                                                        upper = as.vector(upper.int.pred),
+                                                        interval_range = 95,
+                                                        weigh = TRUE)
         
         Sum.Int.Score <- sum(interval_score)
         
