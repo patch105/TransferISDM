@@ -60,10 +60,11 @@ run_model_func <- function(prior.mean,
       # Load PA occurrence data -------------------------------------------------
       
       PA_fit <- rep$pa_a_df
+      PA_fit <- PA_fit %>% mutate(presence = ifelse(presence == 1, TRUE, FALSE))
       
       PO <- rep$PO_GridA
-      names(PO) <- c("x", "y")
-      
+      PO <- as.data.frame(PO)
+     
       # Load covariates ---------------------------------------------------------
       
       cov.rep <- rep$extrap.reps.out$covs.SiteA.rast
