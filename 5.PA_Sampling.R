@@ -95,7 +95,7 @@ pa_sampling_func <- function(reps.setup.list) {
       if(length(spp_process.rand.gridA) < 2) {
         
         print("No presences in PA grid A")
-        pa_a_df <- data.frame(x = NA, y = NA)
+        pa_a_df <- data.frame(x = NA, y = NA, presence = NA)
         
       } else {
         
@@ -148,7 +148,7 @@ pa_sampling_func <- function(reps.setup.list) {
         if(nrow(match) == 0) {
           
           print("No presences in PA grid A")
-          pa_a_df <- data.frame(x = NA, y = NA)
+          pa_a_df <- data.frame(x = NA, y = NA, presence = NA)
           
         } else {
           
