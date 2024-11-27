@@ -83,95 +83,94 @@ pa_sampling_func <- function(reps.setup.list) {
       
       # Create a blank PA dataset at Site A (all zeros), located on grids cells defined by random grid domain and our PA sampling grid size
       grid_a <- expand.grid(east_seq, north_seq)
-      pa_a <- cbind(grid_a, 0)
-      colnames(pa_a) <- c("x", "y", "presence")
-      pa_a <- terra::rast(pa_a)
+      pa_a_df.temp <- cbind(grid_a, 0)
+      colnames(pa_a_df.temp) <- c("x", "y", "presence")
+      pa_a <- terra::rast(pa_a_df.temp)
       
       
       print(paste0("length of spp process rand grid A is: ",nrow(spp_process.rand.gridA)))
       
-      # If there are no presences at all in the presence-only data
-      # Save an empty dataframe
-      if(length(spp_process.rand.gridA) < 2) {
+      # Random stratified sampling ----------------------------------------------
+      
+      # Create a reference grid for the 10x10 raster to identify each cell with a unique number
+      ref_grid <- pa_a
+      values(ref_grid) <- 1:ncell(ref_grid)  # Assign unique values (1 to 100) to each cell
+      
+      # Resample the reference grid to the resolution of the 50x30 raster
+      # This doesn't change the resolution of the 50x30 raster but assigns the corresponding values from the 10x10 cells
+      alignment_layer <- resample(ref_grid, PA.rand.gridA, method="near")
+      
+      names(alignment_layer) <- "strata"
+      
+      # Assign strata to PA.rand.grid.A cells
+      PA.Strata <- c(PA.rand.gridA, alignment_layer)
+      
+      # Create a third layer in PA.Strata to store quadrats
+      quadrats_layer <- PA.rand.gridA
+      values(quadrats_layer) <- NA  # Initialize with NA
+      
+      # Loop through each unique stratum
+      for (i in unique(values(PA.Strata$strata))) {
         
-        print("No presences in PA grid A")
-        pa_a_df <- data.frame(x = NA, y = NA, presence = NA)
+        # Find cells in PA.Strata that belong to the current stratum
+        strata_cells <- which(values(PA.Strata$strata) == i)
+        
+        # Randomly sample two cells from the strata
+        selected_cells <- sample(strata_cells, 1, replace = FALSE)
+        
+        # Assign a unique value to the selected cells (e.g., i or 1 for selected)
+        values(quadrats_layer)[selected_cells] <- 1  
+        
+      }
+      
+      # Add quadrats layer to PA.Strata
+      PA.Strata <- c(PA.Strata, quadrats_layer)
+      names(PA.Strata)[nlyr(PA.Strata)] <- "quadrats"
+      
+      # Change spp_process to a spatvector for extract
+      spp_process.rand.gridA.vect <- vect(spp_process.rand.gridA)
+      
+      match <- terra::extract(PA.Strata, spp_process.rand.gridA.vect) %>% 
+        filter(quadrats == 1)
+      
+      
+      # If there's no presences in the quadrats:
+      if(nrow(match) == 0) {
+        
+        print("No presences in quadrats")
+        
+        PA.Strata[["quadrats"]][!is.na(PA.Strata[["quadrats"]])] <- 0 # set all quadrats to 0
+        po_a <- PA.Strata[["quadrats"]]
+        names(po_a) <- "presence"
+        
+        pa_a_df <- as.data.frame(po_a, xy = T)
+        
         
       } else {
         
-      
-        # Random stratified sampling ----------------------------------------------
+        # Set strata without presence to NA & update others to 1
+        values(PA.Strata$strata)[!values(PA.Strata$strata) %in% match$strata] <- NA
+        values(PA.Strata$strata)[values(PA.Strata$strata) > 1] <- 1
         
+        # Mask the quadrats that have presence by saying, where strata == NA, quadrats stay as 1, otherwise set to 0
+        temp <- mask(PA.Strata[["quadrats"]], PA.Strata[["strata"]], maskvalue = NA, updatevalue = 0)
+        po_a <- mask(temp, PA.Strata[["quadrats"]], maskvalue = NA, updatevalue = NA)
+        names(po_a) <- "presence"
         
-        # Create a reference grid for the 10x10 raster to identify each cell with a unique number
-        ref_grid <- pa_a
-        values(ref_grid) <- 1:ncell(ref_grid)  # Assign unique values (1 to 100) to each cell
-        
-        # Resample the reference grid to the resolution of the 50x30 raster
-        # This doesn't change the resolution of the 50x30 raster but assigns the corresponding values from the 10x10 cells
-        alignment_layer <- resample(ref_grid, PA.rand.gridA, method="near")
-        
-        names(alignment_layer) <- "strata"
-        
-        # Assign strata to PA.rand.grid.A cells
-        PA.Strata <- c(PA.rand.gridA, alignment_layer)
-        
-        # Create a third layer in PA.Strata to store quadrats
-        quadrats_layer <- PA.rand.gridA
-        values(quadrats_layer) <- NA  # Initialize with NA
-        
-        # Loop through each unique stratum
-        for (i in unique(values(PA.Strata$strata))) {
-          
-          # Find cells in PA.Strata that belong to the current stratum
-          strata_cells <- which(values(PA.Strata$strata) == i)
-          
-          # Randomly sample two cells from the strata
-          selected_cells <- sample(strata_cells, 1, replace = FALSE)
-          
-          # Assign a unique value to the selected cells (e.g., i or 1 for selected)
-          values(quadrats_layer)[selected_cells] <- 1  
-          
-        }
-      
-        # Add quadrats layer to PA.Strata
-        PA.Strata <- c(PA.Strata, quadrats_layer)
-        names(PA.Strata)[nlyr(PA.Strata)] <- "quadrats"
-        
-        # Change spp_process to a spatvector for extract
-        spp_process.rand.gridA.vect <- vect(spp_process.rand.gridA)
-        
-        match <- terra::extract(PA.Strata, spp_process.rand.gridA.vect) %>% 
-          filter(quadrats == 1)
-        
-        # If there's no presences in the quadrats:
-        if(nrow(match) == 0) {
-          
-          print("No presences in PA grid A")
-          pa_a_df <- data.frame(x = NA, y = NA, presence = NA)
-          
-        } else {
-          
-          # Set strata without presence to NA & update others to 1
-          values(PA.Strata$strata)[!values(PA.Strata$strata) %in% match$strata] <- NA
-          values(PA.Strata$strata)[values(PA.Strata$strata) > 1] <- 1
-          
-          # Mask the quadrats that have presence by saying, where strata == NA, quadrats stay as 1, otherwise set to 0
-          temp <- mask(PA.Strata[["quadrats"]], PA.Strata[["strata"]], maskvalue = NA, updatevalue = 0)
-          po_a <- mask(temp, PA.Strata[["quadrats"]], maskvalue = NA, updatevalue = NA)
-          names(po_a) <- "presence"
-          
-          pa_a_df <- as.data.frame(po_a, xy = T)
-          
-        }
+        pa_a_df <- as.data.frame(po_a, xy = T)
         
       }
+      
+
+        
+        
       
       # Debugging output for pa_a_df
       print("pa_a_df column names:")
       print(colnames(pa_a_df))
       print(head(pa_a_df))
-      
+      print("Number of presences in PA grid A:")
+      sum(pa_a_df$presence==1)
       
       # pa - region a
       pa_a_df <- pa_a_df %>% 
