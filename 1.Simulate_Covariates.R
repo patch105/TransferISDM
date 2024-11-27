@@ -62,7 +62,7 @@ sim_covariates_func <- function(plot,
   xSeq <- terra::xFromCol(landscape.rast)
   ySeq <- terra::yFromRow(landscape.rast)
   
-  cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov1, nu = 1/2) 
+  cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 5 , rho = range_cov1, nu = 1/2) 
   
   cov1 <- rast(cov1)
   
@@ -70,7 +70,7 @@ sim_covariates_func <- function(plot,
   
   names(cov1) <- "cov"
   
-  cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 1 , rho = range_cov2, nu = 1/2) 
+  cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 5 , rho = range_cov2, nu = 1/2) 
   
   cov2 <- rast(cov2)
   
