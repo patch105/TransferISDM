@@ -100,6 +100,7 @@ Run_Replicate_Func <- function(n_cores,
     # 3.Simulate Environmental Extrapolation ------------------------------------
     
     source("3.Simulate_Enviro_Extrapolation_BA.R")
+    # source("3.Simulate_Enviro_Extrapolation.R")
     
     # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
     # NOTE - must be smaller than total cell number in x y directions
@@ -332,6 +333,7 @@ Run_Replicate_Func <- function(n_cores,
         scenario_name = scenario_name,
         extrap.type = name,
         rep = rep,
+        job = job_index,
         n_po_gridA = reps.setup.list[[name]][[rep]]$n_po_gridA,
         n_presence_gridA = reps.setup.list[[name]][[rep]]$n_presence_gridA,
         n_absence_gridA = reps.setup.list[[name]][[rep]]$n_absence_gridA,
