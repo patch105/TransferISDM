@@ -362,7 +362,8 @@ Run_Replicate_Func <- function(n_cores,
   source("7.Extract_Model_Results.R")
 
 extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list,
-                                                 mod.type = mod.type)
+                                                 mod.type = mod.type,
+                                                 job_index = job_index)
 
 write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary_Job_", job_index, ".csv"))
   
@@ -387,7 +388,8 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   
   source("10.Validation_True_Intensity.R")
 
-  true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
+  true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list,
+                                              job_index = job_index)
 
   write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
 
@@ -436,7 +438,8 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   # *Optional* - run validation for Site A
   true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
-                                                    pred.fixed = pred.fixed)
+                                                    pred.fixed = pred.fixed,
+                                                    job_index = job_index)
   
   
   write_csv(true.validation.SiteA.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_SiteA_Job_", job_index, ".csv"))

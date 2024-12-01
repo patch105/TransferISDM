@@ -4,7 +4,8 @@ library(scoringutils, lib.loc=lib_loc)
 
 # 10. Validation true intensity -------------------------------------------
 
-validation_SiteB_func <- function(reps.setup.list) {
+validation_SiteB_func <- function(reps.setup.list,
+                                  job_index) {
   
   # Create an empty list to store results
   results_list <- list()
@@ -80,6 +81,7 @@ validation_SiteB_func <- function(reps.setup.list) {
           BD = BD,
           Site.distance = Site.distance,
           rep = rep,
+          job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,
           MAE = MAE,
@@ -105,7 +107,8 @@ validation_SiteB_func <- function(reps.setup.list) {
 
 validation_SiteA_func <- function(reps.setup.list,
                                   pred.GRF = FALSE,
-                                  pred.fixed = FALSE) {
+                                  pred.fixed = FALSE,
+                                  job_index) {
   
   # Create an empty list to store results
   results_list <- list()
@@ -223,6 +226,7 @@ validation_SiteA_func <- function(reps.setup.list,
           BD = BD,
           Site.distance = Site.distance,
           rep = rep,
+          job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,
           cor.GRF = cor.GRF,
