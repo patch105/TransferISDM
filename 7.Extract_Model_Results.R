@@ -2,7 +2,8 @@
 # 7. Extract Model Results ------------------------------------------------
 
 extract_model_results_func <- function(reps.setup.list,
-                                       mod.type) {
+                                       mod.type,
+                                       job_index) {
   
   # Extract and save summary results ----------------------------------------
   
@@ -27,8 +28,10 @@ extract_model_results_func <- function(reps.setup.list,
       Model <- reps.setup.list[[name]][[rep]]$models$Model
       
       # Extract the median extrapolation amount
-      BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
-      BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
+      # BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
+      # BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
+      mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
+      median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
       # Extract the distance between the sites
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
@@ -39,10 +42,11 @@ extract_model_results_func <- function(reps.setup.list,
         
           results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
-          BA = BA,
-          BD = BD,
+          mean.extrap = mean,
+          median.extrap = median,
           Site.distance = Site.distance,
           rep = rep,
+          job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
           beta1.mean = mod.summary[[1]]$DISTRIBUTION["cov1", "mean"],
           beta2.mean = mod.summary[[1]]$DISTRIBUTION["cov2", "mean"],

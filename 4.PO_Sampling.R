@@ -67,7 +67,7 @@ po_sampling_func <- function(reps.setup.list,
                        vals = bias_vals,
                        names = c("bias")
           )
-          
+          plot(bias)
           crs(bias) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
           names(bias) <- "bias"
           

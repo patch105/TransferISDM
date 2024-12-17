@@ -180,15 +180,16 @@ run_extrap_func <- function(n_cores,
                                 max = max(shape_extrap$extrapolation))
     
     print(median(shape_extrap$extrapolation))
+    print(mean(shape_extrap$extrapolation))
     
     # Classify extrapolation type
     # If median extrap is less than or = to 50, low
     # If median extrap is not less than or = to 50, but is less than or = to 100, moderate
     # If median extrap is not less than or = to 100, high
     
-    extrap.type <- ifelse(summary.extrap$median <= 5 , "Low", 
-                          ifelse(summary.extrap$median <= 10, "Moderate", 
-                                 ifelse(summary.extrap$median <= 15, "High", "Very High")))
+    extrap.type <- ifelse(summary.extrap$mean <= 40 , "Low", 
+                          ifelse(summary.extrap$mean <= 80, "Moderate", 
+                                 ifelse(summary.extrap$mean <= 120, "High", "Very High")))
     
     # Plotting data in covariate space with extrapolation  ------------------------
     
@@ -431,10 +432,11 @@ run_extrap_func_Spat_Auto <- function(n_cores,
                                     max = max(shape_extrap$extrapolation))
 
         print(median(shape_extrap$extrapolation))
+        print(mean(shape_extrap$extrapolation))
 
         # Classify extrapolation type
 
-        env.extrap <- ifelse(summary.extrap$median <= 5 , "Low", "Very High")
+        env.extrap <- ifelse(summary.extrap$mean <= 5 , "Low", "Very High")
 
 
         # Plotting data in covariate space with extrapolation  ------------------------

@@ -219,7 +219,8 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                 intercept.terms = "PA_Intercept",
                                                 type = "link",
                                                 includeRandom = T,
-                                                includeFixed = F)
+                                                includeFixed = F
+                                                )
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod

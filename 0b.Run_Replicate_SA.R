@@ -97,7 +97,8 @@ Run_Replicate_Func <- function(n_cores,
     
     # 3.Simulate Environmental Extrapolation ------------------------------------
     
-    source("3.Simulate_Enviro_Extrapolation_BA.R")
+    #source("3.Simulate_Enviro_Extrapolation_BA.R")
+    source("3.Simulate_Enviro_Extrapolation.R")
     
     # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
     # NOTE - must be smaller than total cell number in x y directions
@@ -330,6 +331,7 @@ Run_Replicate_Func <- function(n_cores,
         scenario_name = scenario_name,
         extrap.type = name,
         rep = rep,
+        job_index = job_index,
         n_po_gridA = reps.setup.list[[name]][[rep]]$n_po_gridA,
         n_presence_gridA = reps.setup.list[[name]][[rep]]$n_presence_gridA,
         n_absence_gridA = reps.setup.list[[name]][[rep]]$n_absence_gridA,
@@ -358,7 +360,8 @@ Run_Replicate_Func <- function(n_cores,
   source("7.Extract_Model_Results.R")
   
   extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.list,
-                                                   mod.type = mod.type)
+                                                   mod.type = mod.type,
+                                                   job_index = job_index)
   
   write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary_Job_", job_index, ".csv"))
   
@@ -383,7 +386,8 @@ Run_Replicate_Func <- function(n_cores,
   
   source("10.Validation_True_Intensity.R")
   
-  true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list)
+  true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list,
+                                              job_index = job_index)
   
   write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
   
@@ -432,7 +436,8 @@ Run_Replicate_Func <- function(n_cores,
   # *Optional* - run validation for Site A
   true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
-                                                    pred.fixed = pred.fixed)
+                                                    pred.fixed = pred.fixed,
+                                                    job_index = job_index)
   
   
   write_csv(true.validation.SiteA.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_SiteA_Job_", job_index, ".csv"))

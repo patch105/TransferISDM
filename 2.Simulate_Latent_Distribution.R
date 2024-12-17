@@ -78,6 +78,8 @@ sim_latent_dist_func <- function(beta0,
     # Add fixed and random effects
     mu <- mu + GRF.mat[, "GRF"]
   
+    print(paste0("Max. Mu is ", max(exp(mu))))
+    print(paste0("Min. Mu is ", min(exp(mu))))
     
     # Simulate the latent Gaussian field
     lg.s <- rpoispp(exp(mu))
@@ -87,6 +89,9 @@ sim_latent_dist_func <- function(beta0,
   } 
   
   if(latent.type == "ipp") {
+    
+    print(paste0("Max. Mu is ", max(exp(mu))))
+    print(paste0("Min. Mu is ", min(exp(mu))))
     
     # Create IPP with environmental covariates
     lg.s <- rpoispp(exp(mu))
@@ -114,12 +119,33 @@ sim_latent_dist_func <- function(beta0,
 }
 
 
+# lambda <- exp(mu)
+# plot(lambda)
+# 
+# mu <- integral(lambda)
+# dx <- lambda$xstep/2
+# dy <- lambda$ystep/2
+# df <- as.data.frame(lambda)
+# npix <- nrow(df)
+# lpix <- df$value
+# # result <- vector(mode = "list", length = nsim)
+# nn <- rpois(1, mu)
+# # if (!all(is.finite(nn))) 
+# #   stop(paste("Unable to generate Poisson process with a mean of", 
+# #              mu, "points"))
+# # for (isim in seq_len(nsim)) {
+#   # ni <- nn[isim]
+# ii <- sample.int(npix, size = nn, replace = TRUE, 
+#                    prob = lpix)
+# 
+# win <- rescue.rectangle(as.owin(lambda))
+# 
+# xx <- df$x[ii] + runif(nn, -dx, dx)
+# yy <- df$y[ii] + runif(nn, -dy, dy)
+# result <- ppp(xx, yy, window = win, 
+#                       check = FALSE)
+# 
+# plot(result)
 
-# TO DOs ------------------------------------------------------------------
 
-# How does virtual species code in a function for the mean??
-# How do we include a habitat covariate and a latent process?
-# Sample presence-only records from the latent process
-# Figuring out sampling strategy for presence-only records
-# To add: A separate realisation was generated from the log-Gaussian Cox process for each sampling process to represent the fact that the individuals sampled by each method were unlikely to be the same i.e. data collection were at different points in time.
 

@@ -99,8 +99,8 @@ Run_Replicate_Func <- function(n_cores,
     
     # 3.Simulate Environmental Extrapolation ------------------------------------
     
-    source("3.Simulate_Enviro_Extrapolation_BA.R")
-    # source("3.Simulate_Enviro_Extrapolation.R")
+    #source("3.Simulate_Enviro_Extrapolation_BA.R")
+    source("3.Simulate_Enviro_Extrapolation.R")
     
     # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
     # NOTE - must be smaller than total cell number in x y directions

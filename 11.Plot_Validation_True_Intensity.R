@@ -314,7 +314,7 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
   # Plot the validation
   
   cor <- true.validation.df %>% 
-    ggplot(aes(x = BA, y = correlation, color = mod.type)) +
+    ggplot(aes(x = mean.extrap, y = correlation, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "Correlation", fill = "Model Type", color = "Model Type") +
@@ -325,7 +325,7 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
     theme_bw()
   
   MAE <- true.validation.df %>% 
-    ggplot(aes(x = BA, y = MAE, color = mod.type)) +
+    ggplot(aes(x = mean.extrap, y = MAE, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "MAE", fill = "Model Type", color = "Model Type") +
@@ -336,7 +336,7 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
     theme_bw()
   
   RMSE <- true.validation.df %>% 
-    ggplot(aes(x = BA, y = RMSE, color = mod.type)) +
+    ggplot(aes(x = mean.extrap, y = RMSE, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "RMSE", fill = "Model Type", color = "Model Type") +
@@ -349,7 +349,7 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
   ## Smaller values of interval score are better
   
   Int.score.mean <-  true.validation.df %>% 
-    ggplot(aes(x = BA, y = Mean.Int.Score, color = mod.type)) +
+    ggplot(aes(x = mean.extrap, y = Mean.Int.Score, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "Mean Interval Score", fill = "Model Type", color = "Model Type") +
@@ -360,7 +360,7 @@ plot_validation_SiteB_continuous_func <- function(true.validation.df,
     theme_bw()
   
   Int.score.sum <- true.validation.df %>% 
-    ggplot(aes(x = BA, y = Sum.Int.Score, color = mod.type)) +
+    ggplot(aes(x = mean.extrap, y = Sum.Int.Score, color = mod.type)) +
     geom_point(alpha = 0.3) +
     geom_smooth(method = "loess", se = T, aes(fill = mod.type, color = mod.type), alpha = 0.1) +
     labs(x = x.label, y = "Sum Interval Score", fill = "Model Type", color = "Model Type") +

@@ -35,6 +35,7 @@ names( covars) <- c("ACC","DEM","SMRZ")
 library(geodata)
 
 studyarea <- c(-15, 65, 30, 75) # extent of study area. Default: Europe
+studyarea <- c(120, 150, -30, -20)
 
 # Get the WorldClim data for bioclimatic variables
 # The 'getData' function is deprecated; use 'geodata' package for worldclim data instead
@@ -55,5 +56,25 @@ plot(mask)
 
 plot(predictors)
 
+cov1 <- predictors[[3]]
 
 
+
+
+##############################################
+# Choose a random 1000 x 1000 grid
+cov1 <- elev
+raster_extent <- ext(cov1)
+
+# Generate random origin points for the new extent
+x_min <- runif(1, raster_extent[1], raster_extent[2] - 1000)
+y_min <- runif(1, raster_extent[3], raster_extent[4] - 1000)
+
+# Define the new extent (1000 x 1000)
+new_extent <- ext(x_min, x_min + 1000, y_min, y_min + 1000)
+
+# Crop the raster
+cropped_raster <- crop(cov1, new_extent)
+
+# Plot the cropped raster
+plot(cropped_raster)
