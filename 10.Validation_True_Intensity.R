@@ -28,8 +28,10 @@ validation_SiteB_func <- function(reps.setup.list,
       Model <- reps.setup.list[[name]][[rep]]$models$Model
       
       # Extract the median extrapolation amount
-      BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
-      BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
+      # BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
+      # BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
+      mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
+      median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
       # And site distance
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
@@ -77,8 +79,8 @@ validation_SiteB_func <- function(reps.setup.list,
         
         results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
-          BA = BA,
-          BD = BD,
+          mean.extrap = mean,
+          median.extrap = median,
           Site.distance = Site.distance,
           rep = rep,
           job_index = job_index,
@@ -131,8 +133,10 @@ validation_SiteA_func <- function(reps.setup.list,
       Model <- reps.setup.list[[name]][[rep]]$models$Model
       
       # Extract the median extrapolation amount
-      BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
-      BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
+      # BA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BA
+      # BD <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$BD
+      mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
+      median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
       # And site distance
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
@@ -150,6 +154,10 @@ validation_SiteA_func <- function(reps.setup.list,
         # Crop out the TRUE random effect from the Site A
         GRF.rast <- reps.setup.list[[name]][[rep]]$latent.list$GRF.rast
         GRF.rast.SiteA <- crop(GRF.rast, ext(rand.gridA))
+        
+        # Also extract grid B GRF for correlation comparison
+        rand.gridB <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridB
+        GRF.rast.SiteB <- crop(GRF.rast, ext(rand.gridB))
         
       }
       
@@ -206,7 +214,13 @@ validation_SiteA_func <- function(reps.setup.list,
           cor.GRF <- cor(as.vector(median.GRF.pred), as.vector(GRF.rast.SiteA), 
                          method = "spearman")
           
-        } else { cor.GRF = NA }
+          cor.GRFA.GRFB <- cor(as.vector(GRF.rast.SiteB), as.vector(GRF.rast.SiteA), 
+                               method = "spearman")
+          
+        } else { 
+          cor.GRF = NA 
+        cor.GRFA.GRFB = NA
+        }
         
         
         if(pred.fixed == TRUE & grepl("GRF", type, fixed = T)) {
@@ -222,8 +236,8 @@ validation_SiteA_func <- function(reps.setup.list,
         
         results_list[[length(results_list) + 1]] <- data.frame(
           extrap.type = name,
-          BA = BA,
-          BD = BD,
+          mean.extrap = mean,
+          median.extrap = median,
           Site.distance = Site.distance,
           rep = rep,
           job_index = job_index,
@@ -231,6 +245,7 @@ validation_SiteA_func <- function(reps.setup.list,
           correlation = cor,
           cor.GRF = cor.GRF,
           cor.FIXED = cor.FIXED,
+          cor.GRFA.GRFB = cor.GRFA.GRFB,
           MAE = MAE,
           RMSE = RMSE,
           Sum.Int.Score = Sum.Int.Score,
