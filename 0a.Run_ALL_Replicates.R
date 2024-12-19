@@ -27,7 +27,7 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "GRF_TEST3"
+scenario_name = "GRF_TEST_DEC"
 
 # "Enviro.Extrap" or "Spatial.Auto"
 scenario.type = "Spatial.Auto"
@@ -68,7 +68,7 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
-variance <- 10 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+variance <- 1 # Variance of the Gaussian field at distance zero (changed  from 0.5)
 
 # PO sampling values
 detect.prob <- 0.05
@@ -80,7 +80,7 @@ maxprob <- 0.05
 n_cores <- 3
 
 # Number of posterior samples to take * note that it slows things down
-posterior_nsamps <- 500
+posterior_nsamps <- 5000
 
 
 
