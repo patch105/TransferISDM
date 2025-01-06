@@ -1,6 +1,6 @@
 # AntarcticISDM
 
-Code to in support of "Does integrating data in species distribution models improve spatial model transfer?". _In Preparation._ Charlotte R. Patterson, Xiaotian Zheng, Scott D. Foster, Justine D. Shaw & Kate J. Helmstedt.
+Code in support of "Does integrating data in species distribution models improve spatial model transfer?". _In Preparation._ Charlotte R. Patterson, Xiaotian Zheng, Scott D. Foster, Justine D. Shaw & Kate J. Helmstedt.
 
 ## Project overview
 Integrated species distribution models (ISDMs) have the potential to provide better predictions than models fitted to single data types, but this has never been tested in scenarios of spatial transfer. Here, we test the performance of integrated, presence-only, and presence-absence models in simulated model transfer scenarios that emulate common causes of spatial model transfer failure: environmental dissimilarity, spatial autocorrelation, and bias in the presence-only dataset.
