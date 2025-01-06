@@ -29,7 +29,6 @@ Embedded in these two scripts are calls to several other functions and scripts w
 
 [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) calls the following scripts:
 
-
 [0b.Run_Replicate.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate.R): This script sequentially calls and saves all the separate functions of the simulation as follows:
 
 [0b.Run_Replicate_SA.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate_SA.R) (The Spatial Autocorrelation version of the above, called when you set scenario.type = "Spatial.Auto")
@@ -65,6 +64,17 @@ Embedded in these two scripts are calls to several other functions and scripts w
 [12B.Plot_Data.R](https://github.com/patch105/AntarcticISDM/blob/main/12B.Plot_Data.R): This plots, for each replicate, the PO and PA data at the training site.
 
 [12C.Plot_Predictions.R](https://github.com/patch105/AntarcticISDM/blob/main/12C.Plot_Predictions.R): This creates and saves plots of model predictions at both the projection and training sites.
+
+## Simulation scenarios
+
+The following scenarios were run for the manuscript:
+
+xx
+xx
+xx
+xx
+
+
 
 
 ## Antarctic Case Study
