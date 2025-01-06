@@ -69,10 +69,15 @@ Embedded in these two scripts are calls to several other functions and scripts w
 
 The following scenarios were run for the manuscript:
 
-xx
-xx
-xx
-xx
+Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling bias? | Number of PO records | Run scenario | Plot scenario 
+--- | --- | --- | --- |--- |--- | ---
+(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low, High | (link) | (link)
+(2) Spatial autocorrelation |  | Range = 20, 100, 200 |  | Low, High | (link) | (link)
+(3) Environmental dissimilarity & spatial autocorrelation | Low to High | Range = 20 |  | Low, High | (link) | (link)
+(4) Spatial autocorrelation with Bias in PO data | Low | Range = 20, 100, 200 | Yes | Low, High | (link) | (link)
+(5) Environmental extrapolation, Spatial autocorrelation & Bias in PO data | Low to High | Range = 20, 100, 200 | Yes | Low, High | (link) | (link)
+
+## Final summary figures from manuscript
 
 
 
