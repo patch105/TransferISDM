@@ -29,7 +29,7 @@ Embedded in these two scripts are calls to several other functions and scripts w
 
 [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) calls the following scripts:
 
-[0b.Run_Replicate.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate.R): This script sequentially calls and saves all the separate functions of the simulation as follows:
+[0b.Run_Replicate.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate.R): This script sequentially calls and saves all the separate functions of the simulation (steps 1-12 below). In here is where you can adjust the priors and the mesh parameters.
 
 [0b.Run_Replicate_SA.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate_SA.R) (The Spatial Autocorrelation version of the above, called when you set scenario.type = "Spatial.Auto")
 
