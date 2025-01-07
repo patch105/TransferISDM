@@ -225,7 +225,8 @@ Run_Replicate_Func <- function(n_cores,
   
   source("5.PA_Sampling.R")
   
-  reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list)
+  reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list,
+                                      n_cores = n_cores)
   
   
   

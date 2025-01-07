@@ -33,6 +33,14 @@ extract_model_results_func <- function(reps.setup.list,
       mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
       median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
+      meanPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPA
+      meanPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPO
+      meanPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPAPO
+      
+      medianPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPA
+      medianPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPO
+      medianPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPAPO
+      
       # Extract the distance between the sites
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
       
@@ -44,6 +52,12 @@ extract_model_results_func <- function(reps.setup.list,
           extrap.type = name,
           mean.extrap = mean,
           median.extrap = median,
+          meanPA.extrap = meanPA,
+          medianPA.extrap = medianPA,
+          meanPO.extrap = meanPO,
+          medianPO.extrap = medianPO,
+          meanPAPO.extrap = meanPAPO,
+          medianPAPO.extrap = medianPAPO,
           Site.distance = Site.distance,
           rep = rep,
           job_index = job_index,
@@ -56,12 +70,16 @@ extract_model_results_func <- function(reps.setup.list,
           beta1_975 = mod.summary[[1]]$DISTRIBUTION["cov1", "0.975quant"],
           beta2_25 = mod.summary[[1]]$DISTRIBUTION["cov2", "0.025quant"],
           beta2_975 = mod.summary[[1]]$DISTRIBUTION["cov2", "0.975quant"],
+          beta1.sd = mod.summary[[1]]$DISTRIBUTION["cov1", "sd"],
+          beta2.sd = mod.summary[[1]]$DISTRIBUTION["cov2", "sd"],
           PO_intercept = NA,
           PO_intercept_25 = NA,
           PO_intercept_975 = NA,
+          PO_intercept.sd = NA,
           PA_intercept = NA,
           PA_intercept_25 = NA,
           PA_intercept_975 = NA,
+          PA_intercept.sd = NA,
            marg_lik = mod.summary[[1]]$marg.lik,
           GRF.range.mean = NA,
           GRF.sd.mean = NA,
@@ -69,9 +87,12 @@ extract_model_results_func <- function(reps.setup.list,
           GRF.range_975 = NA,
           GRF.sd_25 = NA,
           GRF.sd_975 = NA,
+          GRF.range.sd = NA,
+          GRF.sd.sd = NA,
           bias.coef.mean = NA,
           bias.coef_25 = NA,
-          bias.coef_95 = NA
+          bias.coef_95 = NA,
+          bias.coef.sd = NA
         )
         
           # If the model name contains PO or Integrated, save the PO intercept
@@ -80,6 +101,7 @@ extract_model_results_func <- function(reps.setup.list,
           results_list[[length(results_list)]]$PO_intercept <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "mean"]
           results_list[[length(results_list)]]$PO_intercept_25 <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "0.025quant"]
           results_list[[length(results_list)]]$PO_intercept_975 <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "0.975quant"]
+          results_list[[length(results_list)]]$PO_intercept.sd <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "sd"]
           
         }  
           
@@ -88,6 +110,7 @@ extract_model_results_func <- function(reps.setup.list,
             results_list[[length(results_list)]]$PA_intercept <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "mean"]
             results_list[[length(results_list)]]$PA_intercept_25 <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "0.025quant"]
             results_list[[length(results_list)]]$PA_intercept_975 <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "0.975quant"]
+            results_list[[length(results_list)]]$PA_intercept.sd <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "sd"]
             
           }
        
@@ -100,6 +123,8 @@ extract_model_results_func <- function(reps.setup.list,
             results_list[[length(results_list)]]$GRF.range_975 <- mod.summary[[1]]$SPATIAL[[5]][1]
             results_list[[length(results_list)]]$GRF.sd_25 <- mod.summary[[1]]$SPATIAL[[3]][2]
             results_list[[length(results_list)]]$GRF.sd_975 <- mod.summary[[1]]$SPATIAL[[5]][2]
+            results_list[[length(results_list)]]$GRF.range.sd <- mod.summary[[1]]$SPATIAL[[2]][1]
+            results_list[[length(results_list)]]$GRF.sd.sd <- mod.summary[[1]]$SPATIAL[[2]][2]
           
           }
           
@@ -109,6 +134,7 @@ extract_model_results_func <- function(reps.setup.list,
             results_list[[length(results_list)]]$bias.coef.mean <- mod.summary[[1]]$PO_BIAS["PO_bias", "mean"]
             results_list[[length(results_list)]]$bias.coef_25 <- mod.summary[[1]]$PO_BIAS["PO_bias", "0.025quant"]
             results_list[[length(results_list)]]$bias.coef_95 <- mod.summary[[1]]$PO_BIAS["PO_bias", "0.975quant"]
+            results_list[[length(results_list)]]$bias.coef.sd <- mod.summary[[1]]$PO_BIAS["PO_bias", "sd"]
 
           }
           

@@ -33,6 +33,14 @@ validation_SiteB_func <- function(reps.setup.list,
       mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
       median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
+      meanPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPA
+      meanPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPO
+      meanPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPAPO
+      
+      medianPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPA
+      medianPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPO
+      medianPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPAPO
+      
       # And site distance
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
       
@@ -81,6 +89,12 @@ validation_SiteB_func <- function(reps.setup.list,
           extrap.type = name,
           mean.extrap = mean,
           median.extrap = median,
+          meanPA.extrap = meanPA,
+          medianPA.extrap = medianPA,
+          meanPO.extrap = meanPO,
+          medianPO.extrap = medianPO,
+          meanPAPO.extrap = meanPAPO,
+          medianPAPO.extrap = medianPAPO,
           Site.distance = Site.distance,
           rep = rep,
           job_index = job_index,
