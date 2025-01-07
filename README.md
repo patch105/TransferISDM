@@ -69,13 +69,13 @@ Embedded in these two scripts are calls to several other functions and scripts w
 
 The following scenarios were run for the manuscript:
 
-Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling bias? | Number of PO records | Run scenario | Plot scenario 
---- | --- | --- | --- |--- |--- | ---
-(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low, High | (link) | (link)
-(2) Spatial autocorrelation |  | Range = 20, 100, 200 |  | Low, High | (link) | (link)
-(3) Environmental dissimilarity & spatial autocorrelation | Low to High | Range = 20 |  | Low, High | (link) | (link)
-(4) Spatial autocorrelation with Bias in PO data | Low | Range = 20, 100, 200 | Yes | Low, High | (link) | (link)
-(5) Environmental extrapolation, Spatial autocorrelation & Bias in PO data | Low to High | Range = 20, 100, 200 | Yes | Low, High | (link) | (link)
+Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling bias? | Number of PO records | Run scenario 
+--- | --- | --- | --- |--- |---
+(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low, High | [0a.Run_ALL_Replicates_Scenario_1.R](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios/0a.Run_ALL_Replicates_Scenario_1.R) 
+(2) Spatial autocorrelation |  | Range = 20, 100, 200 |  | Low, High | (link)  
+(3) Environmental dissimilarity & spatial autocorrelation | Low to High | Range = 20 |  | Low, High | (link)  
+(4) Spatial autocorrelation with Bias in PO data | Low | Range = 20, 100, 200 | Yes | Low, High | (link)  
+(5) Environmental extrapolation, Spatial autocorrelation & Bias in PO data | Low to High | Range = 20, 100, 200 | Yes | Low, High | (link) 
 
 ## Final summary figures from manuscript
 
