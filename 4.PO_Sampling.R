@@ -57,6 +57,8 @@ po_sampling_func <- function(reps.setup.list,
           # Flatten the matrix into a vector to match the expected input format for 'vals'
           bias_vals <- as.vector(bias_matrix)
           
+          # Make the true bias cov
+          
           bias <- rast(nrows = rast_cellsA[1],
                        ncols = rast_cellsA[2],
                        xmin = xmin(rand.gridA),
@@ -70,6 +72,29 @@ po_sampling_func <- function(reps.setup.list,
           plot(bias)
           crs(bias) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
           names(bias) <- "bias"
+          
+          # Add random noise to make correlated bias variable (~0.99 correlation)
+          noise <- rnorm(length(bias_vals), mean = 0, sd = 0.035 * max(bias_vals)) # Adjust 'sd' for desired correlation
+          bias_vals_noisy <- bias_vals + noise
+          bias_vals_noisy <- pmax(pmin(bias_vals_noisy, maxprob), minprob) # Clip to valid range
+          
+          bias_noisy <- rast(nrows = rast_cellsA[1],
+                             ncols = rast_cellsA[2],
+                             xmin = xmin(rand.gridA),
+                             xmax = xmax(rand.gridA),
+                             ymin = ymin(rand.gridA),
+                             ymax = ymax(rand.gridA),
+                             resolution = res,
+                             vals = bias_vals_noisy,
+                             names = c("bias")
+          )
+          
+          crs(bias_noisy) <- "epsg:3857"
+          names(bias_noisy) <- "bias"
+          
+          # Check correlation between original and noisy bias
+          correlation <- cor(bias_vals, bias_vals_noisy)
+          print(paste("Correlation between original and noisy bias:", round(correlation, 4)))
           
           # Add spatial bias info to PP data
           po.rand.gridA <- cbind(spp_process.rand.gridA, bias = terra::extract(bias, spp_process.rand.gridA[,1:2]))
@@ -111,7 +136,7 @@ po_sampling_func <- function(reps.setup.list,
                     PO_GridB = po.rand.gridB,
                     n_po_gridA = nrow(po.rand.gridA),
                     n_po_gridB = nrow(po.rand.gridB),
-                    Bias.rast = log(bias))) # Log the bias raster
+                    Bias.rast = log(bias_noisy))) # Log the bias raster
         
         }
        
