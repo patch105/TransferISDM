@@ -131,12 +131,29 @@ po_sampling_func <- function(reps.setup.list,
           dimnames(po.rand.gridB) <- list(NULL, c("x", "y"))
         }
         
-        return(list(spp_process.rand.gridA = spp_process.rand.gridA,
-                    PO_GridA = po.rand.gridA,
-                    PO_GridB = po.rand.gridB,
-                    n_po_gridA = nrow(po.rand.gridA),
-                    n_po_gridB = nrow(po.rand.gridB),
-                    Bias.rast = log(bias_noisy))) # Log the bias raster
+        # If bias field applied 
+        if(bias == TRUE) { 
+          
+          return(list(spp_process.rand.gridA = spp_process.rand.gridA,
+                                       PO_GridA = po.rand.gridA,
+                                       PO_GridB = po.rand.gridB,
+                                       n_po_gridA = nrow(po.rand.gridA),
+                                       n_po_gridB = nrow(po.rand.gridB),
+                                       Bias.rast = log(bias_noisy))) # Log the bias raster
+        }
+        
+        # If bias field not applied 
+        if(bias == FALSE) { 
+          
+          return(list(spp_process.rand.gridA = spp_process.rand.gridA,
+                                        PO_GridA = po.rand.gridA,
+                                        PO_GridB = po.rand.gridB,
+                                        n_po_gridA = nrow(po.rand.gridA),
+                                        n_po_gridB = nrow(po.rand.gridB)))
+                                        
+          }
+        
+        
         
         }
        
