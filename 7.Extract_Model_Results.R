@@ -150,7 +150,7 @@ extract_model_results_func <- function(reps.setup.list,
             #dists <- nbdists(nb1, update_rast_xy)
             
             # Then extract just the values per cell
-            PAresid <- residuals(i)$PA$PAresids$residual
+            PAresid <- residuals(x)$PA$residual
             
             # Normalize the data so it is not affected by high values
             normalize <- function(x, na.rm = TRUE) {
