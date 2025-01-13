@@ -32,7 +32,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
       # Add a dummy bias variable to keep RISDM happy
       cov.rep$bias <- 1
       
-      for (i in seq_along(Model)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
+      for (i in seq_along(Model)) { 
         
         mod <- models_df[[i, "Model"]]
         
@@ -196,37 +196,18 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
         
         if(pred.GRF == TRUE & grepl("GRF", type, fixed = T)) {
           
-          if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
-            
-            # Had to add the [[1]] here because the summary is always list of length 1
-            mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
-                                                covars = cov.rep,
-                                                S = posterior_nsamps, 
-                                                intercept.terms = "PO_Intercept",
-                                                type = "link",
-                                                includeRandom = T,
-                                                includeFixed = F)
-            
-            # Save the updated model back to the dataframe
-            models_df[[i, "Model"]] <- mod
-            
-          } else { # If models are PA or Integrated, use PA intercept
-            
-            # Had to add the [[1]] here because the summary is always list of length 1
-            mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
-                                                covars = cov.rep,
-                                                S = posterior_nsamps, 
-                                                intercept.terms = "PA_Intercept",
-                                                type = "link",
-                                                includeRandom = T,
-                                                includeFixed = F
-                                                )
-            
-            # Save the updated model back to the dataframe
-            models_df[[i, "Model"]] <- mod
-            
-          }
+          # Had to add the [[1]] here because the summary is always list of length 1
+          # Prediction doesn't include an intercept
+          mod[[1]]$preds.GRF.siteA <- predict(mod[[1]],
+                                              covars = cov.rep,
+                                              S = posterior_nsamps, 
+                                              intercept.terms = NULL,
+                                              type = "link",
+                                              includeRandom = T,
+                                              includeFixed = F)
           
+          # Save the updated model back to the dataframe
+          models_df[[i, "Model"]] <- mod
           
         }
         
@@ -236,36 +217,15 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
         
         if(pred.fixed == TRUE & grepl("GRF", type, fixed = T)) {
           
-          if(grepl("PO", type, fixed = T)) { # If models are PO, use PO intercept
-            
-            # Had to add the [[1]] here because the summary is always list of length 1
-            mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
-                                                  covars = cov.rep,
-                                                  S = posterior_nsamps, 
-                                                  intercept.terms = "PO_Intercept",
-                                                  type = "link",
-                                                  includeRandom = F,
-                                                  includeFixed = T)
-            
-            # Save the updated model back to the dataframe
-            models_df[[i, "Model"]] <- mod
-            
-          } else { # If models are PA or Integrated, use PA intercept
-            
-            # Had to add the [[1]] here because the summary is always list of length 1
-            mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
-                                                  covars = cov.rep,
-                                                  S = posterior_nsamps, 
-                                                  intercept.terms = "PA_Intercept",
-                                                  type = "link",
-                                                  includeRandom = F,
-                                                  includeFixed = T)
-            
-            # Save the updated model back to the dataframe
-            models_df[[i, "Model"]] <- mod
-            
-          }
-          
+          # Had to add the [[1]] here because the summary is always list of length 1
+          # Prediction doesn't include an intercept
+          mod[[1]]$preds.FIXED.siteA <- predict(mod[[1]],
+                                                covars = cov.rep,
+                                                S = posterior_nsamps, 
+                                                intercept.terms = NULL,
+                                                type = "link",
+                                                includeRandom = F,
+                                                includeFixed = T)
           
         }
         

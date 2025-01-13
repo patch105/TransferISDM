@@ -63,6 +63,11 @@ sim_latent_dist_func <- function(beta0,
     crs(GRF.rast) <- crs(cov1)
     names(GRF.rast) <- "GRF"
     
+    # Extract cell size for comparison with prediction because RISDM predictions are with reference to cell area
+    log.cell_size <- log(cellSize(cov1))
+    
+    GRF.rast <- GRF.rast + log.cell_size
+    
     # Calculate the correlation between the GRF and the covariates
     cor.GRF.cov1 <- cor(as.vector(GRF.rast), as.vector(cov1),
                       method = "spearman")
@@ -70,12 +75,18 @@ sim_latent_dist_func <- function(beta0,
     cor.GRF.cov2 <- cor(as.vector(GRF.rast), as.vector(cov2),
                         method = "spearman")
     
-    # Save a version that just keeps fixed effects for plotting
-    fixed.rast <- rast(mu)
+    # Save a version that just keeps fixed effects for plotting (removes the intercept)
+    fixed <- beta1*cov1.mat[, "cov"] 
+    mu.fixed <- cov1.df %>% mutate(cov = fixed)
+    mu.fixed <- spatstat.geom::as.im(mu.fixed)
+    
+    fixed.rast <- rast(mu.fixed)
     crs(fixed.rast) <- crs(cov1)
     names(fixed.rast) <- "Fixed"
     
-    # Add fixed and random effects
+    fixed.rast <- fixed.rast + log.cell_size
+    
+    # Combine intercept +  fixed and random effects
     mu <- mu + GRF.mat[, "GRF"]
   
     print(paste0("Max. Mu is ", max(exp(mu))))
