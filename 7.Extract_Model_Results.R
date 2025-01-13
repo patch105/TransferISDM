@@ -3,7 +3,8 @@
 
 extract_model_results_func <- function(reps.setup.list,
                                        mod.type,
-                                       job_index) {
+                                       job_index,
+                                       res) {
   
   # Extract and save summary results ----------------------------------------
   
@@ -33,18 +34,121 @@ extract_model_results_func <- function(reps.setup.list,
       mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
       median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
-      meanPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPA
-      meanPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPO
-      meanPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPAPO
+      meanPA <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$meanPA
+      meanPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$meanPO
+      meanPAPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$meanPAPO
       
-      medianPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPA
-      medianPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPO
-      medianPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPAPO
+      medianPA <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$medianPA
+      medianPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$medianPO
+      medianPAPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$medianPAPO
       
       # Extract the distance between the sites
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
       
-      for (i in seq_along(Model)) { # Until get PA again
+      # MORAN'S I: Residual spatial autocorrelation --------------------------
+
+      # Calculate the neighbourhood distance as 1.5 x resolution (so looks at 1 nearest neighbour)
+      neighbour_dist <- res*1.5
+      
+      # Load covariates
+      cov.rep <- rep$extrap.reps.out$covs.SiteA.rast
+      
+      update_rast_xy <- cov.rep %>% 
+        as.data.frame(xy=TRUE) %>% 
+        .[, -c(3,4)] 
+      
+      # dnearneigh is in metres, finds to index of all values within the specified distance
+      nb1 <- dnearneigh(as.matrix(update_rast_xy), 0, neighbour_dist)
+      
+      # Generate a weights object
+      weights <- nb2listw(nb1, 
+                          glist = NULL,
+                          style = "B",
+                          zero.policy = TRUE) 
+      
+      # Print list of distances
+      dists <- nbdists(nb1, update_rast_xy)
+      
+      
+      
+      for (i in seq_along(Model)) { 
+        
+        # Calculating Moran's I  ----------------------------------------------
+         
+        #### PO residuals ####
+        if (grepl("PO", models_df[i, "Mod.type"], fixed = TRUE) | grepl("int", models_df[i, "Mod.type"], fixed = TRUE)) { 
+          
+          # PO Residuals ------------------------------------------------------------
+
+          # Then extract just the values per cell
+          POresid <- residuals(i)$PO$POresids$residual
+          
+          # Normalize the data so it is not affected by high values
+          normalize <- function(i, na.rm = TRUE) {
+            return((i- min(i)) /(max(i)-min(i)))
+          }
+          
+          norm_POresid <- normalize(POresid)
+          
+          # Moran's I value for normalized data
+          PO_MoransI <- moran(norm_POresid, 
+                     weights, 
+                     zero.policy = T, 
+                     length(nb1), 
+                     Szero(weights)) %>% 
+            .[[1]]
+          
+          # Hypothesis test  ----------------------------------------------------
+          
+          # Run a hypothesis test via permutation
+          set.seed(1)
+          moran_bootstrap <- moran.mc(norm_POresid,
+                                      weights,
+                                      nsim = 10000,
+                                      zero.policy = TRUE)
+          
+          # Print the output of the hypothesis test
+          PO_MoransI_pvalue <- summary(moran_bootstrap)
+
+          
+        }
+        
+        #### PA residuals ####
+        if (grepl("PA", models_df[i, "Mod.type"], fixed = TRUE) | grepl("int", models_df[i, "Mod.type"], fixed = TRUE)) { 
+          
+          # PA Residuals ------------------------------------------------------------
+          
+          # Then extract just the values per cell
+          PAresid <- residuals(i)$PA$PAresids$residual
+          
+          # Normalize the data so it is not affected by high values
+          normalize <- function(x, na.rm = TRUE) {
+            return((x- min(x)) /(max(x)-min(x)))
+          }
+          
+          norm_PAresid <- normalize(PAresid)
+          
+          # Moran's I value for normalized data
+          PA_MoransI <- moran(norm_PAresid, 
+                              weights, 
+                              zero.policy = T, 
+                              length(nb1), 
+                              Szero(weights)) %>% 
+            .[[1]]
+          
+          # Hypothesis test  ----------------------------------------------------
+          
+          # Run a hypothesis test via permutation
+          set.seed(1)
+          moran_bootstrap <- moran.mc(norm_PAresid,
+                                      weights,
+                                      nsim = 10000,
+                                      zero.policy = TRUE)
+          
+          # Print the output of the hypothesis test
+          PA_MoransI_pvalue <- moran_bootstrap$p.value
+          
+        }
         
         mod.summary <- models_df[[i, "Summary"]]
         
@@ -92,7 +196,11 @@ extract_model_results_func <- function(reps.setup.list,
           bias.coef.mean = NA,
           bias.coef_25 = NA,
           bias.coef_95 = NA,
-          bias.coef.sd = NA
+          bias.coef.sd = NA,
+          PO_MoransI = NA,
+          PO_MoransI_pvalue = NA,
+          PA_MoransI = NA,
+          PA_MoransI_pvalue = NA
         )
         
           # If the model name contains PO or Integrated, save the PO intercept
@@ -102,6 +210,8 @@ extract_model_results_func <- function(reps.setup.list,
           results_list[[length(results_list)]]$PO_intercept_25 <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "0.025quant"]
           results_list[[length(results_list)]]$PO_intercept_975 <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "0.975quant"]
           results_list[[length(results_list)]]$PO_intercept.sd <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "sd"]
+          results_list[[length(results_list)]]$PO_MoransI <- PO_MoransI
+          results_list[[length(results_list)]]$PO_MoransI_pvalue <- PO_MoransI_pvalue
           
         }  
           
@@ -111,6 +221,8 @@ extract_model_results_func <- function(reps.setup.list,
             results_list[[length(results_list)]]$PA_intercept_25 <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "0.025quant"]
             results_list[[length(results_list)]]$PA_intercept_975 <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "0.975quant"]
             results_list[[length(results_list)]]$PA_intercept.sd <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "sd"]
+            results_list[[length(results_list)]]$PA_MoransI <- PA_MoransI
+            results_list[[length(results_list)]]$PA_MoransI_pvalue <- PA_MoransI_pvalue
             
           }
        
