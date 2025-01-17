@@ -226,6 +226,8 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                 type = "link",
                                                 includeRandom = F,
                                                 includeFixed = T)
+          # Save the updated model back to the dataframe
+          models_df[[i, "Model"]] <- mod
           
         }
         
