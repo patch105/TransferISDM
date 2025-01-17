@@ -219,8 +219,6 @@ validation_SiteA_func <- function(reps.setup.list,
         
       }
       
-      print(paste0("mean difference fixed - GRF: ", global(fixed.rast - GRF.rast, mean)))
-      
       for (i in seq_along(Model)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
         
         mod <- models_df[[i, "Model"]]

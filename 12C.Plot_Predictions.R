@@ -328,7 +328,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
             
             plot.name.FIXED <- paste0("pred.FIXED.plot.", type)
             
-            p <- preds.FIXED.siteA$field$Median %>% 
+            p <- median.FIXED.pred %>% 
               as.data.frame(xy = T) %>%  
               ggplot() + 
               geom_tile(aes(x = x, y = y, fill = Median)) + 
