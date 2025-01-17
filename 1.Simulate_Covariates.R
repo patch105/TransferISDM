@@ -19,6 +19,8 @@ sim_covariates_func <- function(plot,
                                 seed,
                                 range_cov1,
                                 range_cov2,
+                                var_cov1,
+                                var_cov2,
                                 east_min,
                                 east_max,
                                 north_min,
@@ -62,7 +64,7 @@ sim_covariates_func <- function(plot,
   xSeq <- terra::xFromCol(landscape.rast)
   ySeq <- terra::yFromRow(landscape.rast)
   
-  cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 0.5, rho = range_cov1, nu = 1/2) 
+  cov1 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = var_cov1, rho = range_cov1, nu = 1/2) 
   
   cov1 <- rast(cov1)
   
@@ -70,20 +72,13 @@ sim_covariates_func <- function(plot,
   
   names(cov1) <- "cov"
   
-  cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = 10 , rho = range_cov2, nu = 1/2) 
+  cov2 <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = var_cov2 , rho = range_cov2, nu = 1/2) 
   
   cov2 <- rast(cov2)
   
   crs(cov2) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
   
   names(cov2) <- "cov"
-  
-  # coords <- xyFromCell(cov2, 1:ncell(cov2))
-  # 
-  # # Multiply x-coordinates by 0.01 to create a trend in the x-direction
-  # x_trend <- coords[, 2] * 0.01
-  # 
-  # cov2[] <- values(cov2) + x_trend
   
   covs <- c(cov1, cov2)
   

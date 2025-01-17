@@ -6,16 +6,19 @@ sim_latent_dist_func <- function(beta0,
                                  beta1,
                                  beta2,
                                  scal,
-                                 variance,
+                                 GRF.var.multiplier,
                                  cov1,
                                  cov1.mat,
                                  cov2,
                                  cov2.mat,
                                  cov1.df,
+                                 var_cov1,
+                                 var_cov2,
                                  response.type = "linear",
                                  plot.mu = FALSE,
                                  plot.lg.s = FALSE,
-                                 latent.type) {
+                                 latent.type
+                                 ) {
   print(scal)
   
   nu <- 1/2 # Smoothness parameter - ONLY FOR MATERN
@@ -46,8 +49,18 @@ sim_latent_dist_func <- function(beta0,
     xSeq <- terra::xFromCol(cov1)
     ySeq <- terra::yFromRow(cov1)
     
-    # Simulate the random effect
-    REff <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = variance , rho = scal, nu = nu)
+    ############
+    #### Calculate variance of GRF to be proportional to variance of fixed effect
+    ############
+    
+    # Calculate 'variance' of fixed effect
+    fe.var <- beta1^2*var_cov1 + beta2^2*var_cov2 
+    
+    # Multiply variance by multiplier to get target variance for GRF
+    target.var <- GRF.var.multiplier * fe.var
+    
+    # Simulate the random effect with target variance
+    REff <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = target.var , rho = scal, nu = nu)
     
     REff <- as.numeric(REff)
     
@@ -95,7 +108,14 @@ sim_latent_dist_func <- function(beta0,
     # Simulate the latent Gaussian field
     lg.s <- rpoispp(exp(mu))
     
-    latent.list <- list(mu = mu, lg.s = lg.s, fixed.rast = fixed.rast, GRF.rast = GRF.rast, cor.GRF.cov1 = cor.GRF.cov1, cor.GRF.cov2 = cor.GRF.cov2) 
+    latent.list <- list(mu = mu, 
+                        lg.s = lg.s, 
+                        fixed.rast = fixed.rast, 
+                        GRF.rast = GRF.rast, 
+                        cor.GRF.cov1 = cor.GRF.cov1, 
+                        cor.GRF.cov2 = cor.GRF.cov2,
+                        fixed.variance = fe.var,
+                        GRF.variance = target.var) 
     
   } 
   

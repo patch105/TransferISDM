@@ -27,32 +27,40 @@ library(readr)
 
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "PAPO_Test"
+scenario_name = "TEST"
 
 # "Enviro.Extrap" or "Spatial.Auto"
-scenario.type = "Enviro.Extrap"
+scenario.type = "Spatial.Auto"
 
 nreps <- 1 # Replicates per extrapolation type
 
 # Spatial autocorrelation?
-latent.type = "ipp" 
+latent.type = "lgcp" 
 
 # Bias in PO sampling?
 bias <- FALSE
+
 
 # Model choices -----------------------------------------------------------
 
 # Model types to run
 # Options are "no-GRF" "spatial" "no-GRF.bias" "spatial.bias"
-mod.type = c("no-GRF")
+mod.type = c("no-GRF", "spatial")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
-pred.GRF <- FALSE
-pred.fixed <- FALSE
+pred.GRF <- TRUE
+pred.fixed <- TRUE
 
 
 # Parameters --------------------------------------------------------------
+
+# Autocorrelation range & variance for covs 
+#(Maximum range (raster units) of spatial autocorrelation)
+range_cov1 <- 10 
+range_cov2 <- 100 
+var_cov1 <- 0.5
+var_cov2 <- 10
 
 beta0 <- -2 # Intercept
 beta1 <- 0.01 # Coefficient for cov 1
@@ -68,11 +76,13 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
-variance <- 1 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+# Relative variance of GRF to fixed effect (can be ...)
+GRF.var.multiplier <- 1
+
 
 # PO sampling values
-detect.prob <- 0.05
-maxprob <- 0.05
+detect.prob <- 0.2
+maxprob <- 0.2
 
 
 # Implementation choices --------------------------------------------------
@@ -153,6 +163,14 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
+# Calculate the variance of the GRF so can save for plotting: --------------
+# Calculate 'variance' of fixed effect
+fe.var <- beta1^2*var_cov1 + beta2^2*var_cov2 
+
+# Multiply variance by multiplier to get target variance for GRF
+variance <- GRF.var.multiplier * fe.var
+
+
 # Save the input parameters for this job ----------------------------------
 save(scenario.type, pred.GRF, pred.fixed, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -177,11 +195,15 @@ Run_Replicate_Func(n_cores = n_cores,
                    coords = coords,
                    nreps = nreps,
                    mod.type = mod.type,
+                   range_cov1 = range_cov1,
+                   range_cov2 = range_cov2,
+                   var_cov1 = var_cov1,
+                   var_cov2 = var_cov2,
                    beta0 = beta0,
                    beta1 = beta1,
                    beta2 = beta2,
                    scal = scal,
-                   variance = variance,
+                   GRF.var.multiplier = GRF.var.multiplier,
                    bias = bias,
                    detect.prob = detect.prob,
                    maxprob = maxprob,

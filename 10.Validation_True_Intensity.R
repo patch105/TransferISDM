@@ -5,7 +5,9 @@ library(scoringutils, lib.loc=lib_loc)
 # 10. Validation true intensity -------------------------------------------
 
 validation_SiteB_func <- function(reps.setup.list,
-                                  job_index) {
+                                  job_index,
+                                  GRF.var.multiplier,
+                                  latent.type) {
   
   # Create an empty list to store results
   results_list <- list()
@@ -33,16 +35,29 @@ validation_SiteB_func <- function(reps.setup.list,
       mean <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$mean
       median <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.extrap$median
       
-      meanPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPA
-      meanPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPO
-      meanPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$meanPAPO
+      meanPA <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$meanPA
+      meanPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$meanPO
+      meanPAPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$meanPAPO
       
-      medianPA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPA
-      medianPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPO
-      medianPAPO <- reps.setup.list[[name]][[rep]]$extrap.reps.out$summary.realised.extrap$medianPAPO
+      medianPA <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$medianPA
+      medianPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$medianPO
+      medianPAPO <- reps.setup.list[[name]][[rep]]$summary.realised.extrap$medianPAPO
       
       # And site distance
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
+      
+      # Fixed and GRF variance
+      if(latent.type == "lgcp") {
+        
+        fixed.variance <- reps.setup.list[[name]][[rep]]$latent.list$fixed.variance
+        GRF.variance <- reps.setup.list[[name]][[rep]]$latent.list$GRF.variance
+        
+      } else {
+        
+        fixed.variance <- NA
+        GRF.variance <- NA
+        
+      }
       
       # Crop out the true log intensity from the Site B
       rand.gridB <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridB
@@ -96,6 +111,9 @@ validation_SiteB_func <- function(reps.setup.list,
           meanPAPO.extrap = meanPAPO,
           medianPAPO.extrap = medianPAPO,
           Site.distance = Site.distance,
+          GRF.var.multiplier = GRF.var.multiplier,
+          fixed.variance = fixed.variance,
+          GRF.variance = GRF.variance,
           rep = rep,
           job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
@@ -124,7 +142,9 @@ validation_SiteB_func <- function(reps.setup.list,
 validation_SiteA_func <- function(reps.setup.list,
                                   pred.GRF = FALSE,
                                   pred.fixed = FALSE,
-                                  job_index) {
+                                  job_index,
+                                  GRF.var.multiplier,
+                                  latent.type) {
   
   # Create an empty list to store results
   results_list <- list()
@@ -154,6 +174,19 @@ validation_SiteA_func <- function(reps.setup.list,
       
       # And site distance
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
+      
+      # Fixed and GRF variance
+      if(latent.type == "lgcp") {
+        
+        fixed.variance <- reps.setup.list[[name]][[rep]]$latent.list$fixed.variance
+        GRF.variance <- reps.setup.list[[name]][[rep]]$latent.list$GRF.variance
+        
+      } else {
+        
+        fixed.variance <- NA
+        GRF.variance <- NA
+        
+      }
       
       # Crop out the true log intensity from the Site A
       rand.gridA <- reps.setup.list[[name]][[rep]]$extrap.reps.out$rand.gridA
@@ -185,6 +218,8 @@ validation_SiteA_func <- function(reps.setup.list,
         fixed.rast.SiteA <- crop(fixed.rast, ext(rand.gridA))
         
       }
+      
+      print(paste0("mean difference fixed - GRF: ", global(fixed.rast - GRF.rast, mean)))
       
       for (i in seq_along(Model)) { # NEED TO ADD BACK IN ONCE HAVE PA WORKING
         
@@ -253,6 +288,9 @@ validation_SiteA_func <- function(reps.setup.list,
           mean.extrap = mean,
           median.extrap = median,
           Site.distance = Site.distance,
+          GRF.var.multiplier = GRF.var.multiplier,
+          fixed.variance = fixed.variance,
+          GRF.variance = GRF.variance,
           rep = rep,
           job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),

@@ -1,3 +1,4 @@
+library(spdep)
 
 # 7. Extract Model Results ------------------------------------------------
 
@@ -5,7 +6,9 @@ extract_model_results_func <- function(reps.setup.list,
                                        mod.type,
                                        job_index,
                                        res,
-                                       scal) {
+                                       scal,
+                                       GRF.var.multiplier,
+                                       latent.type) {
   
   # Extract and save summary results ----------------------------------------
   
@@ -46,148 +49,164 @@ extract_model_results_func <- function(reps.setup.list,
       # Extract the distance between the sites
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
       
-    
+      # Fixed and GRF variance
+      if(latent.type == "lgcp") {
+        
+        fixed.variance <- reps.setup.list[[name]][[rep]]$latent.list$fixed.variance
+        GRF.variance <- reps.setup.list[[name]][[rep]]$latent.list$GRF.variance
+        
+      } else {
+        
+        fixed.variance <- NA
+        GRF.variance <- NA
+        
+      }
+      
+      
       for (i in seq_along(Model)) { 
         
         
-        if(latent.type == "lgcp") { # if you have a spatial model
-          
-          if(scenario.type == "Spatial.Auto") {
-            
-            scal.var <- scal[extrap.type] # Pull out spatial auto range
-            
-          } else {scal.var <- scal}
-          
-          # Calculating Moran's I  ----------------------------------------------
-          
-          #### PO residuals ####
-          if (grepl("PO", models_df[i, "Mod.type"], fixed = TRUE) | grepl("int", models_df[i, "Mod.type"], fixed = TRUE)) { 
-            
-            # PO Residuals ------------------------------------------------------------
-            
-            # MORAN'S I: Residual spatial autocorrelation --------------------------
-            
-            # Calculate the neighbourhood distance as scal (true spat auto range)
-            neighbour_dist <- res*scal.var
-            
-            # Load covariates
-            cov.rep <- rep$extrap.reps.out$covs.SiteA.rast
-            
-            update_rast_xy <- cov.rep %>% 
-              as.data.frame(xy=TRUE) %>% 
-              .[, -c(3,4)] 
-            
-            # dnearneigh is in metres, finds to index of all values within the specified distance
-            nb1 <- dnearneigh(as.matrix(update_rast_xy), 0, neighbour_dist)
-            
-            # Generate a weights object
-            weights <- nb2listw(nb1, 
-                                glist = NULL,
-                                style = "B",
-                                zero.policy = TRUE) 
-            
-            # Print list of distances
-            #dists <- nbdists(nb1, update_rast_xy)
-            
-            # Then extract just the values per cell
-            POresid <- residuals(i)$PO$POresids$residual
-            
-            # Normalize the data so it is not affected by high values
-            normalize <- function(i, na.rm = TRUE) {
-              return((i- min(i)) /(max(i)-min(i)))
-            }
-            
-            norm_POresid <- normalize(POresid)
-            
-            # Moran's I value for normalized data
-            PO_MoransI <- moran(norm_POresid, 
-                                weights, 
-                                zero.policy = T, 
-                                length(nb1), 
-                                Szero(weights)) %>% 
-              .[[1]]
-            
-            # Hypothesis test  ----------------------------------------------------
-            
-            # Run a hypothesis test via permutation
-            moran_bootstrap <- moran.mc(norm_POresid,
-                                        weights,
-                                        nsim = 10000,
-                                        zero.policy = TRUE)
-            
-            # Print the output of the hypothesis test
-            PO_MoransI_pvalue <- summary(moran_bootstrap)
-            
-            
-          }
-          
-          #### PA residuals ####
-          if (grepl("PA", models_df[i, "Mod.type"], fixed = TRUE) | grepl("int", models_df[i, "Mod.type"], fixed = TRUE)) { 
-            
-            # PA Residuals ------------------------------------------------------------
-            
-            # Calculate the neighbourhood distance as scal (true spat auto range)
-            neighbour_dist <- res*scal.var
-            
-            # Load covariates
-            cov.rep <- rep$extrap.reps.out$covs.SiteA.rast
-            
-            PA_fit <- rep$pa_a_df
-            
-            update_rast_xy <- PA_fit %>% 
-              select(x, y)
-            
-            # dnearneigh is in metres, finds to index of all values within the specified distance
-            nb1 <- dnearneigh(as.matrix(update_rast_xy), 0, neighbour_dist)
-            
-            # Generate a weights object
-            weights <- nb2listw(nb1, 
-                                glist = NULL,
-                                style = "B",
-                                zero.policy = TRUE) 
-            
-            # Print list of distances
-            #dists <- nbdists(nb1, update_rast_xy)
-            
-            # Then extract just the values per cell
-            PAresid <- residuals(x)$PA$residual
-            
-            # Normalize the data so it is not affected by high values
-            normalize <- function(x, na.rm = TRUE) {
-              return((x- min(x)) /(max(x)-min(x)))
-            }
-            
-            norm_PAresid <- normalize(PAresid)
-            
-            # Moran's I value for normalized data
-            PA_MoransI <- moran(norm_PAresid, 
-                                weights, 
-                                zero.policy = T, 
-                                length(nb1), 
-                                Szero(weights)) %>% 
-              .[[1]]
-            
-            # Hypothesis test  ----------------------------------------------------
-            
-            # Run a hypothesis test via permutation
-            moran_bootstrap <- moran.mc(norm_PAresid,
-                                        weights,
-                                        nsim = 10000,
-                                        zero.policy = TRUE)
-            
-            # Print the output of the hypothesis test
-            PA_MoransI_pvalue <- moran_bootstrap$p.value
-            
-          }
-          
-        } else { # If you don't have a lgcp model, don't do Moran's I
-          
-          PO_MoransI <- NA
-          PO_MoransI_pvalue <- NA
-          PA_MoransI <- NA
-          PA_MoransI_pvalue <- NA
-          
-        }
+        # if(latent.type == "lgcp") { # if you have a spatial model
+        #   
+        #   if(scenario.type == "Spatial.Auto") {
+        #     
+        #     scal.var <- scal[[extrap.type]] # Pull out spatial auto range
+        #     
+        #   } else {scal.var <- scal}
+        #   
+        #   # Calculating Moran's I  ----------------------------------------------
+        #   
+        #   #### PO residuals ####
+        #   if (grepl("PO", models_df[i, "Mod.type"], fixed = TRUE) | grepl("int", models_df[i, "Mod.type"], fixed = TRUE)) { 
+        #     
+        #     # PO Residuals ------------------------------------------------------------
+        #     
+        #     # MORAN'S I: Residual spatial autocorrelation --------------------------
+        #     
+        #     # Calculate the neighbourhood distance as scal (true spat auto range)
+        #     neighbour_dist <- res*scal.var
+        #     
+        #     # Load covariates
+        #     cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteA.rast
+        #     
+        #     update_rast_xy <- cov.rep %>% 
+        #       as.data.frame(xy=TRUE) %>% 
+        #       .[, -c(3,4)] 
+        #     
+        #     # dnearneigh is in metres, finds to index of all values within the specified distance
+        #     nb1 <- dnearneigh(as.matrix(update_rast_xy), 0, neighbour_dist)
+        #     
+        #     # Generate a weights object
+        #     weights <- nb2listw(nb1, 
+        #                         glist = NULL,
+        #                         style = "B",
+        #                         zero.policy = TRUE) 
+        #     
+        #     # Print list of distances
+        #     #dists <- nbdists(nb1, update_rast_xy)
+        #     
+        #     print(paste0("PO residuals str()", str(residuals(i))))
+        #     
+        #     # Then extract just the values per cell
+        #     POresid <- residuals(i)$PO$POresids$residual
+        #     
+        #     # Normalize the data so it is not affected by high values
+        #     normalize <- function(x, na.rm = TRUE) {
+        #       return((x- min(x)) /(max(x)-min(x)))
+        #     }
+        #     
+        #     norm_POresid <- normalize(POresid)
+        #     
+        #     # Moran's I value for normalized data
+        #     PO_MoransI <- moran(norm_POresid, 
+        #                         weights, 
+        #                         zero.policy = T, 
+        #                         length(nb1), 
+        #                         Szero(weights)) %>% 
+        #       .[[1]]
+        #     
+        #     # Hypothesis test  ----------------------------------------------------
+        #     
+        #     # Run a hypothesis test via permutation
+        #     moran_bootstrap <- moran.mc(norm_POresid,
+        #                                 weights,
+        #                                 nsim = 10000,
+        #                                 zero.policy = TRUE)
+        #     
+        #     # Print the output of the hypothesis test
+        #     PO_MoransI_pvalue <- summary(moran_bootstrap)
+        #     
+        #     
+        #   }
+        #   
+        #   #### PA residuals ####
+        #   if (grepl("PA", models_df[i, "Mod.type"], fixed = TRUE) | grepl("int", models_df[i, "Mod.type"], fixed = TRUE)) { 
+        #     
+        #     # PA Residuals ------------------------------------------------------------
+        #     
+        #     # Calculate the neighbourhood distance as scal (true spat auto range)
+        #     neighbour_dist <- res*scal.var
+        #     
+        #     # Load covariates
+        #     cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteA.rast
+        #     
+        #     PA_fit <- rep$pa_a_df
+        #     
+        #     update_rast_xy <- PA_fit %>% 
+        #       select(x, y)
+        #     
+        #     # dnearneigh is in metres, finds to index of all values within the specified distance
+        #     nb1 <- dnearneigh(as.matrix(update_rast_xy), 0, neighbour_dist)
+        #     
+        #     # Generate a weights object
+        #     weights <- nb2listw(nb1, 
+        #                         glist = NULL,
+        #                         style = "B",
+        #                         zero.policy = TRUE) 
+        #     
+        #     # Print list of distances
+        #     #dists <- nbdists(nb1, update_rast_xy)
+        #     
+        #     
+        #     # Then extract just the values per cell
+        #     PAresid <- residuals(i)$PA$residual
+        #     
+        #     # Normalize the data so it is not affected by high values
+        #     normalize <- function(x, na.rm = TRUE) {
+        #       return((x- min(x)) /(max(x)-min(x)))
+        #     }
+        #     
+        #     norm_PAresid <- normalize(PAresid)
+        #     
+        #     # Moran's I value for normalized data
+        #     PA_MoransI <- moran(norm_PAresid, 
+        #                         weights, 
+        #                         zero.policy = T, 
+        #                         length(nb1), 
+        #                         Szero(weights)) %>% 
+        #       .[[1]]
+        #     
+        #     # Hypothesis test  ----------------------------------------------------
+        #     
+        #     # Run a hypothesis test via permutation
+        #     moran_bootstrap <- moran.mc(norm_PAresid,
+        #                                 weights,
+        #                                 nsim = 10000,
+        #                                 zero.policy = TRUE)
+        #     
+        #     # Print the output of the hypothesis test
+        #     PA_MoransI_pvalue <- moran_bootstrap$p.value
+        #     
+        #   }
+        #   
+        # } else { # If you don't have a lgcp model, don't do Moran's I
+        #   
+        #   PO_MoransI <- NA
+        #   PO_MoransI_pvalue <- NA
+        #   PA_MoransI <- NA
+        #   PA_MoransI_pvalue <- NA
+        #   
+        # }
         
         
         
@@ -204,6 +223,9 @@ extract_model_results_func <- function(reps.setup.list,
           meanPAPO.extrap = meanPAPO,
           medianPAPO.extrap = medianPAPO,
           Site.distance = Site.distance,
+          GRF.var.multiplier = GRF.var.multiplier,
+          fixed.variance = fixed.variance,
+          GRF.variance = GRF.variance,
           rep = rep,
           job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
@@ -251,8 +273,8 @@ extract_model_results_func <- function(reps.setup.list,
           results_list[[length(results_list)]]$PO_intercept_25 <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "0.025quant"]
           results_list[[length(results_list)]]$PO_intercept_975 <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "0.975quant"]
           results_list[[length(results_list)]]$PO_intercept.sd <- mod.summary[[1]]$PO_BIAS["PO_Intercept", "sd"]
-          results_list[[length(results_list)]]$PO_MoransI <- PO_MoransI
-          results_list[[length(results_list)]]$PO_MoransI_pvalue <- PO_MoransI_pvalue
+          # results_list[[length(results_list)]]$PO_MoransI <- PO_MoransI
+          # results_list[[length(results_list)]]$PO_MoransI_pvalue <- PO_MoransI_pvalue
           
         }  
           
@@ -262,8 +284,8 @@ extract_model_results_func <- function(reps.setup.list,
             results_list[[length(results_list)]]$PA_intercept_25 <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "0.025quant"]
             results_list[[length(results_list)]]$PA_intercept_975 <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "0.975quant"]
             results_list[[length(results_list)]]$PA_intercept.sd <- mod.summary[[1]]$PA_ARTEFACT["PA_Intercept", "sd"]
-            results_list[[length(results_list)]]$PA_MoransI <- PA_MoransI
-            results_list[[length(results_list)]]$PA_MoransI_pvalue <- PA_MoransI_pvalue
+            # results_list[[length(results_list)]]$PA_MoransI <- PA_MoransI
+            # results_list[[length(results_list)]]$PA_MoransI_pvalue <- PA_MoransI_pvalue
             
           }
        

@@ -19,11 +19,15 @@ Run_Replicate_Func <- function(n_cores,
                                coords,
                                nreps,
                                mod.type,
+                               range_cov1,
+                               range_cov2,
+                               var_cov1,
+                               var_cov2,
                                beta0,
                                beta1,
                                beta2,
                                scal,
-                               variance,
+                               GRF.var.multiplier,
                                bias,
                                add.bias.cov,
                                detect.prob,
@@ -64,6 +68,8 @@ Run_Replicate_Func <- function(n_cores,
                                     seed = NA,
                                     range_cov1 = range_cov1,
                                     range_cov2 = range_cov2,
+                                    var_cov1 = var_cov1,
+                                    var_cov2 = var_cov2,
                                     east_min = east_min,
                                     east_max = east_max,
                                     north_min = north_min,
@@ -83,12 +89,14 @@ Run_Replicate_Func <- function(n_cores,
                                         beta1 = beta1,
                                         beta2 = beta2,
                                         scal = scal, # pass current range
-                                        variance = variance,
+                                        GRF.var.multiplier = GRF.var.multiplier,
                                         cov1 = cov.list$cov1,
                                         cov2 = cov.list$cov2,
                                         cov1.mat = cov.list$cov1.mat,
                                         cov2.mat = cov.list$cov2.mat,
                                         cov1.df = cov.list$cov1.df,
+                                        var_cov1 = var_cov1,
+                                        var_cov2 = var_cov2,
                                         response.type = response.type,
                                         plot.mu = FALSE,
                                         plot.lg.s = FALSE,
@@ -281,11 +289,13 @@ Run_Replicate_Func <- function(n_cores,
                              nreps = nreps,
                              range_cov1 = range_cov1,
                              range_cov2 = range_cov2,
+                             var_cov1 = var_cov1,
+                             var_cov2 = var_cov2,
                              beta0 = beta0,
                              beta1 = beta1,
                              beta2 = beta2,
                              scal = unlist(scal.list),
-                             variance = variance,
+                             GRF.var.multiplier = GRF.var.multiplier,
                              latent.type = latent.type,
                              response.type = response.type,
                              rast_cellsA = rast_cellsA[1],
@@ -364,7 +374,9 @@ Run_Replicate_Func <- function(n_cores,
                                                    mod.type = mod.type,
                                                    job_index = job_index,
                                                    res = res,
-                                                   scal)
+                                                   scal = scal,
+                                                   GRF.var.multiplier = GRF.var.multiplier,
+                                                   latent.type = latent.type)
   
   write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary_Job_", job_index, ".csv"))
   
@@ -390,7 +402,9 @@ Run_Replicate_Func <- function(n_cores,
   source("10.Validation_True_Intensity.R")
   
   true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list,
-                                              job_index = job_index)
+                                              job_index = job_index,
+                                              GRF.var.multiplier,
+                                              latent.type)
   
   write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
   
@@ -440,7 +454,9 @@ Run_Replicate_Func <- function(n_cores,
   true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
                                                     pred.fixed = pred.fixed,
-                                                    job_index = job_index)
+                                                    job_index = job_index,
+                                                    GRF.var.multiplier,
+                                                    latent.type)
   
   
   write_csv(true.validation.SiteA.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_SiteA_Job_", job_index, ".csv"))

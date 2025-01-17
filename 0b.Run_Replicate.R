@@ -19,11 +19,15 @@ Run_Replicate_Func <- function(n_cores,
                                coords,
                                nreps,
                                mod.type,
+                               range_cov1,
+                               range_cov2,
+                               var_cov1,
+                               var_cov2,
                                beta0,
                                beta1,
                                beta2,
                                scal,
-                               variance,
+                               GRF.var.multiplier,
                                bias,
                                add.bias.cov,
                                detect.prob,
@@ -51,12 +55,6 @@ Run_Replicate_Func <- function(n_cores,
     source("1.Simulate_Covariates.R")
     # source("1B.Simulate_Covariates_Simple_Cov.R")
     
-    # Set autocorrelation range Cov1
-    range_cov1 <<- 10 # Maximum range (raster units) of spatial autocorrelation
-    
-    # Set autocorrelation range Cov2
-    range_cov2 <<- 100 # Maximum range (raster units) of spatial autocorrelation
-    
     print("Simulating new cov")
     
     cov.list <- sim_covariates_func(plot = FALSE, 
@@ -66,6 +64,8 @@ Run_Replicate_Func <- function(n_cores,
                                     seed = NA,
                                     range_cov1 = range_cov1,
                                     range_cov2 = range_cov2,
+                                    var_cov1 = var_cov1,
+                                    var_cov2 = var_cov2,
                                     east_min = east_min,
                                     east_max = east_max,
                                     north_min = north_min,
@@ -85,12 +85,14 @@ Run_Replicate_Func <- function(n_cores,
                                         beta1 = beta1,
                                         beta2 = beta2,
                                         scal = scal,
-                                        variance = variance,
+                                        GRF.var.multiplier = GRF.var.multiplier,
                                         cov1 = cov.list$cov1,
                                         cov2 = cov.list$cov2,
                                         cov1.mat = cov.list$cov1.mat,
                                         cov2.mat = cov.list$cov2.mat,
                                         cov1.df = cov.list$cov1.df,
+                                        var_cov1 = var_cov1,
+                                        var_cov2 = var_cov2,
                                         response.type = response.type,
                                         plot.mu = FALSE,
                                         plot.lg.s = FALSE,
@@ -240,7 +242,7 @@ Run_Replicate_Func <- function(n_cores,
   prior.mean <- 0
   int.sd <- 1000 # Intercept standard deviation
   other.sd <- 10 # Covariate effect standard deviation
-  prior.range <- c(1, 0.1) # Prior chance 10% that parameter falls below range of 1km
+  prior.range <- c(1, 0.1) # Prior chance 10% that parameter falls below range of 1
   prior.space.sigma <- c(5, 0.1) # Prior chance 10% that parameter falls above SD of 5
   
   # Set mesh parameters
@@ -287,7 +289,7 @@ Run_Replicate_Func <- function(n_cores,
                              beta1 = beta1,
                              beta2 = beta2,
                              scal = scal,
-                             variance = variance,
+                             GRF.var.multiplier = GRF.var.multiplier,
                              latent.type = latent.type,
                              response.type = response.type,
                              rast_cellsA = rast_cellsA[1],
@@ -366,7 +368,9 @@ extrap.scenario.df <- extract_model_results_func(reps.setup.list = reps.setup.li
                                                  mod.type = mod.type,
                                                  job_index = job_index,
                                                  res = res,
-                                                 scal)
+                                                 scal = scal,
+                                                 GRF.var.multiplier = GRF.var.multiplier,
+                                                 latent.type = latent.type)
 
 write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Results_Summary_Job_", job_index, ".csv"))
   
@@ -392,7 +396,9 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   source("10.Validation_True_Intensity.R")
 
   true.validation.df <- validation_SiteB_func(reps.setup.list = reps.setup.list,
-                                              job_index = job_index)
+                                              job_index = job_index,
+                                              GRF.var.multiplier,
+                                              latent.type)
 
   write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
 
@@ -442,7 +448,9 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
                                                     pred.fixed = pred.fixed,
-                                                    job_index = job_index)
+                                                    job_index = job_index,
+                                                    GRF.var.multiplier,
+                                                    latent.type)
   
   
   write_csv(true.validation.SiteA.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_SiteA_Job_", job_index, ".csv"))

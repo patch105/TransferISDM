@@ -2,7 +2,8 @@
 
 # 5. PA Sampling ----------------------------------------------------------
 
-pa_sampling_func <- function(reps.setup.list) {
+pa_sampling_func <- function(reps.setup.list,
+                             n_cores) {
                              
   
   PA.data <- imap(reps.setup.list, function(extrap.type, extrap.name) {
@@ -176,12 +177,97 @@ pa_sampling_func <- function(reps.setup.list) {
       pa_a_df <- pa_a_df %>% 
         mutate(area = 1)
       
+      # Finally calculate the 'realised' environmental extrapolation  --------
+      
+      cov1 <- rep$extrap.reps.out$covs.SiteA.rast["cov1"]
+      cov2 <- rep$extrap.reps.out$covs.SiteA.rast["cov2"]
+      
+      # Extract covariates for PA grid A
+      
+      pa_xy <- pa_a_df[,c("x", "y")]
+      
+      cov.1PA <- terra::extract(cov1, pa_xy, xy = T) 
+      cov.2PA <- terra::extract(cov2, pa_xy, xy = T) 
+      
+      covsPA <- left_join(cov.1PA, cov.2PA, by = join_by(ID, x, y)) %>% 
+        mutate(Presence = 1) %>% 
+        .[,c("cov1", "cov2", "Presence")]
+      
+      # Extract covariates for PO grid A
+      
+      PO_GridA <- rep$PO_GridA
+      PO_GridA <- as.data.frame(PO_GridA)
+      
+      cov.1PO <- terra::extract(cov1, PO_GridA, xy = T)
+      cov.2PO <- terra::extract(cov2, PO_GridA, xy = T) 
+      
+      covsPO <- left_join(cov.1PO, cov.2PO, by = join_by(ID, x, y)) %>% 
+        mutate(Presence = 1) %>% 
+        .[,c("cov1", "cov2", "Presence")]
+      
+      # Extract covariates for PA + PO grid A
+    
+      PA_PO <- rbind(pa_xy, PO_GridA) 
+      
+      cov.1PAPO <- terra::extract(cov1, PA_PO, xy = T) 
+      cov.2PAPO <- terra::extract(cov2, PA_PO, xy = T) 
+      
+      covsPAPO <- left_join(cov.1PAPO, cov.2PAPO, by = join_by(ID, x, y)) %>% 
+        mutate(Presence = 1) %>% 
+        .[,c("cov1", "cov2", "Presence")]
+      
+      # Covariates for site B
+      
+      covs.SiteB <- rep$extrap.reps.out$covs.SiteB
+      
+      projection <- covs.SiteB %>% 
+        .[,c("cov1", "cov2")]
+      
+      
+      # Shape approach ----------------------------------------------------------
+      
+      extrap_PA <- flexsdm::extra_eval(training_data = covsPA,
+                                       pr_ab = "Presence",
+                                       projection_data = projection,
+                                       metric = "mahalanobis",
+                                       univar_comb = F,
+                                       n_cores = n_cores)
+      
+      extrap_PA <- cbind(extrap_PA, covs.SiteB[, c("x", "y")])
+      
+      extrap_PO <- flexsdm::extra_eval(training_data = covsPO,
+                                       pr_ab = "Presence",
+                                       projection_data = projection,
+                                       metric = "mahalanobis",
+                                       univar_comb = F,
+                                       n_cores = n_cores)
+      
+      extrap_PO <- cbind(extrap_PO, covs.SiteB[, c("x", "y")])
+      
+      extrap_PAPO <- flexsdm::extra_eval(training_data = covsPAPO,
+                                       pr_ab = "Presence",
+                                       projection_data = projection,
+                                       metric = "mahalanobis",
+                                       univar_comb = F,
+                                       n_cores = n_cores)
+      
+      extrap_PAPO <- cbind(extrap_PAPO, covs.SiteB[, c("x", "y")])
+      
+      summary.realised.extrap <- data.frame(meanPA = mean(extrap_PA$extrapolation),
+                                   meanPO = mean(extrap_PO$extrapolation),
+                                   meanPAPO = mean(extrap_PAPO$extrapolation),
+                                   medianPA = median(extrap_PA$extrapolation),
+                                   medianPO = median(extrap_PO$extrapolation),
+                                   medianPAPO = median(extrap_PAPO$extrapolation))
+      
+      
       return(list(pa_a_df = pa_a_df, 
                   PA_grid_size = rast_cellsA, 
                   PA_a_res = PA_a_res,
                   n_presence_gridA = sum(pa_a_df$presence == 1),
                   n_absence_gridA = sum(pa_a_df$presence == 0),
-                  PA.rand.gridA = PA.rand.gridA)) # Need these last two for plotting
+                  PA.rand.gridA = PA.rand.gridA, # Need these last two for plotting
+                  summary.realised.extrap = summary.realised.extrap)) 
       
     })
     

@@ -328,7 +328,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
             
             plot.name.FIXED <- paste0("pred.FIXED.plot.", type)
             
-            p <- median.FIXED.pred %>% 
+            p <- preds.FIXED.siteA$field$Median %>% 
               as.data.frame(xy = T) %>%  
               ggplot() + 
               geom_tile(aes(x = x, y = y, fill = Median)) + 
@@ -465,7 +465,7 @@ plot_predictions_SiteA_func <- function(reps.setup.list,
           
           p6a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.int.GRF +
             ggtitle('Median predicted GRF - Integrated GRF')
-          p7a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PO.GRF +
+          p7a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PO.GRF + 
             ggtitle('Median predicted GRF - PO GRF')
           p8a <- reps.setup.list[[name]][[rep]]$pred.GRF.plot.m.PA.GRF +
             ggtitle('Median predicted GRF - PA GRF')
