@@ -240,9 +240,9 @@ Run_Replicate_Func <- function(n_cores,
   
   # Set model control parameters
   prior.mean <- 0
-  int.sd <- 1000 # Intercept standard deviation
+  int.sd <- 100 # Intercept standard deviation
   other.sd <- 10 # Covariate effect standard deviation
-  prior.range <- c(1, 0.1) # Prior chance 10% that parameter falls below range of 1
+  prior.range <- c(10, 0.1) # Prior chance 10% that parameter falls below range of 1
   prior.space.sigma <- c(5, 0.1) # Prior chance 10% that parameter falls above SD of 5
   
   # Set mesh parameters

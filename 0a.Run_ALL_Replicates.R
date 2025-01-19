@@ -80,9 +80,10 @@ if(scenario.type == "Spatial.Auto") {
 GRF.var.multiplier <- 1
 
 
-# PO sampling values
-detect.prob <- 0.2
+#Maximum probability for bias field (0.2 or 0.05)
 maxprob <- 0.2
+# PO sampling values (0.08 or 0.02)
+detect.prob <- 0.08
 
 
 # Implementation choices --------------------------------------------------
