@@ -59,7 +59,7 @@ po_sampling_func <- function(reps.setup.list,
           
           # Make the true bias cov
           
-          bias <- rast(nrows = rast_cellsA[1],
+          bias.true <- rast(nrows = rast_cellsA[1],
                        ncols = rast_cellsA[2],
                        xmin = xmin(rand.gridA),
                        xmax = xmax(rand.gridA),
@@ -69,9 +69,9 @@ po_sampling_func <- function(reps.setup.list,
                        vals = bias_vals,
                        names = c("bias")
           )
-          plot(bias)
-          crs(bias) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
-          names(bias) <- "bias"
+          
+          crs(bias.true) <- "epsg:3857" # Setting to WGS 84 / Pseudo-Mercator projection for later functions requiring cell size
+          names(bias.true) <- "bias"
           
           # Add random noise to make correlated bias variable (~0.99 correlation)
           noise <- rnorm(length(bias_vals), mean = 0, sd = 0.035 * max(bias_vals)) # Adjust 'sd' for desired correlation
@@ -97,7 +97,7 @@ po_sampling_func <- function(reps.setup.list,
           print(paste("Correlation between original and noisy bias:", round(correlation, 4)))
           
           # Add spatial bias info to PP data
-          po.rand.gridA <- cbind(spp_process.rand.gridA, bias = terra::extract(bias, spp_process.rand.gridA[,1:2]))
+          po.rand.gridA <- cbind(spp_process.rand.gridA, bias = terra::extract(bias.true, spp_process.rand.gridA[,1:2]))
           
           # Thin the process by the bias field
           po.rand.gridA <- cbind(po.rand.gridA, presence = rbinom(nrow(po.rand.gridA), 1, po.rand.gridA[, "bias"]))
