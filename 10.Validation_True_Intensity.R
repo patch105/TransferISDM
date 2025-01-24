@@ -78,7 +78,7 @@ validation_SiteB_func <- function(reps.setup.list,
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB),
+        cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB),
                    method = "spearman")
         
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteB)))
@@ -97,6 +97,13 @@ validation_SiteB_func <- function(reps.setup.list,
         Sum.Int.Score <- sum(interval_score)
         
         Mean.Int.Score <- mean(interval_score)
+        
+        Mean.CI.width <- global(upper.int.pred - lower.int.pred, "mean")[1,1]
+        
+        coverage.true <- ifelse(as.vector(true_log_int.rast.SiteB) >= as.vector(lower.int.pred) 
+                                & as.vector(true_log_int.rast.SiteB) <= as.vector(upper.int.pred), 1, 0)
+        
+        coverage.rate <- sum(coverage.true) / ncell(true_log_int.rast.SiteB)
         
         # Save results to list
         
@@ -121,7 +128,10 @@ validation_SiteB_func <- function(reps.setup.list,
           MAE = MAE,
           RMSE = RMSE,
           Sum.Int.Score = Sum.Int.Score,
-          Mean.Int.Score = Mean.Int.Score
+          Mean.Int.Score = Mean.Int.Score,
+          Mean.CI.width = Mean.CI.width,
+          coverage.rate = coverage.rate
+          
         )
         
       }}
@@ -254,9 +264,18 @@ validation_SiteA_func <- function(reps.setup.list,
         
         Mean.Int.Score <- mean(interval_score)
         
+        Mean.CI.width <- global(upper.int.pred - lower.int.pred, "mean")[1,1]
+        
+        coverage.true <- ifelse(as.vector(true_log_int.rast.SiteA) >= as.vector(lower.int.pred) 
+                                & as.vector(true_log_int.rast.SiteA) <= as.vector(upper.int.pred), 1, 0)
+        
+        coverage.rate <- sum(coverage.true) / ncell(true_log_int.rast.SiteA)
+        
         if(pred.GRF == TRUE & grepl("GRF", type, fixed = T)) {
           
           median.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Median
+          lower.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Lower
+          upper.GRF.pred <- mod[[1]]$preds.GRF.siteA$field$Upper
           
           cor.GRF <- cor(as.vector(median.GRF.pred), as.vector(GRF.rast.SiteA), 
                          method = "spearman")
@@ -264,20 +283,68 @@ validation_SiteA_func <- function(reps.setup.list,
           cor.GRFA.GRFB <- cor(as.vector(GRF.rast.SiteB), as.vector(GRF.rast.SiteA), 
                                method = "spearman")
           
+          RMSE.GRF <- Metrics::rmse(actual = as.vector(GRF.rast.SiteA), 
+                                    predicted = as.vector(median.GRF.pred))
+          
+          interval_score.GRF <- scoringutils:::interval_score(observed = as.vector(GRF.rast.SiteA),
+                                                             lower = as.vector(lower.GRF.pred), 
+                                                             upper = as.vector(upper.GRF.pred),
+                                                             interval_range = 95,
+                                                             weigh = TRUE)
+          
+          Mean.Int.Score.GRF <- mean(interval_score.GRF)
+          
+          coverage.true.GRF <- ifelse(as.vector(GRF.rast.SiteA) >= as.vector(lower.GRF.pred) 
+                                      & as.vector(GRF.rast.SiteA) <= as.vector(upper.GRF.pred), 1, 0)
+          
+          coverage.rate.GRF <- sum(coverage.true.GRF) / ncell(GRF.rast.SiteA)
+          
         } else { 
-          cor.GRF = NA 
+          
+        cor.GRF = NA 
         cor.GRFA.GRFB = NA
+        RMSE.GRF = NA
+        Mean.Int.Score.GRF = NA
+        coverage.rate.GRF = NA
+        
         }
         
         
         if(pred.fixed == TRUE & grepl("GRF", type, fixed = T)) {
           
           median.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Median
+          lower.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Lower
+          upper.FIXED.pred <- mod[[1]]$preds.FIXED.siteA$field$Upper
           
           cor.FIXED <- cor(as.vector(median.FIXED.pred), as.vector(fixed.rast.SiteA),
                            method = "spearman")
           
-        } else { cor.FIXED = NA }
+          RMSE.FIXED <- Metrics::rmse(actual = as.vector(fixed.rast.SiteA), 
+                                      predicted = as.vector(median.FIXED.pred))
+          
+          interval_score.FIXED <- scoringutils:::interval_score(observed = as.vector(fixed.rast.SiteA),
+                                                              lower = as.vector(lower.FIXED.pred), 
+                                                              upper = as.vector(upper.FIXED.pred),
+                                                              interval_range = 95,
+                                                              weigh = TRUE)
+          
+          Mean.Int.Score.FIXED <- mean(interval_score.FIXED)
+          
+          coverage.true.FIXED <- ifelse(as.vector(fixed.rast.SiteA) >= as.vector(lower.FIXED.pred) 
+                                      & as.vector(fixed.rast.SiteA) <= as.vector(upper.FIXED.pred), 1, 0)
+          
+          coverage.rate.FIXED <- sum(coverage.true.FIXED) / ncell(fixed.rast.SiteA)
+          
+          
+          
+        } else { 
+          
+          cor.FIXED = NA 
+          RMSE.FIXED = NA
+          Mean.Int.Score.FIXED = NA
+          coverage.rate.FIXED = NA
+          
+          }
         
         # Save results to list
         
@@ -294,12 +361,20 @@ validation_SiteA_func <- function(reps.setup.list,
           mod.type = as.character(models_df[i, "Mod.type"]),
           correlation = cor,
           cor.GRF = cor.GRF,
+          RMSE.GRF = RMSE.GRF,
+          Mean.Int.Score.GRF = Mean.Int.Score.GRF,
+          coverage.rate.GRF = coverage.rate.GRF,
           cor.FIXED = cor.FIXED,
+          RMSE.FIXED = RMSE.FIXED,
+          Mean.Int.Score.FIXED = Mean.Int.Score.FIXED,
+          coverage.rate.FIXED = coverage.rate.FIXED,
           cor.GRFA.GRFB = cor.GRFA.GRFB,
           MAE = MAE,
           RMSE = RMSE,
           Sum.Int.Score = Sum.Int.Score,
-          Mean.Int.Score = Mean.Int.Score
+          Mean.Int.Score = Mean.Int.Score,
+          Mean.CI.width = Mean.CI.width,
+          coverage.rate = coverage.rate
         )
         
       }

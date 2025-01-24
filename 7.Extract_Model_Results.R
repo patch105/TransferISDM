@@ -258,7 +258,7 @@ extract_model_results_func <- function(reps.setup.list,
           GRF.sd.sd = NA,
           bias.coef.mean = NA,
           bias.coef_25 = NA,
-          bias.coef_95 = NA,
+          bias.coef_975 = NA,
           bias.coef.sd = NA,
           PO_MoransI = NA,
           PO_MoransI_pvalue = NA,
@@ -308,7 +308,7 @@ extract_model_results_func <- function(reps.setup.list,
             
             results_list[[length(results_list)]]$bias.coef.mean <- mod.summary[[1]]$PO_BIAS["PO_bias", "mean"]
             results_list[[length(results_list)]]$bias.coef_25 <- mod.summary[[1]]$PO_BIAS["PO_bias", "0.025quant"]
-            results_list[[length(results_list)]]$bias.coef_95 <- mod.summary[[1]]$PO_BIAS["PO_bias", "0.975quant"]
+            results_list[[length(results_list)]]$bias.coef_975 <- mod.summary[[1]]$PO_BIAS["PO_bias", "0.975quant"]
             results_list[[length(results_list)]]$bias.coef.sd <- mod.summary[[1]]$PO_BIAS["PO_bias", "sd"]
 
           }

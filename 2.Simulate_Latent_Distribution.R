@@ -89,7 +89,7 @@ sim_latent_dist_func <- function(beta0,
                         method = "spearman")
     
     # Save a version that just keeps fixed effects for plotting (removes the intercept)
-    fixed <- beta1*cov1.mat[, "cov"] 
+    fixed <- beta1*cov1.mat[, "cov"] + beta2*cov2.mat[, "cov"]
     mu.fixed <- cov1.df %>% mutate(cov = fixed)
     mu.fixed <- spatstat.geom::as.im(mu.fixed)
     

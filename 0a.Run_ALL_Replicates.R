@@ -45,7 +45,7 @@ bias <- FALSE
 
 # Model types to run
 # Options are "no-GRF" "spatial" "no-GRF.bias" "spatial.bias"
-mod.type = c("no-GRF", "spatial")
+mod.type = c("spatial")
 
 
 # If doing a spatial model, choose whether to predict the GRF and the Fixed effect
@@ -91,7 +91,7 @@ detect.prob <- 0.08
 n_cores <- 3
 
 # Number of posterior samples to take * note that it slows things down
-posterior_nsamps <- 5000
+posterior_nsamps <- 100
 
 
 
