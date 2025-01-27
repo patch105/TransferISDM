@@ -78,13 +78,25 @@ validation_SiteB_func <- function(reps.setup.list,
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB),
-                   method = "spearman")
+        correlation <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteB),
+                           method = "spearman")
         
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteB)))
         
-        RMSE <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteB), 
+        RMSE.global <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteB), 
                               predicted = as.vector(median.int.pred))
+        
+        
+        pred_matrix <- as.matrix(median.int.pred)
+        true_matrix <- as.matrix(true_log_int.rast.SiteB)
+        cell_RMSE <- numeric(nrow(pred_matrix))
+        
+        for (z in seq_len(nrow(pred_matrix))) {
+          cell_RMSE[i] <- Metrics::rmse(actual = true_matrix[z, ], 
+                                        predicted = pred_matrix[z, ])
+        }
+        
+        RMSE.local <- mean(cell_RMSE, na.rm = TRUE)
         
         ### Calculating the Interval Score ###
         
@@ -124,9 +136,10 @@ validation_SiteB_func <- function(reps.setup.list,
           rep = rep,
           job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
-          correlation = cor,
+          correlation = correlation,
           MAE = MAE,
-          RMSE = RMSE,
+          RMSE.global = RMSE.global,
+          RMSE.local = RMSE.local,
           Sum.Int.Score = Sum.Int.Score,
           Mean.Int.Score = Mean.Int.Score,
           Mean.CI.width = Mean.CI.width,
@@ -244,13 +257,24 @@ validation_SiteA_func <- function(reps.setup.list,
         
         # Metrics from Simmonds et al. 
         # Compare the predicted intensity to the true intensity 
-        cor <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteA),
-                   method = "spearman")
+        correlation <- cor(as.vector(median.int.pred), as.vector(true_log_int.rast.SiteA),
+                           method = "spearman")
         
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteA)))
         
-        RMSE <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteA), 
+        RMSE.global <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteA), 
                               predicted = as.vector(median.int.pred))
+        
+        pred_matrix <- as.matrix(median.int.pred)
+        true_matrix <- as.matrix(true_log_int.rast.SiteA)
+        cell_RMSE <- numeric(nrow(pred_matrix))
+        
+        for (z in seq_len(nrow(pred_matrix))) {
+          cell_RMSE[i] <- Metrics::rmse(actual = true_matrix[z, ], 
+                                        predicted = pred_matrix[z, ])
+        }
+        
+        RMSE.local <- mean(cell_RMSE, na.rm = TRUE)
         
         ### Calculating the Interval Score ###
         
@@ -283,8 +307,19 @@ validation_SiteA_func <- function(reps.setup.list,
           cor.GRFA.GRFB <- cor(as.vector(GRF.rast.SiteB), as.vector(GRF.rast.SiteA), 
                                method = "spearman")
           
-          RMSE.GRF <- Metrics::rmse(actual = as.vector(GRF.rast.SiteA), 
+          RMSE.global.GRF <- Metrics::rmse(actual = as.vector(GRF.rast.SiteA), 
                                     predicted = as.vector(median.GRF.pred))
+          
+          pred_matrix <- as.matrix(median.GRF.pred)
+          true_matrix <- as.matrix(GRF.rast.SiteA)
+          cell_RMSE <- numeric(nrow(pred_matrix))
+          
+          for (z in seq_len(nrow(pred_matrix))) {
+            cell_RMSE[i] <- Metrics::rmse(actual = true_matrix[z, ], 
+                                          predicted = pred_matrix[z, ])
+          }
+          
+          RMSE.local.GRF <- mean(cell_RMSE, na.rm = TRUE)
           
           interval_score.GRF <- scoringutils:::interval_score(observed = as.vector(GRF.rast.SiteA),
                                                              lower = as.vector(lower.GRF.pred), 
@@ -303,7 +338,8 @@ validation_SiteA_func <- function(reps.setup.list,
           
         cor.GRF = NA 
         cor.GRFA.GRFB = NA
-        RMSE.GRF = NA
+        RMSE.global.GRF = NA
+        RMSE.local.GRF = NA
         Mean.Int.Score.GRF = NA
         coverage.rate.GRF = NA
         
@@ -319,8 +355,19 @@ validation_SiteA_func <- function(reps.setup.list,
           cor.FIXED <- cor(as.vector(median.FIXED.pred), as.vector(fixed.rast.SiteA),
                            method = "spearman")
           
-          RMSE.FIXED <- Metrics::rmse(actual = as.vector(fixed.rast.SiteA), 
+          RMSE.global.FIXED <- Metrics::rmse(actual = as.vector(fixed.rast.SiteA), 
                                       predicted = as.vector(median.FIXED.pred))
+          
+          pred_matrix <- as.matrix(median.FIXED.pred)
+          true_matrix <- as.matrix(fixed.rast.SiteA)
+          cell_RMSE <- numeric(nrow(pred_matrix))
+          
+          for (z in seq_len(nrow(pred_matrix))) {
+            cell_RMSE[i] <- Metrics::rmse(actual = true_matrix[z, ], 
+                                          predicted = pred_matrix[z, ])
+          }
+          
+          RMSE.local.FIXED <- mean(cell_RMSE, na.rm = TRUE)
           
           interval_score.FIXED <- scoringutils:::interval_score(observed = as.vector(fixed.rast.SiteA),
                                                               lower = as.vector(lower.FIXED.pred), 
@@ -340,7 +387,8 @@ validation_SiteA_func <- function(reps.setup.list,
         } else { 
           
           cor.FIXED = NA 
-          RMSE.FIXED = NA
+          RMSE.global.FIXED = NA
+          RMSE.local.FIXED = NA
           Mean.Int.Score.FIXED = NA
           coverage.rate.FIXED = NA
           
@@ -359,18 +407,21 @@ validation_SiteA_func <- function(reps.setup.list,
           rep = rep,
           job_index = job_index,
           mod.type = as.character(models_df[i, "Mod.type"]),
-          correlation = cor,
+          correlation = correlation,
           cor.GRF = cor.GRF,
-          RMSE.GRF = RMSE.GRF,
+          RMSE.global.GRF = RMSE.global.GRF,
+          RMSE.local.GRF = RMSE.local.GRF,
           Mean.Int.Score.GRF = Mean.Int.Score.GRF,
           coverage.rate.GRF = coverage.rate.GRF,
           cor.FIXED = cor.FIXED,
-          RMSE.FIXED = RMSE.FIXED,
+          RMSE.global.FIXED = RMSE.global.FIXED,
+          RMSE.local.FIXED = RMSE.local.FIXED,
           Mean.Int.Score.FIXED = Mean.Int.Score.FIXED,
           coverage.rate.FIXED = coverage.rate.FIXED,
           cor.GRFA.GRFB = cor.GRFA.GRFB,
           MAE = MAE,
-          RMSE = RMSE,
+          RMSE.global = RMSE.global,
+          RMSE.local = RMSE.local,
           Sum.Int.Score = Sum.Int.Score,
           Mean.Int.Score = Mean.Int.Score,
           Mean.CI.width = Mean.CI.width,
