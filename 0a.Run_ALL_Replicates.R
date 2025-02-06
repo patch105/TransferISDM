@@ -62,13 +62,13 @@ range_cov2 <- 100
 var_cov1 <- 0.5
 var_cov2 <- 10
 
-beta0 <- -2 # Intercept
+beta0 <- -1 # Intercept
 beta1 <- 0.01 # Coefficient for cov 1
 beta2 <- 0.2 # Coefficient for cov 2
 
 if(scenario.type == "Spatial.Auto") {
   
-  scal <- list(20, 100, 200) # List of range parameters for spatial autocorr scenario
+  scal <- list(20, 300, 700) # List of range parameters for spatial autocorr scenario
   
 } else {
   

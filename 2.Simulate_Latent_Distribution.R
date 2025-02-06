@@ -60,7 +60,7 @@ sim_latent_dist_func <- function(beta0,
     target.var <- GRF.var.multiplier * fe.var
     
     # Simulate the random effect with target variance
-    REff <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = target.var , rho = scal, nu = nu)
+    REff <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = target.var , rho = scal, nu = nu, min_exponent2 = 12)
     
     REff <- as.numeric(REff)
     
