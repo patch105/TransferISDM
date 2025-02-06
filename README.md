@@ -94,4 +94,15 @@ Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling
 
 ## Scenario 2.
 
+## Session details
+R version 4.4.1
+terra 1.7.78
+spatstat 3.0-7
+ggplot2 3.5.1
+sf 1.0-19
+viridis 0.6.5
+readr 2.1.5
+purrr 1.0.2
+
+
 Contact Charlotte Patterson at crpattrsn@gmail.com for queries.
