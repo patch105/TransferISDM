@@ -17,9 +17,11 @@ See Methods of Patterson et al. for further details.
 
 ## Simulation Code Overview
 
-At its simplest, you can run a scenario all the way through from the simulation code via running sequentially this script:
+At its simplest, you can run a scenario all the way through from the simulation code via running sequentially these two scripts:
 
-Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) function. Here, you name your scenario and set the scenario specifications and parameters. 
+Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. 
+
+Plot the outputs from the scenario with the [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) script. *NOTE - your scenario name must match the scenario name in the 0a.Run_ALL_Replicates.R file.
 
 Embedded in this script are calls to several other scripts which are outlined below.
 
