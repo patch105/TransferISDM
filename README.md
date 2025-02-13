@@ -17,13 +17,11 @@ See Methods of Patterson et al. for further details.
 
 ## Simulation Code Overview
 
-At its simplest, you can run a scenario from the simulation code via running sequentially these two scripts:
+At its simplest, you can run a scenario all the way through from the simulation code via running sequentially this script:
 
-Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) function. Here you name your scenario and set the scenario specifications and parameters. 
+Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) function. Here, you name your scenario and set the scenario specifications and parameters. 
 
-Plot the outputs from the scenario with the [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) function. Your input scenario name in this script must match your scenario name in the previous script.
-
-Embedded in these two scripts are calls to several other functions and scripts which are outlined below.
+Embedded in this script are calls to several other scripts which are outlined below.
 
 ## Run a scenario
 
@@ -31,7 +29,7 @@ Embedded in these two scripts are calls to several other functions and scripts w
 
 [0b.Run_Replicate.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate.R): This script sequentially calls and saves all the separate functions of the simulation (steps 1-12 below). In here is where you can adjust the priors and the mesh parameters.
 
-[0b.Run_Replicate_SA.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate_SA.R) (The Spatial Autocorrelation version of the above, called when you set scenario.type = "Spatial.Auto")
+[0b.Run_Replicate_SA.R](https://github.com/patch105/AntarcticISDM/blob/main/0b.Run_Replicate_SA.R) (The Spatial Autocorrelation version of the above, called when you set scenario.type = "Spatial.Auto" in the 0a.Run_ALL_Replicates.R script)
 
 [1.Simulate_Covariates.R](https://github.com/patch105/AntarcticISDM/blob/main/1.Simulate_Covariates.R): Simulate two spatially-varying covariates as Gaussian random fields.
 
