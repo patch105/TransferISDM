@@ -13,7 +13,7 @@ We simulate a virtual landscape with two covariates (Fig. 1a) that drive the dis
 
 See Methods of Patterson et al. for further details.
 
-![screenshot](imageFolder/screenshot.png)
+![Figure 1. A workflow plot.](https://github.com/patch105/AntarcticISDM/blob/main/Figures/WORKFLOW_PLOT.png)
 
 ## Simulation Code Overview
 
