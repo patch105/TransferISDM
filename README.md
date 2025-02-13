@@ -33,15 +33,15 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [1.Simulate_Covariates.R](https://github.com/patch105/AntarcticISDM/blob/main/1.Simulate_Covariates.R): Simulate two spatially-varying covariates as Gaussian random fields.
 
-[2.Simulate_Latent_Distribution.R](https://github.com/patch105/AntarcticISDM/blob/main/2.Simulate_Latent_Distribution.R): Simulate the latent species distribution, either with or without spatial autocorrelation (determined by parameter 'latent.type').
+[2.Simulate_Latent_Distribution.R](https://github.com/patch105/AntarcticISDM/blob/main/2.Simulate_Latent_Distribution.R): Simulate the latent species distribution, either with or without spatial autocorrelation (determined by parameter 'latent.type' in the 0a.Run_ALL_Replicates.R script).
 
 [3.Simulate_Enviro_Extrapolation.R](https://github.com/patch105/AntarcticISDM/blob/main/3.Simulate_Enviro_Extrapolation.R): Randomly select two sites, one your training site and one your projection site. Calculate the environmental distance between the sites with the Shape metric.
 
-[4.PO_Sampling.R](https://github.com/patch105/AntarcticISDM/blob/main/4.PO_Sampling.R): Sample PO data at the training site. Data are either biased or not, depending on the parameter 'bias'.
+[4.PO_Sampling.R](https://github.com/patch105/AntarcticISDM/blob/main/4.PO_Sampling.R): Sample PO data at the training site. Data are either biased or not, depending on the parameter 'bias'from the 0a.Run_ALL_Replicates.R script.
 
 [5.PA_Sampling.R](https://github.com/patch105/AntarcticISDM/blob/main/5.PA_Sampling.R): Sample the PA data at the training site via quadrat surveys.
 
-[6.Run_Model.R](https://github.com/patch105/AntarcticISDM/blob/main/6.Run_Model.R): Set up and run the integrated, presence-only and presence-absence models. Model types are designated via the object 'mod.type'.
+[6.Run_Model.R](https://github.com/patch105/AntarcticISDM/blob/main/6.Run_Model.R): Set up and run the integrated, presence-only and presence-absence models. Model types are designated via the object 'mod.type' in the 0a.Run_ALL_Replicates.R script.
 
 [7.Extract_Model_Results.R](https://github.com/patch105/AntarcticISDM/blob/main/7.Extract_Model_Results.R): Pull out model parameter estimates. 
 
