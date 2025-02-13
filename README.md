@@ -13,6 +13,8 @@ We simulate a virtual landscape with two covariates (Fig. 1a) that drive the dis
 
 See Methods of Patterson et al. for further details.
 
+![screenshot](imageFolder/screenshot.png)
+
 ## Simulation Code Overview
 
 At its simplest, you can run a scenario from the simulation code via running sequentially these two scripts:
