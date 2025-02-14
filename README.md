@@ -53,7 +53,7 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site.
 
-## Plot the outputs of a scenario
+## Plot the outputs of a scenario (just for a quick look at outputs)
 
 [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) calls the following scripts:
 
