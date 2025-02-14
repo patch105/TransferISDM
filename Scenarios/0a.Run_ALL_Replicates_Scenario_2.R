@@ -13,6 +13,7 @@ lib_loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC s
 # For non-hpc version
 job_index <- 1
 
+
 library(spatstat)
 library(ggplot2)
 library(dplyr)
@@ -188,7 +189,5 @@ Run_Replicate_Func(n_cores = n_cores,
                    pred.fixed = pred.fixed,
                    posterior_nsamps = posterior_nsamps,
                    job_index = job_index)
-
-
 
 

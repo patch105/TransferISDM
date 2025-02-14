@@ -11,17 +11,18 @@
 lib_loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC script
 
 # For non-hpc version
-job_index <- 1
+# job_index <- 1
 
 library(spatstat)
 library(ggplot2)
 library(dplyr)
 library(ggpubr, lib.loc = lib_loc)
-
 library(viridis)
 library(terra)
 library(purrr)
 library(readr)
+
+
 
 # Scenario choices --------------------------------------------------------
 
@@ -52,7 +53,14 @@ pred.fixed <- FALSE
 
 # Parameters --------------------------------------------------------------
 
-beta0 <- -2 # Intercept
+# Autocorrelation range & variance for covs 
+#(Maximum range (raster units) of spatial autocorrelation)
+range_cov1 <- 10 
+range_cov2 <- 100 
+var_cov1 <- 0.5
+var_cov2 <- 10
+
+beta0 <- -1 # Intercept
 beta1 <- 0.01 # Coefficient for cov 1
 beta2 <- 0.2 # Coefficient for cov 2
 
@@ -66,11 +74,13 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
-variance <- 2 # Variance of the Gaussian field at distance zero (changed  from 0.5)
+# Relative variance of GRF to fixed effect (can be 0.2, 1, or 5)
+GRF.var.multiplier <- 1
 
-# PO sampling values
-detect.prob <- 0.2
+#Maximum probability for bias field (0.2 or 0.05)
 maxprob <- 0.2
+# PO sampling values (0.08 or 0.02)
+detect.prob <- 0.08
 
 
 # Implementation choices --------------------------------------------------
@@ -151,6 +161,14 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
+# Calculate the variance of the GRF so can save for plotting: --------------
+# Calculate 'variance' of fixed effect
+fe.var <- beta1^2*var_cov1 + beta2^2*var_cov2 
+
+# Multiply variance by multiplier to get target variance for GRF
+variance <- GRF.var.multiplier * fe.var
+
+
 # Save the input parameters for this job ----------------------------------
 save(scenario.type, pred.GRF, pred.fixed, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -175,11 +193,15 @@ Run_Replicate_Func(n_cores = n_cores,
                    coords = coords,
                    nreps = nreps,
                    mod.type = mod.type,
+                   range_cov1 = range_cov1,
+                   range_cov2 = range_cov2,
+                   var_cov1 = var_cov1,
+                   var_cov2 = var_cov2,
                    beta0 = beta0,
                    beta1 = beta1,
                    beta2 = beta2,
                    scal = scal,
-                   variance = variance,
+                   GRF.var.multiplier = GRF.var.multiplier,
                    bias = bias,
                    detect.prob = detect.prob,
                    maxprob = maxprob,
@@ -188,6 +210,7 @@ Run_Replicate_Func(n_cores = n_cores,
                    pred.fixed = pred.fixed,
                    posterior_nsamps = posterior_nsamps,
                    job_index = job_index)
+
 
 
 
