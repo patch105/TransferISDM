@@ -53,7 +53,7 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site.
 
-## Plot the outputs of a scenario
+## Plot the outputs of a scenario (just for a quick look at outputs)
 
 [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) calls the following scripts:
 
@@ -73,11 +73,12 @@ Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling
 --- | --- | --- | --- |--- |---
 (1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | High | [Scenario_1](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios/0a.Run_ALL_Replicates_Scenario_1.R) 
 (2) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low | [Scenario_2](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios/0a.Run_ALL_Replicates_Scenario_2.R) 
-(3) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200; RE variance* = 0.2,1,5 | Yes | High | [Scenario 3]()  
-(4) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200; RE variance = 0.2,1,5 | Yes | Low | [Scenario 4] (link)  
-(5) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20; RE variance = 1 | Yes | High | (link) 
-(6) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20; RE variance = 1 | Yes | Low | (link) 
-* The relative proportion of variance in the latent species distribution assigned to the random effect vs. the fixed effect. 
+(3) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200; RE variance* = 0.2,1,5 | Yes | High | [Scenario 3](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_3)  
+(4) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200; RE variance = 0.2,1,5 | Yes | Low | [Scenario 4](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_4)  
+(5) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20; RE variance = 1 | Yes | High | [Scenario 5](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios/0a.Run_ALL_Replicates_Scenario_5.R)
+(6) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20; RE variance = 1 | Yes | Low | [Scenario 6](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios/0a.Run_ALL_Replicates_Scenario_6.R) 
+
+\*The relative proportion of variance in the latent species distribution assigned to the random effect vs. the fixed effect. 
 
 ## Code for plotting figures from manuscript
 
