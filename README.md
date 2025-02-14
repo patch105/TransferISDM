@@ -71,11 +71,12 @@ The following scenarios were run for the manuscript:
 
 Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling bias? | Number of PO records | Run scenario 
 --- | --- | --- | --- |--- |---
-(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low, High | [Scenario_1](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_1) 
-(2) Spatial autocorrelation |  | Range = 20, 100, 200 |  | Low, High | (link)  
-(3) Environmental dissimilarity & spatial autocorrelation | Low to High | Range = 20 |  | Low, High | (link)  
-(4) Spatial autocorrelation with Bias in PO data | Low | Range = 20, 100, 200 | Yes | Low, High | (link)  
-(5) Environmental extrapolation, Spatial autocorrelation & Bias in PO data | Low to High | Range = 20, 100, 200 | Yes | Low, High | (link) 
+(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | High | [Scenario_1](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_1) 
+(2) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low | [Scenario_1](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_1) 
+(3) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200 | Yes | High | (link)  
+(4) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200 | Yes | Low | (link)  
+(5) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20, 100, 200 | Yes | High | (link) 
+(6) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20, 100, 200 | Yes | Low | (link) 
 
 ## Final summary figures from manuscript
 
