@@ -71,28 +71,20 @@ The following scenarios were run for the manuscript:
 
 Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling bias? | Number of PO records | Run scenario 
 --- | --- | --- | --- |--- |---
-(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low, High | [Scenario_1](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_1) 
-(2) Spatial autocorrelation |  | Range = 20, 100, 200 |  | Low, High | (link)  
-(3) Environmental dissimilarity & spatial autocorrelation | Low to High | Range = 20 |  | Low, High | (link)  
-(4) Spatial autocorrelation with Bias in PO data | Low | Range = 20, 100, 200 | Yes | Low, High | (link)  
-(5) Environmental extrapolation, Spatial autocorrelation & Bias in PO data | Low to High | Range = 20, 100, 200 | Yes | Low, High | (link) 
+(1) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | High | [Scenario_1](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_1) 
+(2) Environmental dissimilarity with bias in PO data | Low to High |  | Yes | Low | [Scenario_1](https://github.com/patch105/AntarcticISDM/tree/main/Scenarios/Scenario_1) 
+(3) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200; RE variance* = 0.2,1,5 | Yes | High | (link)  
+(4) Spatial autocorrelation with bias in PO data | Low | Range = 20, 100, 200; RE variance = 0.2,1,5 | Yes | Low | (link)  
+(5) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20; RE variance = 1 | Yes | High | (link) 
+(6) Environmental dissimilarity, spatial autocorrelation & bias in PO data | Low to High | Range = 20; RE variance = 1 | Yes | Low | (link) 
+* The relative proportion of variance in the latent species distribution assigned to the random effect vs. the fixed effect. 
 
-## Final summary figures from manuscript
+## Code for plotting figures from manuscript
 
-
-
-
-## Antarctic Case Study
-
-
-## Biological data acquisition and cleaning
-
-
-## Environmental data acquisition and cleaning
-
-## Scenario 1.
-
-## Scenario 2.
+[Figure 3.]()
+[Figure 4.]()
+[Figure 5.]()
+[Figure 6.]()
 
 ## Session details
 R version 4.4.1
