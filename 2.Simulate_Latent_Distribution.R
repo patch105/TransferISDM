@@ -1,6 +1,29 @@
 
+########################################################################
+################### 2. Simulate latent distribution ###################
+########################################################################
 
-# Simulate Latent Distribution --------------------------------------------
+# Simulate the latent species distribution, either with or without spatial autocorrelation (determined by parameter 'latent.type' in the 0a.Run_ALL_Replicates.R script).
+
+# In the spatial autocorrelation scenario, the random and fixed effect relative contributions are controlled with the GRF.var.multiplier parameter. This parameter is multiplied by the variance of the fixed effect to determine the target variance of the random effect.
+
+# The output is a list containing the latent species distribution, fixed and random effects saved separately, and the correlation between the random effect and the covariates.
+
+# Inputs: 
+
+# Intercept and coefficients (beta0, beta1, beta2)
+
+# Range of spatial autocorrelation for the random effect (scal)
+
+# Multiplier for the variance of the random effect (GRF.var.multiplier)
+
+# Type of response (only linear supported)
+
+# Whether the species distribution has spatial autocorrelation (latent.type)
+
+
+########################################################################
+
 
 sim_latent_dist_func <- function(beta0,
                                  beta1,
@@ -21,7 +44,7 @@ sim_latent_dist_func <- function(beta0,
                                  ) {
   print(scal)
   
-  nu <- 1/2 # Smoothness parameter - ONLY FOR MATERN
+  nu <- 1/2 # Smoothness parameter - for matern function
   
   # Assumed intensity at mean of enviro. variables
   # log(lambda) = intercept + b1*(mean of cov1) + b2*(mean of cov2)
@@ -39,11 +62,11 @@ sim_latent_dist_func <- function(beta0,
   mu <- cov1.df %>% mutate(cov = fe)
   mu <- spatstat.geom::as.im(mu)
   
-  plot(mu)
+  # plot(mu)
   
   if(latent.type == "lgcp") {
     
-    # Create LGCP with environmental covariate
+    # Create log-Gaussian Cox Process with environmental covariates
     # Separate out fixed and random effects
     
     xSeq <- terra::xFromCol(cov1)
@@ -70,7 +93,7 @@ sim_latent_dist_func <- function(beta0,
     
     colnames(GRF.mat)[colnames(GRF.mat) == "cov"] <- "GRF"
     
-    # Save a version that removes mu and just keeps GRF for plotting
+    # Save a version that removes mu and just keeps random effect for later comparison
     GRF.rast <- rast((mu*0 + GRF.mat[, "GRF"]))
     
     crs(GRF.rast) <- crs(cov1)
@@ -88,7 +111,7 @@ sim_latent_dist_func <- function(beta0,
     cor.GRF.cov2 <- cor(as.vector(GRF.rast), as.vector(cov2),
                         method = "spearman")
     
-    # Save a version that just keeps fixed effects for plotting (removes the intercept)
+    # Save a version that just keeps fixed effects for later comparison (removes the intercept)
     fixed <- beta1*cov1.mat[, "cov"] + beta2*cov2.mat[, "cov"]
     mu.fixed <- cov1.df %>% mutate(cov = fixed)
     mu.fixed <- spatstat.geom::as.im(mu.fixed)
@@ -102,9 +125,6 @@ sim_latent_dist_func <- function(beta0,
     # Combine intercept +  fixed and random effects
     mu <- mu + GRF.mat[, "GRF"]
   
-    print(paste0("Max. Mu is ", max(exp(mu))))
-    print(paste0("Min. Mu is ", min(exp(mu))))
-    
     # Simulate the latent Gaussian field
     lg.s <- rpoispp(exp(mu))
     
@@ -119,7 +139,9 @@ sim_latent_dist_func <- function(beta0,
     
   } 
   
-  if(latent.type == "ipp") {
+  # If no spatial autocorrelation, species process is an inhomogenous Poisson point process
+  
+  if(latent.type == "ipp") { 
     
     print(paste0("Max. Mu is ", max(exp(mu))))
     print(paste0("Min. Mu is ", min(exp(mu))))
@@ -148,35 +170,4 @@ sim_latent_dist_func <- function(beta0,
   return(latent.list)
     
 }
-
-
-# lambda <- exp(mu)
-# plot(lambda)
-# 
-# mu <- integral(lambda)
-# dx <- lambda$xstep/2
-# dy <- lambda$ystep/2
-# df <- as.data.frame(lambda)
-# npix <- nrow(df)
-# lpix <- df$value
-# # result <- vector(mode = "list", length = nsim)
-# nn <- rpois(1, mu)
-# # if (!all(is.finite(nn))) 
-# #   stop(paste("Unable to generate Poisson process with a mean of", 
-# #              mu, "points"))
-# # for (isim in seq_len(nsim)) {
-#   # ni <- nn[isim]
-# ii <- sample.int(npix, size = nn, replace = TRUE, 
-#                    prob = lpix)
-# 
-# win <- rescue.rectangle(as.owin(lambda))
-# 
-# xx <- df$x[ii] + runif(nn, -dx, dx)
-# yy <- df$y[ii] + runif(nn, -dy, dy)
-# result <- ppp(xx, yy, window = win, 
-#                       check = FALSE)
-# 
-# plot(result)
-
-
 
