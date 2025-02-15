@@ -7,6 +7,8 @@
 
 # Name the scenario and set the scenario specifications and parameters.
 
+# Set up the domain and grid resolution for the scenario.
+
 # Key choices include the scenario type: environmental dissimilarity or spatial autocorrelation and whether bias is present.
 
 ########################################################################
