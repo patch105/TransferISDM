@@ -1,40 +1,48 @@
 
-## HPC version
+########################################################################
+############### Run all replicates for a given scenario ################
+########################################################################
 
-# # extract the arguments provided in the command line
-# args <- commandArgs(trailingOnly = TRUE)
-# # The first argument is now the job index
-# job_index <- as.integer(args[1])
+# The script is the baseline for running a scenario.
 
-# Set the library for packages
-# lib_loc <- paste(getwd(),"/r_lib",sep="")
-lib_loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC script
+# Name the scenario and set the scenario specifications and parameters.
 
-# For non-hpc version
+# Key choices include the scenario type: environmental dissimilarity or spatial autocorrelation and whether bias is present.
+
+########################################################################
+
+
+# Set the library for packages to maintain consistency with HPC and non-HPC script
+lib_loc = .libPaths() 
+
+# Set job index for non-HPC script
 job_index <- 1
 
 library(spatstat)
 library(ggplot2)
 library(dplyr)
 library(ggpubr, lib.loc = lib_loc)
-
 library(viridis)
 library(terra)
 library(purrr)
 library(readr)
 
 
-
 # Scenario choices --------------------------------------------------------
 
-scenario_name = "TEST"
+# Name the scenario
+scenario_name = "Scenario_X"
 
-# "Enviro.Extrap" or "Spatial.Auto"
+# Select scenario type: "Enviro.Extrap" or "Spatial.Auto"
 scenario.type = "Spatial.Auto"
 
-nreps <- 1 # Replicates per extrapolation type
+# Replicates per scenario level
+nreps <- 1 
 
-# Spatial autocorrelation?
+# Spatial autocorrelation? 
+#"lgcp" for spatial autocorrelation or "ipp" for no spatial-autocorrelation
+#NOTE - the scenario can be scenario.type == "Enviro.Extrap" and latent.type == "lgcp" - the scenario will be environmental dissimilarity with spatial autocorrelation 
+
 latent.type = "lgcp" 
 
 # Bias in PO sampling?
@@ -44,27 +52,35 @@ bias <- FALSE
 # Model choices -----------------------------------------------------------
 
 # Model types to run
-# Options are "no-GRF" "spatial" "no-GRF.bias" "spatial.bias"
-mod.type = c("spatial")
+# Options are "no-GRF", "spatial", "no-GRF.bias", "spatial.bias"
+# "no-GRF" means no Gaussian random field
+# "spatial means with Gaussian random field
+# .bias means model with a bias covariate 
+
+mod.type = c("no-GRF", "no-GRF.bias")
 
 
-# If doing a spatial model, choose whether to predict the GRF and the Fixed effect
+# If doing a spatial model, choose whether to make a separate prediction of the GRF and the Fixed effect for evaluation 
+
 pred.GRF <- TRUE
 pred.fixed <- TRUE
 
 
 # Parameters --------------------------------------------------------------
 
-# Autocorrelation range & variance for covs 
+# Autocorrelation range & variance for 2 covariates 
 #(Maximum range (raster units) of spatial autocorrelation)
+
 range_cov1 <- 10 
 range_cov2 <- 100 
 var_cov1 <- 0.5
 var_cov2 <- 10
 
-beta0 <- -1 # Intercept
+beta0 <- -1 # Species distribution intercept
 beta1 <- 0.01 # Coefficient for cov 1
 beta2 <- 0.2 # Coefficient for cov 2
+
+# If the scenario is spatial autocorrelation, set the range parameter for spatial autocorrelation of the species distribution to vary across 3 range values
 
 if(scenario.type == "Spatial.Auto") {
   
@@ -72,26 +88,28 @@ if(scenario.type == "Spatial.Auto") {
   
 } else {
   
-  scal <- 20 # Scale parameter (range of spatial effect)
+  scal <- 20 # Otherwise set to this value
   
 }
 
-# Relative variance of GRF to fixed effect (can be ...)
+# Relative variance of GRF to fixed effect (multiplied)
+# Controls how influential the random effect is in the species distribution relative to the fixed effect 
 GRF.var.multiplier <- 1
 
 
-#Maximum probability for bias field (0.2 or 0.05)
+# Maximum probability for bias field 
 maxprob <- 0.2
-# PO sampling values (0.08 or 0.02)
+
+# PO sampling detection probability - chosen to be the mean of the bias field to keep bias and non-bias scenarios consistent.
 detect.prob <- 0.08
 
 
 # Implementation choices --------------------------------------------------
 
-n_cores <- 3
+n_cores <- 3 # Number of cores to use for parallel processing, only relevant for the calculation of the Shape metric for environmental dissimilarity
 
-# Number of posterior samples to take * note that it slows things down
-posterior_nsamps <- 100
+# Number of posterior samples to take * note that it slows things down when more
+posterior_nsamps <- 5000
 
 
 
@@ -114,12 +132,11 @@ if(!dir.exists(file.path(outpath, scenario_name))) {
 
 # START with set up of resolution and north/east step length for later Site A and B grid creation.
 
-# Set ncol
 ncol <- 1000
 nrow <- 1000
 res <- 1
 
-# Create a bounded domain on [0, 10] x [0, 10]
+# Create a bounded domain on [0, 1000] x [0, 1000]
 
 east_min <- 0
 east_max <- 1000
@@ -129,12 +146,11 @@ north_max <- 1000
 
 # We generate the grid resolution from min, max dimensions and the number of pixels
 
-# Set number of pixels (100 x 100)
+# Set number of pixels (1000 x 1000)
 n_bau_east <- ncol
 n_bau_north <- nrow
-# so now we have n_bau_est x n_bau_north grid cells
 
-# Obtain the cell resolution
+# Calculate the cell resolution
 bau_east_step <- (east_max - east_min) / n_bau_east
 bau_north_step <- (north_max - north_min) / n_bau_north 
 
@@ -150,7 +166,7 @@ colnames(coords) <- c("eastings", "northings")
 
 # Run setup for replicates ------------------------------------------------
 
-# Depending on your scenario type, source 1 of 2 R scripts for running replicates
+# Depending on your scenario type (spatial autocorrelation or not), source one of two R scripts for running replicates
 
 if(scenario.type == "Enviro.Extrap") {
   
@@ -165,6 +181,7 @@ if(scenario.type == "Spatial.Auto") {
 }
 
 # Calculate the variance of the GRF so can save for plotting: --------------
+
 # Calculate 'variance' of fixed effect
 fe.var <- beta1^2*var_cov1 + beta2^2*var_cov2 
 
@@ -175,6 +192,7 @@ variance <- GRF.var.multiplier * fe.var
 # Save the input parameters for this job ----------------------------------
 save(scenario.type, pred.GRF, pred.fixed, mod.type, beta0, beta1, beta2, scal, variance, file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
+# Run the scenario --------------------------------------------------------
 
 Run_Replicate_Func(n_cores = n_cores,
                    outpath = outpath,
