@@ -1,4 +1,26 @@
 
+########################################################################
+############### Run a single replicates for a given scenario ##########
+########################################################################
+
+# This script sequentially calls and saves all the separate functions of the simulation (steps 1-12). 
+
+# In here is where you can adjust the priors and the mesh parameters.
+
+# Inputs:
+
+# Scenario choices
+
+# Model choices
+
+# Parameters
+
+# Implementation choices
+
+
+########################################################################
+
+
 Run_Replicate_Func <- function(n_cores,
                                outpath,
                                scenario_name,
@@ -41,11 +63,10 @@ Run_Replicate_Func <- function(n_cores,
   
   
   
-  # Set up a list to save covariates, latent dist, and extrapolation results
+  # Set up a list to save covariates, latent distribution, and extrapolation results
+  # Results are split in to Low, Mod, High for saving a given number of replicates across different levels of the environmental dissimilarity / spatial autocorrelation
   reps.setup.list <- list(Low = list(), Moderate = list(), High = list())
   
-  # Set up the function that runs the covariates, latent distribution, and extrapolation 
-  # LATER TO DO: ADD REQUIRED INPUTS TO THIS SETUP FUNCTION
   
   run_setup_func <- function(){
     
@@ -53,7 +74,6 @@ Run_Replicate_Func <- function(n_cores,
     # 1.Simulate Covariates ---------------------------------------------------
     
     source("1.Simulate_Covariates.R")
-    # source("1B.Simulate_Covariates_Simple_Cov.R")
     
     print("Simulating new cov")
     
@@ -76,6 +96,7 @@ Run_Replicate_Func <- function(n_cores,
     
     source("2.Simulate_Latent_Distribution.R")
     
+    # Select the response function, only set up for linear but could be modified
     response.type <<- "linear"
     latent.type <<- latent.type 
     
@@ -101,10 +122,9 @@ Run_Replicate_Func <- function(n_cores,
     
     # 3.Simulate Environmental Extrapolation ------------------------------------
     
-    #source("3.Simulate_Enviro_Extrapolation_BA.R")
     source("3.Simulate_Enviro_Extrapolation.R")
     
-    # Set size of grid (number of cells) for Site A (Reference) and Site B (Target)
+    # Set size of grid (number of cells) for Site A (Training) and Site B (Projection)
     # NOTE - must be smaller than total cell number in x y directions
     rast_cellsA <<- c(100, 100)
     rast_cellsB <<- c(100, 100)
@@ -188,10 +208,7 @@ Run_Replicate_Func <- function(n_cores,
   
   # 4. PO sampling ----------------------------------------------------------
   
-  # PO_min
-  # thin 
-  
-  source("4.PO_Sampling.R")
+    source("4.PO_Sampling.R")
   
   reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list,
                                       bias = bias,
@@ -239,16 +256,16 @@ Run_Replicate_Func <- function(n_cores,
   source("6.Run_Model.R")
   
   # Set model control parameters
-  prior.mean <- 0
+  prior.mean <- 0 # For coefficients and intercept
   int.sd <- 100 # Intercept standard deviation
   other.sd <- 10 # Covariate effect standard deviation
-  prior.range <- c(10, 0.1) # Prior chance 10% that parameter falls below range of 1
+  prior.range <- c(10, 0.1) # Prior chance 10% that parameter falls below range of 10
   prior.space.sigma <- c(5, 0.1) # Prior chance 10% that parameter falls above SD of 5
   
   # Set mesh parameters
   max.n <- c(5000, 2500) # Default c(500,200)
   dep.range <- NULL # In raster projection units, default is 1/3 diagonal length of raster extent
-  expans.mult <- 1.5 # Default, 1.5 x dep.range                         
+  expans.mult <- NULL # Default, 1.5 x dep.range                         
   max.edge <- NULL # Default c(0.2, 0.5)*dep.range                         
   cutoff <- NULL # Default 0.2*max.edge1                         
   offset <- NULL # Default is dep.range                       
@@ -360,6 +377,7 @@ Run_Replicate_Func <- function(n_cores,
  
   write_csv(replicate_info_ALL.df, paste0(file.path(outpath, scenario_name),  "/Scenario_", scenario_name, "_N_Presences_EACH_rep_Job", job_index,".csv"))
   
+  
   # 7. Extract Model Results ------------------------------------------------
   
   source("7.Extract_Model_Results.R")
@@ -382,13 +400,12 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   reps.setup.list <- make_truth_func(reps.setup.list = reps.setup.list)
   
   
-  # 9. Predict to Site B from fitted --------------------------------------------------
+  # 9. Predict to Site B (Projection) from fitted ---------------------------
   
   source("9.Predict_from_fitted.R")
 
   reps.setup.list <- predict_from_fitted_SiteB_func(reps.setup.list = reps.setup.list,
                                                     posterior_nsamps = posterior_nsamps)
-  
   
   
   # 10. Validation true intensity -------------------------------------------
@@ -404,7 +421,7 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
 
   
   # 12B. Plot Data  ---------------------------------------------------------
-  # If I want to plot the Presence-Absence and Presence-Only data
+  # If you want to plot the Presence-Absence and Presence-Only data
   
   source("12B.Plot_Data.R")
 
@@ -425,10 +442,9 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
                               job_index = job_index)
 
   
-  # OPTIONAL - predict to and validate Site A -------------------------------
+  # OPTIONAL - predict to and validate Site A (training) --------------------
   
-  # *Optional* - predict to Site A
-  ## You can choose to predict just the random effect here
+  # If pred.GRF or pred.fixed == T a prediction of just the random or fixed effect will also be predicted
   
   reps.setup.list <- predict_from_fitted_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
@@ -444,7 +460,7 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
                               mod.type = mod.type,
                               job_index = job_index)
   
-  # *Optional* - run validation for Site A
+  # *Optional* - run validation for Site A (projection)
   true.validation.SiteA.df <- validation_SiteA_func(reps.setup.list = reps.setup.list,
                                                     pred.GRF = pred.GRF,
                                                     pred.fixed = pred.fixed,
@@ -456,39 +472,4 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   write_csv(true.validation.SiteA.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_SiteA_Job_", job_index, ".csv"))
   
   }
-
-
-# ARCHIVE -----------------------------------------------------------------
-
-# # Checking number of PO and PA and rerunning as necessary -----------------
-# 
-# # If there are any reps with no PO data OR no PO data in PA sampling Grid A, re-run the parts 1,2,3, 4 for those reps
-# 
-# po_pa <- po_pa_checking_func(reps.setup.list)
-# 
-# removed_counts_pa <- po_pa$removed_counts_pa # List with Low = nremoved, Mod = nremoved, High = nremoved
-# reps.setup.list <- po_pa$reps.setup.list # List with any reps removed that had no PO at PA sampling Grid A
-# 
-# 
-# # Iterate over the setup function until you get to the desired nreps for Low, Moderate, High AND none of them have no PO data anymore
-# 
-# while(length(reps.setup.list$Low) < nreps | length(reps.setup.list$Moderate) < nreps | length(reps.setup.list$High) < nreps | sum(removed_counts_pa) != 0) {
-#   
-#   reps.setup.list <- run_setup_func()
-#   
-#   reps.setup.list <- po_sampling_func(reps.setup.list = reps.setup.list)
-#   
-#   reps.setup.list <- pa_sampling_func(reps.setup.list = reps.setup.list,
-#                                       new.latent = FALSE) # If you want to make a separate realisation of the latent state for the PA data set to true
-#   
-#   # If there are any reps with no PO data, re-run the parts 1,2,3 for those reps
-#   
-#   po_pa <- po_pa_checking_func(reps.setup.list)
-#   
-#   removed_counts_pa <- po_pa$removed_counts_pa
-#   reps.setup.list <- po_pa$reps.setup.list
-#   
-#   
-# }
-
 
