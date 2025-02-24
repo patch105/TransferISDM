@@ -702,14 +702,16 @@ covs.SiteA.rast <- crop(covs, ext(rand.gridA))
 cov.rep <- covs.SiteA.rast
 
 # Add bias covariate to covariate stack
-Bias.rast <- bias_noisy
+Bias.rast <- log(bias_noisy)
 cov.rep.bias <- c(cov.rep, Bias.rast)
 
 cov3 <- covs.SiteA.rast[[1]]
 values(cov3) <- 1
 names(cov3) <- "cov3"
 
-cov.rep2.no.bias <- c(cov.rep, cov3)
+cov.rep2.bias <- c(cov.rep.bias, cov3)
+
+cov.rep3.no.bias <- c(cov.rep, cov3)
 
 mesh.default <- makeMesh(cov.rep,
                          max.n = max.n, # Default c(500,200)
@@ -722,8 +724,6 @@ mesh.default <- makeMesh(cov.rep,
 
 
 
-#### Models without bias covariate
-
 Model <- list()
 
 # Integrated model with bias covariate
@@ -734,19 +734,31 @@ Model$m.int.bias <- isdm(observationList = list(POdat = PO,
               responseNames = c(PO = NULL, PA = "presence"),
               sampleAreaNames = c(PO = NULL, PA = "area"),
               distributionFormula = distributionFormula,
-              biasFormula = ~1, # Intercept only
+              biasFormula = ~1 + bias, 
               artefactFormulas = list(PA = ~1), # Intercept only
               control = my.control)
 
-# Integrated model with 3rd covariate rather than bias covariate
-Model$m.int.3rd.cov <- isdm(observationList = list(POdat = PO,
+# Integrated model with bias covariate and 3rd covariate
+Model$m.int.3rd.cov.bias <- isdm(observationList = list(POdat = PO,
                                      PAdat = PA_fit),
-              covars = cov.rep2.no.bias,
+              covars = cov.rep2.bias,
               mesh = mesh.default,
               responseNames = c(PO = NULL, PA = "presence"),
               sampleAreaNames = c(PO = NULL, PA = "area"),
               distributionFormula = distributionFormula2,
-              biasFormula = ~1, # Intercept only
+              biasFormula = ~1 + bias, 
+              artefactFormulas = list(PA = ~1), # Intercept only
+              control = my.control)
+
+# Integrated model with no bias covariate but a 3rd covariate
+Model$m.int.3rd.cov <- isdm(observationList = list(POdat = PO,
+                                     PAdat = PA_fit),
+              covars = cov.rep3.no.bias,
+              mesh = mesh.default,
+              responseNames = c(PO = NULL, PA = "presence"),
+              sampleAreaNames = c(PO = NULL, PA = "area"),
+              distributionFormula = distributionFormula2,
+              biasFormula = ~1, 
               artefactFormulas = list(PA = ~1), # Intercept only
               control = my.control)
 
