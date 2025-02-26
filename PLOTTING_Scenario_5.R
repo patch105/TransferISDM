@@ -116,24 +116,24 @@ extrap.scenario.df <- extrap.scenario.df %>%
   filter(job_index %in% common_jobs$job_index)
 
 true.validation.df <- true.validation.df %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 true.validation.SiteA.df <- true.validation.SiteA.df %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 extrap.scenario.df <- extrap.scenario.df %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -220,24 +220,24 @@ extrap.scenario.df_5C <- extrap.scenario.df_5C %>%
 
 
 true.validation.df_5C <- true.validation.df_5C %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 true.validation.SiteA.df_5C <- true.validation.SiteA.df_5C %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 extrap.scenario.df_5C <- extrap.scenario.df_5C %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -324,24 +324,24 @@ extrap.scenario.dfv0.2 <- extrap.scenario.dfv0.2 %>%
 
 
 true.validation.dfv0.2 <- true.validation.dfv0.2 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 true.validation.SiteA.dfv0.2 <- true.validation.SiteA.dfv0.2 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 extrap.scenario.dfv0.2 <- extrap.scenario.dfv0.2 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -429,24 +429,24 @@ extrap.scenario.df_5Cv0.2 <- extrap.scenario.df_5Cv0.2 %>%
 
 
 true.validation.df_5Cv0.2 <- true.validation.df_5Cv0.2 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 true.validation.SiteA.df_5Cv0.2 <- true.validation.SiteA.df_5Cv0.2 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 extrap.scenario.df_5Cv0.2 <- extrap.scenario.df_5Cv0.2 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -534,24 +534,24 @@ extrap.scenario.dfv5 <- extrap.scenario.dfv5 %>%
 
 
 true.validation.dfv5 <- true.validation.dfv5 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 true.validation.SiteA.dfv5 <- true.validation.SiteA.dfv5 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 extrap.scenario.dfv5 <- extrap.scenario.dfv5 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -640,8 +640,8 @@ extrap.scenario.df_5Cv5 <- extrap.scenario.df_5Cv5 %>%
 
 
 true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -649,8 +649,8 @@ true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>%
 
 
 true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -658,8 +658,8 @@ true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>%
 
 
 extrap.scenario.df_5Cv5 <- extrap.scenario.df_5Cv5 %>%
-  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With GRF", "Without GRF")) %>% 
-  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias cov", "Without bias cov")) %>%
+  mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
+  mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type2, fixed = T), gsub(".bias", "", mod.type2), mod.type2)) %>% 
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
@@ -681,9 +681,9 @@ true.validation.dfv5 <- true.validation.dfv5 %>%
 
 final.df <- rbind(true.validation.df, true.validation.dfv0.2, true.validation.dfv5)
 
-final.df$bias.type <- factor(final.df$bias.type, levels = c("Without GRF", "With GRF"))
+final.df$bias.type <- factor(final.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
 
-final.df$bias.type2 <- factor(final.df$bias.type2, levels = c("Without bias cov", "With bias cov"))
+final.df$bias.type2 <- factor(final.df$bias.type2, levels = c("Without bias covariate", "With bias covariate"))
 
 final.df$mod.type2 <- factor(final.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
 
@@ -694,15 +694,15 @@ final.df.bias <- final.df
 
 # Filter out just the models that account for bias with covariate
 final.df <- final.df %>% 
-  filter(bias.type2 == "With bias cov" | mod.type2 == "m.PA")
+  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
   
 projection1 <- final.df %>%
   ggplot(aes(x = relative.GRF, y = RMSE.global, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -726,10 +726,10 @@ projection1 <- final.df %>%
 projection2 <-  final.df %>%
   ggplot(aes(x = relative.GRF, y = Mean.Int.Score, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Mean Interval Score", color = NULL) +
+  labs(x = "Relative random effect contribution", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 2.3)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -756,8 +756,8 @@ projection3 <-  final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -784,8 +784,8 @@ projection4 <-  final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   #coord_cartesian(ylim = c(0, 0.1)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -805,9 +805,9 @@ projection4 <-  final.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-fig2b <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Fig4 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_site.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Figure_4.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 ########### COEFFICIENT RECOVERY ###############
 
@@ -823,22 +823,22 @@ extrap.scenario.dfv5 <- extrap.scenario.dfv5 %>%
 final.extrap.df <- rbind(extrap.scenario.df, extrap.scenario.dfv0.2, extrap.scenario.dfv5)
 
 
-final.extrap.df$bias.type <- factor(final.extrap.df$bias.type, levels = c("Without GRF", "With GRF"))
+final.extrap.df$bias.type <- factor(final.extrap.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
 final.extrap.df$mod.type2 <- factor(final.extrap.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
 
 # Save a version for bias comparison
 final.extrap.df.bias <- final.extrap.df
 
 final.extrap.df <- final.extrap.df %>% 
-  filter(bias.type2 == "With bias cov" | mod.type2 == "m.PA")
+  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
 
 coef1 <- final.extrap.df %>%
   ggplot(aes(x = relative.GRF, y = beta1.mean, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[1]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-1, 1)) +
   theme_bw() +
@@ -864,8 +864,8 @@ coef2 <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[2]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-1, 1)) +
   theme_bw() +
@@ -896,8 +896,8 @@ PO_int <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[0]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-6, 1)) +
   theme_bw() +
@@ -925,8 +925,8 @@ PA_int <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[0]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-6, 1)) +
   theme_bw() +
@@ -957,8 +957,8 @@ coefSD1 <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[1]~"SD"), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 0.7)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -983,8 +983,8 @@ coefSD2 <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[2]~"SD"), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(0, 0.7)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1014,7 +1014,7 @@ ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_
 
 
 g1 <- final.extrap.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
   ggplot(aes(x = relative.GRF, y = scal - GRF.range.mean)) +
@@ -1041,7 +1041,7 @@ g1 <- final.extrap.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 g2 <- final.extrap.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = relative.GRF, y = GRF.variance - (GRF.sd.mean)^2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
@@ -1088,14 +1088,14 @@ true.validation.SiteA.dfv5 <- true.validation.SiteA.dfv5 %>%
 final.SiteA.df <- rbind(true.validation.SiteA.df, true.validation.SiteA.dfv0.2, true.validation.SiteA.dfv5)
 
 
-final.SiteA.df$bias.type <- factor(final.SiteA.df$bias.type, levels = c("Without GRF", "With GRF"))
+final.SiteA.df$bias.type <- factor(final.SiteA.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
 final.SiteA.df$mod.type2 <- factor(final.SiteA.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
 
 # Save a version for bias comparison
 final.SiteA.df.bias <- final.SiteA.df
 
 final.SiteA.df <- final.SiteA.df %>% 
-  filter(bias.type2 == "With bias cov" | mod.type2 == "m.PA")
+  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
 
 
 training1 <- final.SiteA.df %>%
@@ -1103,8 +1103,8 @@ training1 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1132,8 +1132,8 @@ training2 <- final.SiteA.df %>%
   # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 3.5)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1158,8 +1158,8 @@ training3 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1193,8 +1193,8 @@ training4 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   #coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1221,7 +1221,7 @@ ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests
 ########## CORRELATION BETWEEN ESTIMATED AND TRUE FIXED & GRF #############
 
 cor.GRF <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = relative.GRF, y = cor.GRF)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
@@ -1247,7 +1247,7 @@ cor.GRF <- final.SiteA.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 RMSE.GRF <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = relative.GRF, y = RMSE.global.GRF, fill = mod.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -1275,7 +1275,7 @@ RMSE.GRF <- final.SiteA.df %>%
 
 
 cor.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
   ggplot(aes(x = relative.GRF, y = cor.FIXED)) +
@@ -1302,7 +1302,7 @@ cor.FIXED <- final.SiteA.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 RMSE.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
   ggplot(aes(x = relative.GRF, y = RMSE.global.FIXED, fill = mod.type2)) +
@@ -1399,7 +1399,7 @@ newdf <- newdf %>%
             by = c("relative.GRF", "extrap.type", "job_index", "mod.type"))
 
 plot1 <- newdf %>% 
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(dist_coef1 = abs(beta1.mean - beta1)) %>%
   mutate(dist_coef2 = abs(beta2.mean - beta2)) %>%
   mutate(dist_coef.mean = (dist_coef1 + dist_coef2) / 2) %>% 
@@ -1457,7 +1457,7 @@ newdfA <- newdf %>%
 
 
 plot2 <- newdf %>% 
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   ggplot(aes(x = cor.GRF, y = RMSE.global),  color = "#0072B2") +
   geom_point(alpha = 0.05, size = 1, color = "#0072B2") +
   geom_smooth(method = "loess", se = TRUE, fill = "#0072B2", alpha = 0.3) +
@@ -1493,7 +1493,7 @@ plot2 <- newdf %>%
 ggsave(plot = plot2, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_vs_ProjectionRMSE.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
 
 plot3 <- newdfA %>% 
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   ggplot(aes(x = cor.GRF, y = RMSE.global),  color = "#0072B2") +
   geom_point(alpha = 0.05, size = 1, color = "#0072B2") +
   geom_smooth(method = "loess", se = TRUE, fill = "#0072B2", alpha = 0.3) +
@@ -1613,8 +1613,8 @@ newdf %>%
     x = "Correlation random effect projection vs. training site",
     y = "Mean RMSE projection site"
   ) +
-  scale_fill_manual(values = c("Without GRF" = "green4", "With GRF" = "purple4")) + 
-  scale_color_manual(values = c("Without GRF" = "green4", "With GRF" = "purple4")) + 
+  scale_fill_manual(values = c("Without Gaussian random field" = "green4", "With Gaussian random field" = "purple4")) + 
+  scale_color_manual(values = c("Without Gaussian random field" = "green4", "With Gaussian random field" = "purple4")) + 
   coord_cartesian(xlim = c(-0.5, 0.9), ylim = c(0, 2)) +
   theme_bw() +
   facet_grid(
@@ -1767,8 +1767,8 @@ projection1 <- final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1792,10 +1792,10 @@ projection1 <- final.df %>%
 projection2 <-  final.df %>%
   ggplot(aes(x = extrap.type, y = Mean.Int.Score, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Spatial autocorrelation range", y = "Mean Interval Score", color = NULL) +
+  labs(x = "Spatial autocorrelation range", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4.5)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1822,8 +1822,8 @@ projection3 <-  final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1850,8 +1850,8 @@ projection4 <-  final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   #coord_cartesian(ylim = c(0, 0.1)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1877,7 +1877,7 @@ ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests
 
 
 g1 <- final.extrap.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
   ggplot(aes(x = extrap.type, y = scal - GRF.range.mean, fill = mod.type2)) +
@@ -1905,7 +1905,7 @@ g1 <- final.extrap.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 g2 <- final.extrap.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = extrap.type, y = GRF.variance - (GRF.sd.mean)^2, fill = mod.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -1940,8 +1940,8 @@ training1 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1969,8 +1969,8 @@ training2 <- final.SiteA.df %>%
   # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 3.5)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -1995,8 +1995,8 @@ training3 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2022,8 +2022,8 @@ training4 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Spatial autocorrelation range", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   #coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2050,7 +2050,7 @@ ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests
 
 
 cor.GRF <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = extrap.type, y = cor.GRF, fill = mod.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -2078,7 +2078,7 @@ cor.GRF <- final.SiteA.df %>%
 
 
 RMSE.GRF <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = extrap.type, y = RMSE.global.GRF, fill = mod.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -2105,7 +2105,7 @@ RMSE.GRF <- final.SiteA.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 cor.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = extrap.type, y = cor.FIXED, fill = mod.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -2132,7 +2132,7 @@ cor.FIXED <- final.SiteA.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 RMSE.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   ggplot(aes(x = exrap.type, y = RMSE.global.FIXED, fill = mod.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -2180,8 +2180,8 @@ ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_test
 #   geom_point(alpha = 0.4, size = 0.6) +
 #   geom_smooth(method = "loess", se = T, alpha = 0.3) +
 #   labs(x = "Range vs. Site Distance", y = "Mean RMSE projection site", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-#   scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
 #   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
 #   theme_bw() +
 #   facet_wrap(~mod.type2,
@@ -2205,9 +2205,9 @@ ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_test
 #   ggplot(aes(x = relative.range.dist, y = Mean.Int.Score, color = bias.type, fill = bias.type)) +
 #   geom_point(alpha = 0.4, size = 0.6) +
 #   geom_smooth(method = "loess", se = T, alpha = 0.3) +
-#   labs(x = "Range vs. Site Distance", y = "Mean Interval Score", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-#   scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+#   labs(x = "Range vs. Site Distance", y = "Mean interval score", color = NULL, fill = NULL) +
+#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
 #   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
 #   theme_bw() +
 #   facet_wrap(~mod.type2,
@@ -2233,8 +2233,8 @@ ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_test
 #   geom_point(alpha = 0.4, size = 0.6) +
 #   geom_smooth(method = "loess", se = T, alpha = 0.3) +
 #   labs(x = "Range vs. Site Distance", y = "Correlation", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-#   scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
 #   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
 #   theme_bw() +
 #   facet_wrap(~mod.type2,
@@ -2259,8 +2259,8 @@ ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_test
 #   geom_point(alpha = 0.4, size = 0.6) +
 #   geom_smooth(method = "loess", se = T, alpha = 0.3) +
 #   labs(x = "Range vs. Site Distance", y = "Mean coverage probability", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-#   scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
 #   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
 #   theme_bw() +
 #   facet_wrap(~mod.type2,
@@ -2284,7 +2284,7 @@ ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_test
 
 ##########################################################################
 ##########################################################################
-# Scenario without BIAS COV -----------------------------------------------
+# Scenario Without bias covariate -----------------------------------------------
 ##########################################################################
 ##########################################################################
 
@@ -2294,9 +2294,9 @@ projection1 <- final.df.bias %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2323,11 +2323,11 @@ projection1 <- final.df.bias %>%
 projection2 <-  final.df.bias %>%
   ggplot(aes(x = relative.GRF, y = Mean.Int.Score, fill = bias.type, linetype = bias.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Mean Interval Score", color = NULL) +
+  labs(x = "Relative random effect contribution", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   coord_cartesian(ylim = c(NA, 2.3)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2357,9 +2357,9 @@ projection3 <-  final.df.bias %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2389,9 +2389,9 @@ projection4 <-  final.df.bias %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   #coord_cartesian(ylim = c(0, 0.1)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2426,9 +2426,9 @@ training1 <- final.SiteA.df.bias %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2455,11 +2455,11 @@ training1 <- final.SiteA.df.bias %>%
 training2 <-  final.SiteA.df.bias %>%
   ggplot(aes(x = relative.GRF, y = Mean.Int.Score, fill = bias.type, linetype = bias.type2)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Mean Interval Score", color = NULL) +
+  labs(x = "Relative random effect contribution", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   coord_cartesian(ylim = c(NA, 3.5)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2489,9 +2489,9 @@ training3 <-  final.SiteA.df.bias %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2521,9 +2521,9 @@ training4 <-  final.SiteA.df.bias %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_linetype_manual(values = c("Without bias cov" = "dotted", "With bias cov" = "solid")) +  # Different line types for bias types
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_linetype_manual(values = c("Without bias covariate" = "dotted", "With bias covariate" = "solid")) +  # Different line types for bias types
   #coord_cartesian(ylim = c(0, 0.1)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2554,16 +2554,16 @@ ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests
 ############# FIGURE 4 UPDATED ###############
 
 cor.GRF <- final.SiteA.df.bias %>% 
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
-  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias cov", "With bias cov"))) %>%
+  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias covariate", "With bias covariate"))) %>%
   ggplot(aes(x = relative.GRF, y = cor.GRF, fill = bias.type2)) +  
   geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation random", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
-  scale_fill_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
-  scale_color_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
   coord_cartesian(ylim = c(-0.2, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
@@ -2584,16 +2584,16 @@ cor.GRF <- final.SiteA.df.bias %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 cor.FIXED <- final.SiteA.df.bias %>% 
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
-  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias cov", "With bias cov"))) %>%
+  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias covariate", "With bias covariate"))) %>%
   ggplot(aes(x = relative.GRF, y = cor.FIXED, fill = bias.type2)) +  
   geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation fixed", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
-  scale_fill_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
-  scale_color_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
   coord_cartesian(ylim = c(-0.2, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
@@ -2631,9 +2631,7 @@ COR_GRF_FIXED_plot <- annotate_figure(
 ) 
 
 
-ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/Scenario_5_tests/FIGURE4.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")
-
-
+ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/Scenario_5_tests/Figure_5.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")
 
 
 
@@ -2654,26 +2652,32 @@ true.validation.df_5Cv0.2 <- true.validation.df_5Cv0.2 %>%
 true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>% 
   mutate(relative.GRF = "5")
 
-final.df <- rbind(true.validation.df_5C, true.validation.df_5Cv0.2, true.validation.df_5Cv5)
 
+final.df <- rbind(true.validation.df_5C, true.validation.df_5Cv0.2, true.validation.dfv5)
 
-final.df$bias.type <- factor(final.df$bias.type, levels = c("Without GRF", "With GRF"))
+final.df$bias.type <- factor(final.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
+
+final.df$bias.type2 <- factor(final.df$bias.type2, levels = c("Without bias covariate", "With bias covariate"))
+
 final.df$mod.type2 <- factor(final.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
 
-final.df.save <- final.df
+# Save a version for bias comparison
+final.df.bias <- final.df
+
 
 ######## Projection site  ############
 
+# Filter out just the models that account for bias with covariate
 final.df <- final.df %>% 
-  filter(bias.type2 == "Bias" | mod.type2 == "m.PA")
+  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
 
 projection1 <- final.df %>%
   ggplot(aes(x = relative.GRF, y = RMSE.global, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2683,13 +2687,13 @@ projection1 <- final.df %>%
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 13.5),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 14, vjust = 1.7),
+        axis.title.x = element_text(size = 13.5),
         axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
+        strip.text = element_text(size = 14),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
@@ -2697,11 +2701,11 @@ projection1 <- final.df %>%
 projection2 <-  final.df %>%
   ggplot(aes(x = relative.GRF, y = Mean.Int.Score, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Mean Interval Score", color = NULL) +
+  labs(x = "Relative random effect contribution", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  coord_cartesian(ylim = c(NA, 4.5)) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  coord_cartesian(ylim = c(NA, 2.3)) +
   theme_bw() +
   facet_wrap(~mod.type2,
              labeller = as_labeller(c(m.int = "Integrated",
@@ -2710,13 +2714,13 @@ projection2 <-  final.df %>%
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 13.5),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 14, vjust = 1.7),
+        axis.title.x = element_text(size = 14),
         axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
+        strip.text = element_text(size = 14),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))  
 
@@ -2727,8 +2731,8 @@ projection3 <-  final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2738,19 +2742,16 @@ projection3 <-  final.df %>%
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 13.5),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 14, vjust = 1.7),
+        axis.title.x = element_text(size = 14),
         axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
+        strip.text = element_text(size = 14),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-fig2 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 3, legend = "bottom", labels = c("(a)", "(b)", "(c)"), align = "v")
-
-ggsave(plot = fig2, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_siteC.png"), w = 21, h = 27, units = "cm", dpi = 400, device = "png")
 
 # Coverage probability
 projection4 <-  final.df %>%
@@ -2758,8 +2759,8 @@ projection4 <-  final.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   #coord_cartesian(ylim = c(0, 0.1)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2769,19 +2770,19 @@ projection4 <-  final.df %>%
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),
+        legend.text = element_text(size = 13.5),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 14, vjust = 1.7),
+        axis.title.x = element_text(size = 13.5),
         axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
+        strip.text = element_text(size = 14),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-fig2b <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Fig4 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_siteV5C.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_site_v5C.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 
@@ -2802,19 +2803,22 @@ extrap.scenario.df_5Cv5 <- extrap.scenario.df_5Cv5 %>%
 final.extrap.df <- rbind(extrap.scenario.df_5C, extrap.scenario.df_5Cv0.2, extrap.scenario.df_5Cv5)
 
 
-final.extrap.df$bias.type <- factor(final.extrap.df$bias.type, levels = c("Without GRF", "With GRF"))
+final.extrap.df$bias.type <- factor(final.extrap.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
 final.extrap.df$mod.type2 <- factor(final.extrap.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
 
+# Save a version for bias comparison
+final.extrap.df.bias <- final.extrap.df
+
 final.extrap.df <- final.extrap.df %>% 
-  filter(bias.type2 == "Bias" | mod.type2 == "m.PA")
+  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
 
 coef1 <- final.extrap.df %>%
   ggplot(aes(x = relative.GRF, y = beta1.mean, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[1]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-1, 1)) +
   theme_bw() +
@@ -2840,8 +2844,8 @@ coef2 <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[2]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-1, 1)) +
   theme_bw() +
@@ -2864,7 +2868,7 @@ coef2 <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(coef1 + rremove("xlab"), coef2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/CoefficientsC.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficients_5C.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 PO_int <- final.extrap.df %>%
   filter(PO_intercept != 0 ) %>% 
@@ -2872,8 +2876,8 @@ PO_int <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[0]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-6, 1)) +
   theme_bw() +
@@ -2901,8 +2905,8 @@ PA_int <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[0]), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
   coord_cartesian(ylim = c(-6, 1)) +
   theme_bw() +
@@ -2926,15 +2930,15 @@ PA_int <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(PO_int + rremove("xlab"), PA_int + rremove("xlab") , common.legend = T,  ncol = 2, nrow = 1, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/InterceptsC.png"), w = 23.5, h = 15, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Intercepts_5C.png"), w = 23.5, h = 15, units = "cm", dpi = 400, device = "png")
 
 coefSD1 <- final.extrap.df %>%
   ggplot(aes(x = relative.GRF, y = beta1.sd, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[1]~"SD"), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 0.7)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2959,8 +2963,8 @@ coefSD2 <- final.extrap.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = expression(beta[2]~"SD"), color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(0, 0.7)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -2982,21 +2986,21 @@ coefSD2 <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(coefSD1 + rremove("xlab"), coefSD2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficient_SDsC.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficient_SDs_5C.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 #######################################################
 ################ GRF HYPERPARAMETERS ##################
 #######################################################
 
+
 g1 <- final.extrap.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
-  ggplot(aes(x = relative.GRF, y = scal - GRF.range.mean, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
+  ggplot(aes(x = relative.GRF, y = scal - GRF.range.mean)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Bias of GRF range", color = NULL, fill = "Model Type") +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
   coord_cartesian(ylim = c(-100, 700)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -3017,14 +3021,13 @@ g1 <- final.extrap.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 g2 <- final.extrap.df %>%
-  filter(bias.type == "With GRF") %>% 
+  filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = relative.GRF, y = GRF.variance - (GRF.sd.mean)^2, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
+  ggplot(aes(x = relative.GRF, y = GRF.variance - (GRF.sd.mean)^2)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Bias of GRF variance", color = NULL, fill = "Model Type") +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  coord_cartesian(ylim = c(-5, 2)) +
+  coord_cartesian(ylim = c(-3, 2)) +
   theme_bw() +
   facet_wrap(~mod.type2,
              labeller = as_labeller(c(m.int = "Integrated",
@@ -3046,8 +3049,7 @@ g2 <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(g1 + rremove("xlab"), g2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/True_vs_estimated_GRF_paramsC.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
-
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/True_vs_estimated_GRF_params_5C.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 #########################################################
 ################## TRAINING SITE #########################
@@ -3062,15 +3064,19 @@ true.validation.SiteA.df_5Cv0.2 <- true.validation.SiteA.df_5Cv0.2 %>%
 true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>% 
   mutate(relative.GRF = "5")
 
+
 final.SiteA.df <- rbind(true.validation.SiteA.df_5C, true.validation.SiteA.df_5Cv0.2, true.validation.SiteA.df_5Cv5)
 
 
-final.SiteA.df$bias.type <- factor(final.SiteA.df$bias.type, levels = c("Without GRF", "With GRF"))
-
+final.SiteA.df$bias.type <- factor(final.SiteA.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
 final.SiteA.df$mod.type2 <- factor(final.SiteA.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
 
+# Save a version for bias comparison
+final.SiteA.df.bias <- final.SiteA.df
+
 final.SiteA.df <- final.SiteA.df %>% 
-  filter(bias.type2 == "Bias" | mod.type2 == "m.PA")
+  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
+
 
 
 training1 <- final.SiteA.df %>%
@@ -3078,8 +3084,8 @@ training1 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean RMSE projection site", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -3107,8 +3113,8 @@ training2 <- final.SiteA.df %>%
   # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean interval score", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(NA, 3.5)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -3133,8 +3139,8 @@ training3 <- final.SiteA.df %>%
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -3154,14 +3160,18 @@ training3 <- final.SiteA.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
+fig2 <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 3, legend = "bottom", labels = c("(a)", "(b)", "(c)"), align = "v")
+
+ggsave(plot = fig2, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site_5C.png"), w = 21, h = 27, units = "cm", dpi = 400, device = "png")
+
 
 training4 <- final.SiteA.df %>%
   ggplot(aes(x = relative.GRF, y = coverage.rate, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = "Relative random effect contribution", y = "Mean coverage probability", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
-  scale_color_manual(values = c("Without GRF" = "#D55E00", "With GRF" = "#0072B2")) +
+  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
+  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
   #coord_cartesian(ylim = c(-0.5, NA)) +
   theme_bw() +
   facet_wrap(~mod.type2,
@@ -3181,97 +3191,199 @@ training4 <- final.SiteA.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-fig2 <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+fig2b <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_siteC.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site_5C.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
-#######################################################
-############ FIG 3. TRAINING AND PROJECTION ###########
-#######################################################
+########## CORRELATION BETWEEN ESTIMATED AND TRUE FIXED & GRF #############
 
-# 
-# ggsave(plot = fig, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_siteC.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
-
-############# FIGURE 4 UPDATED ###############
-
-cor.GRF <- final.SiteA.df.bias %>% 
-  filter(bias.type == "With GRF") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
-  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias cov", "With bias cov"))) %>%
-  ggplot(aes(x = relative.GRF, y = cor.GRF, fill = bias.type2)) +  
-  geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Correlation random", color = NULL) +
+cor.GRF <- final.SiteA.df %>%
+  filter(bias.type == "With Gaussian random field") %>% 
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
+  ggplot(aes(x = relative.GRF, y = cor.GRF)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
+  labs(x = "Relative random effect contribution", y = "Correlation random", color = NULL, fill = "Model Type") +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
-  scale_fill_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
-  scale_color_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
-  coord_cartesian(ylim = c(-0.2, NA)) +
+  #coord_cartesian(ylim = c(-300, 200)) +
   theme_bw() +
-  facet_wrap(~mod.type2, 
-             labeller = as_labeller(c(m.int = "Integrated", 
-                                      m.PA = "Presence-absence", 
-                                      m.PO = "Presence-only"))) +
+  facet_wrap(~mod.type2,
+             labeller = as_labeller(c(m.int = "Integrated",
+                                      m.PA = "PA",
+                                      m.PO = "PO"))) +
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 13.5),  
-        panel.grid.major.x = element_blank(),   
-        panel.grid.minor.x = element_blank(),   
-        axis.title.y = element_text(size = 14), 
-        axis.title.x = element_text(size = 14),
-        axis.text = element_text(size = 12),    
-        strip.text = element_text(size = 14),   
+        legend.text = element_text(size = 14),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 15),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-cor.FIXED <- final.SiteA.df.bias %>% 
-  filter(bias.type == "With GRF") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
-  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias cov", "With bias cov"))) %>%
-  ggplot(aes(x = relative.GRF, y = cor.FIXED, fill = bias.type2)) +  
-  geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Correlation fixed", color = NULL) +
+RMSE.GRF <- final.SiteA.df %>%
+  filter(bias.type == "With Gaussian random field") %>% 
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
+  ggplot(aes(x = relative.GRF, y = RMSE.global.GRF, fill = mod.type2)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
+  labs(x = "Relative random effect contribution", y = "Mean RMSE random", color = NULL, fill = "Model Type") +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
-  scale_fill_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
-  scale_color_manual(values = c("Without bias cov" = "green4", "With bias cov" = "purple4")) + 
-  coord_cartesian(ylim = c(-0.2, NA)) +
+  scale_fill_manual(values = fill.colours, guide = "none") +
+  #coord_cartesian(ylim = c(-300, 200)) +
   theme_bw() +
-  facet_wrap(~mod.type2, 
-             labeller = as_labeller(c(m.int = "Integrated", 
-                                      m.PA = "Prsence-absence", 
-                                      m.PO = "Presence-only"))) +
+  facet_wrap(~mod.type2,
+             labeller = as_labeller(c(m.int = "Integrated",
+                                      m.PA = "PA",
+                                      m.PO = "PO"))) +
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 13.5),  
-        panel.grid.major.x = element_blank(),   
-        panel.grid.minor.x = element_blank(),   
-        axis.title.y = element_text(size = 14), 
-        axis.title.x = element_text(size = 14),
-        axis.text = element_text(size = 12),    
-        strip.text = element_text(size = 14),   
+        legend.text = element_text(size = 14),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 15),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 
-COR_GRF_FIXED_plot <- ggarrange(
-  cor.GRF + rremove("xlab"),  # Remove individual x labels
-  cor.FIXED + rremove("xlab"),
-  common.legend = TRUE,  
-  ncol = 1, nrow = 2, 
-  legend = "bottom",
-  align = "v",
-  labels = c("(a)", "(b)"),
-  heights = c(1, 1)
-)
+cor.FIXED <- final.SiteA.df %>%
+  filter(bias.type == "With Gaussian random field") %>% 
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
+  mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
+  ggplot(aes(x = relative.GRF, y = cor.FIXED)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
+  labs(x = "Relative random effect contribution", y = "Correlation fixed", color = NULL, fill = "Model Type") +
+  scale_x_discrete(labels = x.discrete.label) +
+  #coord_cartesian(ylim = c(-300, 200)) +
+  theme_bw() +
+  facet_wrap(~mod.type2,
+             labeller = as_labeller(c(m.int = "Integrated",
+                                      m.PA = "PA",
+                                      m.PO = "PO"))) +
+  theme(legend.position = "bottom",
+        legend.key.size = unit(1.5, "line"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 15),
+        strip.background = element_rect(fill = "gray96"),
+        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-COR_GRF_FIXED_plot <- annotate_figure(
-  COR_GRF_FIXED_plot, 
-  bottom = text_grob("Relative random effect contribution", size = 14, vjust = 0.5)  # Adjust vertical position
-) 
+RMSE.FIXED <- final.SiteA.df %>%
+  filter(bias.type == "With Gaussian random field") %>% 
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
+  mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
+  ggplot(aes(x = relative.GRF, y = RMSE.global.FIXED, fill = mod.type2)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
+  labs(x = "Relative random effect contribution", y = "Mean RMSE fixed", color = NULL, fill = "Model Type") +
+  scale_x_discrete(labels = x.discrete.label) +
+  scale_fill_manual(values = fill.colours, guide = "none") +
+  #coord_cartesian(ylim = c(-300, 200)) +
+  theme_bw() +
+  facet_wrap(~mod.type2,
+             labeller = as_labeller(c(m.int = "Integrated",
+                                      m.PA = "PA",
+                                      m.PO = "PO"))) +
+  theme(legend.position = "bottom",
+        legend.key.size = unit(1.5, "line"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 15),
+        strip.background = element_rect(fill = "gray96"),
+        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
+
+COR_GRF_FIXED_plot <- ggarrange(cor.GRF + rremove("xlab"), cor.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
+
+RMSE_GRF_FIXED_plot <- ggarrange(RMSE.GRF + rremove("xlab"), RMSE.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
+
+Fig.4 <- ggarrange(COR_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
+
+Fig.4b <- ggarrange(RMSE_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
+
+ggsave(plot = Fig.4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_fixed_GRF_params_5C.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
+
+ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_tests/RMSE_random_fixed_5C.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
 
 
-ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/Scenario_5_tests/FIGURE4C.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")
+#######################
+
+# Pull out some key values for results ------------------------------------
+
+#######################
+
+### Figure 5. results
+
+# Calculate difference in projection coverage rate ISDM to PA per replicate
+# calculate difference in RMSE training site & coverage rate training between ISDM and PA (mean)
+# Calculate difference in RMSE training site & coverage rate training between ISDM with GRF and PA with/without GRF (mean)
+
+# Mean correlation of PO and integrated models GRF, mean correlation of PA model GRF
+
+
+
+summary_table <- true.validation.df %>% 
+  filter(mod.type2 %in% c("m.int", "m.PA")) %>% 
+  group_by(job_index, extrap.type) %>% 
+  summarise(
+    m_PA_cov.rate = coverage.rate[mod.type == "m.PA"],
+    m_int_RMSE = RMSE.global[mod.type == "m.int"],
+    m_int_bias_RMSE = RMSE.global[mod.type == "m.int.bias"],
+    diff_PA_minus_int = m_PA_RMSE - m_int_RMSE,
+    diff_PA_mins_int_bias = m_PA_RMSE - m_int_bias_RMSE,
+    ratio.int = m_PA_RMSE/  m_int_RMSE,
+    ratio.int.bias = m_PA_RMSE/m_int_bias_RMSE,
+    .groups = "drop"
+  ) 
+
+
+test <- true.validation.df %>% 
+  filter(mod.type2 %in% c("m.int", "m.PA")) %>% 
+  filter(job_index == 1)
+
+median(summary_table$perc_improvement_m_int_vs_m_PA)
+median(summary_table$perc_improvement_m_int_bias_vs_m_PA)
+mean(summary_table$diff_int_PA)
+mean(summary_table$diff_int_bias_PA)
+
+
+mean(summary_table$av_diff)
+
+print(paste0("RMSE is on average ", mean(summary_table$ratio.int), " higher in PA than integrated models"))
+
+print(paste0("RMSE is on average ", mean(summary_table$ratio.int.bias), " higher in PA than integrated models"))
+
+
+
+summary_table.bias <- true.validation.df %>% 
+  filter(mod.type2 %in% c("m.int", "m.PO")) %>% 
+  group_by(job_index, extrap.type) %>% 
+  summarise(
+    m_PO_RMSE = RMSE.global[mod.type == "m.PO"],
+    m_PO_bias_RMSE = RMSE.global[mod.type == "m.PO.bias"],
+    m_int_RMSE = RMSE.global[mod.type == "m.int"],
+    m_int_bias_RMSE = RMSE.global[mod.type == "m.int.bias"],
+    diff_PO_wbias_cov = m_PO_RMSE - m_PO_bias_RMSE,
+    diff_int_wbias_cov = m_int_RMSE - m_int_bias_RMSE,
+    .groups = "drop"
+  ) 
+
+print(paste0("RMSE increased by ", mean(summary_table.bias$diff_PO_wbias_cov), " on average when bias cov not present"))
+
+print(paste0("RMSE increased by ", mean(summary_table.bias$diff_int_wbias_cov), " on average when bias cov not present"))
+
 
 
