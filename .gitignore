@@ -16,3 +16,10 @@ Testing_Bias_Scenarios_Simple.html
 Testing_Bias_Scenarios.qmd
 Testing_Bias_Scenarios.html
 Testing_Bias_Scenarios.R
+RESULTS_FIGURES.R
+RESULTS_FIGURES_FINAL.R
+RESULTS_FIGURES_FINAL_SCENARIO2.R
+RESULTS_FIGURES_FINAL_SCENARIO5_w_out_bisa_cov.R
+Testing_Fixedvs.Random.rmarkdown
+Testing_spat_autocorrelation_scenarios.rmarkdown
+Testing_spat_autocorrelation_scenarios_files/
