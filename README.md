@@ -26,7 +26,7 @@ Figure 2. (a) A visual representation of the simulation study design. Steps 1-3 
 
 At its simplest, you can run a scenario all the way through from the simulation code via running sequentially these two scripts:
 
-Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. 
+Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. All the scripts in the [Scenarios folder](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios) are just variations of this script.
 
 Plot the outputs from the scenario with the [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) script. *NOTE - your scenario name must match the scenario name in the 0a.Run_ALL_Replicates.R file.
 
@@ -50,15 +50,15 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [5.PA_Sampling.R](https://github.com/patch105/AntarcticISDM/blob/main/5.PA_Sampling.R): Sample the PA data at the training site via quadrat surveys.
 
-[6.Run_Model.R](https://github.com/patch105/AntarcticISDM/blob/main/6.Run_Model.R): Set up and run the integrated, presence-only and presence-absence models. Model types are designated via the object 'mod.type' in the 0a.Run_ALL_Replicates.R script.
+[6.Run_Model.R](https://github.com/patch105/AntarcticISDM/blob/main/6.Run_Model.R): Set up and run the integrated, presence-only and presence-absence models. Model types are designated via the object 'mod.type' in the 0a.Run_ALL_Replicates.R script and can include or not include a bias covariate and a Gaussian random field. 
 
 [7.Extract_Model_Results.R](https://github.com/patch105/AntarcticISDM/blob/main/7.Extract_Model_Results.R): Pull out model parameter estimates. 
 
 [8.Make_Truth.R](https://github.com/patch105/AntarcticISDM/blob/main/8.Make_Truth.R): Save the true log species intensity for comparison with predictions.
 
-[9.Predict_from_fitted.R](https://github.com/patch105/AntarcticISDM/blob/main/9.Predict_from_fitted.R): Take fitted models and predict from the training to the projection site. 
+[9.Predict_from_fitted.R](https://github.com/patch105/AntarcticISDM/blob/main/9.Predict_from_fitted.R): Take fitted models and predict from the training to the projection site (called Site B). You can also predict back to the training site (Site A).
 
-[10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site.
+[10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site. You can also compare the predicted and true log species intensity at the training site.
 
 ## Plot the outputs of a scenario (just for a quick look at outputs)
 
@@ -89,13 +89,15 @@ Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling
 
 ## Code for plotting figures from manuscript
 
-[Figure 3. and supplementary figures Scenarios 1 & 2](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_1.R)
+[Figure 3. and supplementary tables for all scenarios]()
 
-[Figure 4. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
+[Figure 4. and supplementary figures Scenarios 1 & 2](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_1.R)
 
 [Figure 5. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
 
-[Figure 6. and supplementary figures Scenarios 5 & 6](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_6.R)
+[Figure 6. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
+
+[Supplementary figures Scenarios 5 & 6](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_6.R)
 
 ## Session details
 R version 4.4.1
