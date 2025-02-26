@@ -26,7 +26,7 @@ Figure 2. (a) A visual representation of the simulation study design. Steps 1-3 
 
 At its simplest, you can run a scenario all the way through from the simulation code via running sequentially these two scripts:
 
-Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. 
+Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. All the scripts in the [Scenarios folder](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios) are just variations of this script.
 
 Plot the outputs from the scenario with the [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) script. *NOTE - your scenario name must match the scenario name in the 0a.Run_ALL_Replicates.R file.
 
