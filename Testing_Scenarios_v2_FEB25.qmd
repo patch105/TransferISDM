@@ -209,23 +209,117 @@ beta0 <- -1 # Intercept
 beta1 <- 0.01 # Coefficient for cov 1
 beta2 <- 0.2 # Coefficient for cov 2
 
-
-
 nu <- 1/2 # Smoothness parameter for Matern covariance function
 
-# Print the expected mean intensity (assuming mean of covariate is 0)
- exp(beta0 + beta1*(0) + beta2*(0))
+GRF.var.multiplier <- 1
 
 fe <- beta0 + beta1*cov1.mat[, "cov"] + beta2*cov2.mat[, "cov"]
 
- mu <- cov1.df %>% mutate(cov = fe)
+mu <- cov1.df %>% mutate(cov = fe)
   mu <- spatstat.geom::as.im(mu)
+  
+  # Create log-Gaussian Cox Process with environmental covariates
+    # Separate out fixed and random effects
+    
+    xSeq <- terra::xFromCol(cov1)
+    ySeq <- terra::yFromRow(cov1)
+    
+    ############
+    #### Calculate variance of GRF to be proportional to variance of fixed effect
+    ############
+    
+    # Calculate 'variance' of fixed effect
+    fe.var <- beta1^2*var_cov1 + beta2^2*var_cov2 
+    
+    # Multiply variance by multiplier to get target variance for GRF
+    target.var <- GRF.var.multiplier * fe.var
+    
+    # Simulate the random effect with target variance
+    REff <- RISDM:::fftGPsim2( x=xSeq, y=ySeq, sig2 = target.var , rho = scal, nu = nu, min_exponent2 = 12)
+    
+    REff <- as.numeric(REff)
+    
+    GRF.mat <- cov1.mat
+    
+    GRF.mat[, "cov"] <- as.numeric(REff)
+    
+    colnames(GRF.mat)[colnames(GRF.mat) == "cov"] <- "GRF"
+    
+    # Save a version that removes mu and just keeps random effect for later comparison
+    GRF.rast <- rast((mu*0 + GRF.mat[, "GRF"]))
+    
+    crs(GRF.rast) <- crs(cov1)
+    names(GRF.rast) <- "GRF"
+    
+    # Extract cell size for comparison with prediction because RISDM predictions are with reference to cell area
+    log.cell_size <- log(cellSize(cov1))
+    
+    GRF.rast <- GRF.rast + log.cell_size
+    
+    # Calculate the correlation between the GRF and the covariates
+    cor.GRF.cov1 <- cor(as.vector(GRF.rast), as.vector(cov1),
+                      method = "spearman")
+    
+    cor.GRF.cov2 <- cor(as.vector(GRF.rast), as.vector(cov2),
+                        method = "spearman")
+    
+    # Save a version that just keeps fixed effects for later comparison (removes the intercept)
+    fixed <- beta1*cov1.mat[, "cov"] + beta2*cov2.mat[, "cov"]
+    mu.fixed <- cov1.df %>% mutate(cov = fixed)
+    mu.fixed <- spatstat.geom::as.im(mu.fixed)
+    
+    fixed.rast <- rast(mu.fixed)
+    crs(fixed.rast) <- crs(cov1)
+    names(fixed.rast) <- "Fixed"
+    
+    fixed.rast <- fixed.rast + log.cell_size
+    
+    # Combine intercept +  fixed and random effects
+    mu <- mu + GRF.mat[, "GRF"]
+  
+    # Simulate the latent Gaussian field
+    lg.s <- rpoispp(exp(mu))
 
-# Create IPP with environmental covariate
-ipp <- rpoispp(exp(mu))
+spp_process <- cbind(x = lg.s$x, y = lg.s$y)
 
-spp_process <- cbind(x = ipp$x, y = ipp$y)
 ```
+
+## 2b. Make truth 
+
+
+
+
+```{r}
+# True log intensity
+true_log_int <- mu
+
+true_log_int.rast <- rast(true_log_int)
+
+crs(true_log_int.rast) <- crs(cov1) 
+
+names(true_log_int.rast) <- "int"
+
+# Extract cell size because RISDM predictions are with reference to cell area
+log.cell_size <- log(cellSize(cov1))
+
+# Add intensity + log(cell area)
+true_log_int.rast <- true_log_int.rast+log.cell_size
+
+
+# Now the intensity (not logged)
+true_int <- exp(mu)
+
+true_int.rast <- rast(true_int)
+
+crs(true_int.rast) <- crs(cov1) 
+
+names(true_int.rast) <- "int"
+
+true_int.rast <- true_int.rast + cellSize(cov1)
+  
+```
+
+
 
 ## 3. Choose Reference and Target sites
 
@@ -375,12 +469,38 @@ cov1 %>%
 ```
 
 
-## 4. PO sampling
+<!-- ## 4. PO sampling - no bias -->
 
-*Note that the below bias field applies only within the Reference Site.
+<!-- *Note that the below bias field applies only within the Reference Site. -->
+
+<!-- ```{r} -->
+
+<!-- #Maximum probability for bias field (0.2 or 0.05) -->
+<!-- maxprob <- 0.2 -->
+<!-- # PO sampling values (0.08 or 0.02) -->
+<!-- detect.prob <- 0.08 -->
+
+<!-- # Trim po to only include points in Site A -->
+<!-- spp_process.rand.gridA <- spp_process[ -->
+<!--   spp_process[,1] >= xmin(ext(rand.gridA)) & spp_process[,1] <= xmax(ext(rand.gridA)) &  -->
+<!--     spp_process[,2] >= ymin(ext(rand.gridA)) & spp_process[,2] <= ymax(ext(rand.gridA)), ] -->
+
+
+<!-- ########## NO BIAS: RANDOM THINNING ############ -->
+<!-- detect.prob = 0.08 -->
+
+<!-- # Thin the process by the probability -->
+<!-- po.rand.gridA <- cbind(spp_process.rand.gridA, presence = rbinom(nrow(spp_process.rand.gridA), 1, detect.prob)) -->
+<!-- po.rand.gridA <- po.rand.gridA[po.rand.gridA[, "presence"] == 1, ] -->
+
+<!-- # Trim to just xy -->
+<!-- po.rand.gridA.no.bias <- po.rand.gridA[, c("x", "y")] -->
+
+<!-- ``` -->
+
+## PO sampling - bias 
 
 ```{r}
-
 #Maximum probability for bias field (0.2 or 0.05)
 maxprob <- 0.2
 # PO sampling values (0.08 or 0.02)
@@ -454,9 +574,8 @@ spp_process.rand.gridA <- spp_process[
           
           # Trim to just xy
           po.rand.gridA <- po.rand.gridA[, c("x", "y")]
-        
-          
 ```
+
 
 ## 5. PA sampling
 
@@ -678,7 +797,6 @@ ggarrange(A, B, ncol = 1, nrow = 2)
 
 # Set the distribution formula for the model
 distributionFormula <- ~0 + cov1 + cov2 # Linear w two covs
-distributionFormula2 <- ~0 + cov1 + cov2 + cov3
 
 my.control <- list(coord.names = c("x", "y"),
                    prior.mean = prior.mean,
@@ -688,6 +806,15 @@ my.control <- list(coord.names = c("x", "y"),
                    prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
                    addRandom = FALSE, # No random effect
                    standardiseCovariates = FALSE) 
+
+my.control.GRF <- list(coord.names = c("x", "y"),
+                         prior.mean = prior.mean,
+                         int.sd = int.sd, # Intercept standard deviation
+                         other.sd = other.sd, # Covariate effect standard deviation
+                         prior.range = prior.range, # Prior chance 10% that parameter falls below range of 1km
+                         prior.space.sigma = prior.space.sigma, # Prior chance 10% that parameter falls above SD of 5
+                         addRandom = TRUE, # With random effect
+                         standardiseCovariates = FALSE) 
 
 # Load PA/PO occurrence data -------------------------------------------------
 
@@ -701,17 +828,9 @@ names(PO) <- c("x", "y")
 covs.SiteA.rast <- crop(covs, ext(rand.gridA))
 cov.rep <- covs.SiteA.rast
 
-# Add bias covariate to covariate stack
 Bias.rast <- log(bias_noisy)
-cov.rep.bias <- c(cov.rep, Bias.rast)
 
-cov3 <- covs.SiteA.rast[[1]]
-values(cov3) <- 1
-names(cov3) <- "cov3"
-
-cov.rep2.bias <- c(cov.rep.bias, cov3)
-
-cov.rep3.no.bias <- c(cov.rep, cov3)
+cov.rep <- c(cov.rep, Bias.rast)
 
 mesh.default <- makeMesh(cov.rep,
                          max.n = max.n, # Default c(500,200)
@@ -722,59 +841,33 @@ mesh.default <- makeMesh(cov.rep,
                          offset = offset, # Default is dep.range
                          doPlot = doPlot)
 
-
-
 Model <- list()
 
-# Integrated model with bias covariate
-Model$m.int.bias <- isdm(observationList = list(POdat = PO,
-                                     PAdat = PA_fit),
-              covars = cov.rep.bias,
-              mesh = mesh.default,
-              responseNames = c(PO = NULL, PA = "presence"),
-              sampleAreaNames = c(PO = NULL, PA = "area"),
-              distributionFormula = distributionFormula,
-              biasFormula = ~1 + bias, 
-              artefactFormulas = list(PA = ~1), # Intercept only
-              control = my.control)
+#### Models with GRF
 
-# Integrated model with bias covariate and 3rd covariate
-Model$m.int.3rd.cov.bias <- isdm(observationList = list(POdat = PO,
-                                     PAdat = PA_fit),
-              covars = cov.rep2.bias,
-              mesh = mesh.default,
-              responseNames = c(PO = NULL, PA = "presence"),
-              sampleAreaNames = c(PO = NULL, PA = "area"),
-              distributionFormula = distributionFormula2,
-              biasFormula = ~1 + bias, 
-              artefactFormulas = list(PA = ~1), # Intercept only
-              control = my.control)
+Model$m.int.GRF <- isdm(observationList = list(POdat = PO,
+                                                        PAdat = PA_fit),
+                                 covars = cov.rep,
+                                 mesh = mesh.default,
+                                 responseNames = c(PO = NULL, PA = "presence"),
+                                 sampleAreaNames = c(PO = NULL, PA = "area"),
+                                 distributionFormula = distributionFormula, # Linear w one cov
+                                 biasFormula = ~1 + bias, #Intercept only
+                                 artefactFormulas = list(PA = ~1),
+                                 control = my.control.GRF)
 
-# Integrated model with no bias covariate but a 3rd covariate
-Model$m.int.3rd.cov <- isdm(observationList = list(POdat = PO,
-                                     PAdat = PA_fit),
-              covars = cov.rep3.no.bias,
-              mesh = mesh.default,
-              responseNames = c(PO = NULL, PA = "presence"),
-              sampleAreaNames = c(PO = NULL, PA = "area"),
-              distributionFormula = distributionFormula2,
-              biasFormula = ~1, 
-              artefactFormulas = list(PA = ~1), # Intercept only
-              control = my.control)
 
-# PO model (no bias covariate)
-Model$m.PO <- isdm(observationList = list(POdat = PO), 
-             covars = cov.rep,
-             mesh = mesh.default,
-             responseNames = NULL,
-             sampleAreaNames = NULL,
-             distributionFormula = distributionFormula, # Linear w one cov
-             biasFormula = ~1, # Intercept only
-             artefactFormulas = NULL,
-             control = my.control)
+Model$m.PO.GRF <- isdm(observationList = list(POdat = PO),
+                                covars = cov.rep,
+                                mesh = mesh.default,
+                                responseNames = NULL,
+                                sampleAreaNames = NULL,
+                                distributionFormula = distributionFormula, # Linear w one cov
+                                biasFormula = ~1 + bias, 
+                                artefactFormulas = NULL,
+                                control = my.control.GRF)
 
-# PA model 
-Model$m.PA <- isdm(observationList = list(PAdat = PA_fit),
+Model$m.PA.GRF <- isdm(observationList = list(PAdat = PA_fit),
                                 covars = cov.rep,
                                 mesh = mesh.default,
                                 responseNames = c(PA = "presence"),
@@ -782,9 +875,11 @@ Model$m.PA <- isdm(observationList = list(PAdat = PA_fit),
                                 distributionFormula = distributionFormula, # Linear w one cov
                                 biasFormula = NULL, #Intercept only
                                 artefactFormulas = list(PA = ~1), # Intercept only
-                                control = my.control)
+                                control = my.control.GRF)
 
 ```
+
+
 
 ## Look at model summaries
 
@@ -795,5 +890,444 @@ map(Model, summary)
 
 ```
 
+# Predict from fitted to Projection Site (INTENSITY)
 
+```{r}
+
+posterior_nsamps <- 500
+
+# Covs Site B
+covs.SiteB.rast <- crop(covs, ext(rand.gridB))
+cov.rep <- covs.SiteB.rast
+
+# Add a dummy bias variable to keep RISDM happy
+cov.rep$bias <- 1 
+
+Model <- imap(Model, function(x, name) {
+  
+  if (grepl("PO", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+    
+    x$preds.PO.int.GRF.SiteB <- predict(x,
+                                        covars = cov.rep,
+                                        S = posterior_nsamps, 
+                                        intercept.terms = "PO_Intercept",
+                                        type = "intensity",
+                                        includeRandom = FALSE)
+  }
+  
+   if (grepl("PA", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+      
+       x$preds.PA.int.GRF.SiteB <- predict(x,
+                                        covars = cov.rep,
+                                        S = posterior_nsamps, 
+                                        intercept.terms = "PA_Intercept",
+                                        type = "intensity",
+                                        includeRandom = FALSE)
+    }
+  
+  return(x)
+  
+})
+
+```
+
+# Predict from fitted to Projection Site (LOG INTENSITY)
+
+```{r}
+
+posterior_nsamps <- 500
+
+# Covs Site B
+covs.SiteB.rast <- crop(covs, ext(rand.gridB))
+cov.rep <- covs.SiteB.rast
+
+# Add a dummy bias variable to keep RISDM happy
+cov.rep$bias <- 1 
+
+Model <- imap(Model, function(x, name) {
+  
+  if (grepl("PO", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+    
+    x$preds.PO.int.GRF.SiteB <- predict(x,
+                                        covars = cov.rep,
+                                        S = posterior_nsamps, 
+                                        intercept.terms = "PO_Intercept",
+                                        type = "link",
+                                        includeRandom = FALSE)
+  }
+  
+   if (grepl("PA", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+      
+       x$preds.PA.int.GRF.SiteB <- predict(x,
+                                        covars = cov.rep,
+                                        S = posterior_nsamps, 
+                                        intercept.terms = "PA_Intercept",
+                                        type = "link",
+                                        includeRandom = FALSE)
+    }
+  
+  return(x)
+  
+})
+
+```
+
+
+# Pull out posterior variance of the GRF to add to prediction
+
+```{r}
+
+GRF_sd_df <- data.frame(model = c("m.PO.GRF", "m.PA.GRF", "m.int.GRF"),
+                   GRF_sd = c(summary(Model$m.PO.GRF)$SPATIAL$mean[2], 
+                            summary(Model$m.PA.GRF)$SPATIAL$mean[2],
+                            summary(Model$m.int.GRF)$SPATIAL$mean[2])) %>% 
+  mutate(GRF_var = GRF_sd^2) 
+
+GRF_sd_df <- GRF_sd_df %>% 
+  mutate(variance.term = exp(0.5*GRF_var),
+         variance.term.log.int = 0.5*GRF_var)
+
+
+```
+
+# Add to the prediction at the projection site (INTENSITY)
+Pull out the Median predictions and then multiply by the variance term. 
+
+```{r}
+
+Model <- imap(Model, function(x, name) {
+  
+  if (grepl("PO", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+    
+    variance.term <- GRF_sd_df$variance.term[GRF_sd_df$model == name]
+    
+    x$MEDIAN_preds.PO.int.GRF.SiteB <- x$preds.PO.int.GRF.SiteB$field$Median
+    
+    x$MEDIAN_preds.PO.int.GRF.SiteB_UPDATE <- x$MEDIAN_preds.PO.int.GRF.SiteB*variance.term
+      
+  }
+  
+   if (grepl("PA", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+      
+     variance.term <- GRF_sd_df$variance.term[GRF_sd_df$model == name]
+     
+     x$MEDIAN_preds.PA.int.GRF.SiteB <- x$preds.PA.int.GRF.SiteB$field$Median
+     
+       x$MEDIAN_preds.PA.int.GRF.SiteB_UPDATE <- x$MEDIAN_preds.PA.int.GRF.SiteB*variance.term
+    }
+  
+  return(x)
+  
+})
+
+```
+
+
+# Add to the prediction at the projection site (LOG INTENSITY)
+Pull out the Median predictions and then multiply by the variance term. 
+
+```{r}
+
+Model <- imap(Model, function(x, name) {
+  
+  if (grepl("PO", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+    
+    variance.term.log.int <- GRF_sd_df$variance.term.log.int[GRF_sd_df$model == name]
+    
+    x$MEDIAN_preds.PO.int.GRF.SiteB <- x$preds.PO.int.GRF.SiteB$field$Median
+    
+    x$MEDIAN_preds.PO.int.GRF.SiteB_UPDATE <- x$MEDIAN_preds.PO.int.GRF.SiteB+variance.term.log.int
+      
+  }
+  
+   if (grepl("PA", name, fixed = TRUE) | grepl("int", name, fixed = TRUE)) {
+      
+     variance.term.log.int <- GRF_sd_df$variance.term.log.int[GRF_sd_df$model == name]
+     
+     x$MEDIAN_preds.PA.int.GRF.SiteB <- x$preds.PA.int.GRF.SiteB$field$Median
+     
+       x$MEDIAN_preds.PA.int.GRF.SiteB_UPDATE <- x$MEDIAN_preds.PA.int.GRF.SiteB+variance.term.log.int
+    }
+  
+  return(x)
+  
+})
+
+```
+
+## Compare with truth (INTENSITY)
+
+```{r}
+
+true_log_int.rast
+
+true_int.rast.SiteB <- crop(true_int.rast, ext(rand.gridB))
+
+range_GRF <- range(values(true_int.rast.SiteB))
+
+truth <- true_int.rast.SiteB %>% 
+  as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = int)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("True intensity")
+
+PO <- Model$m.PO.GRF$MEDIAN_preds.PO.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PO model GRF")
+
+PO_update <- Model$m.PO.GRF$MEDIAN_preds.PO.int.GRF.SiteB_UPDATE %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PO model GRF with variance term")
+
+PA <- Model$m.PA.GRF$MEDIAN_preds.PA.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PA model GRF")
+
+PA_update <- Model$m.PA.GRF$MEDIAN_preds.PA.int.GRF.SiteB_UPDATE %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PA model GRF with variance term")
+
+int.PO <- Model$m.int.GRF$MEDIAN_preds.PO.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PO Intercept GRF")
+
+int.PO_update <- Model$m.int.GRF$MEDIAN_preds.PO.int.GRF.SiteB_UPDATE %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PO Intercept GRF with variance term")
+
+int.PA <- Model$m.int.GRF$MEDIAN_preds.PA.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PA Intercept GRF")
+
+int.PA_update <- Model$m.int.GRF$MEDIAN_preds.PA.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5)) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PA Intercept GRF with variance term")
+
+ ggarrange(truth, PO, PO_update, ncol = 3, nrow = 1)
+ 
+ ggarrange(truth, PA, PA_update, ncol = 3, nrow = 1)
+  
+ ggarrange(truth, int.PO, int.PO_update, ncol = 3, nrow = 1) 
+ 
+ ggarrange(truth, int.PA, int.PA_update, ncol = 3, nrow = 1)
+
+ 
+ 
+```
+
+## Compare with truth (LOG INTENSITY)
+
+```{r}
+
+
+true_log_int.rast.SiteB <- crop(true_log_int.rast, ext(rand.gridB))
+
+range_GRF <- range(values(true_log_int.rast.SiteB))
+
+truth <- true_log_int.rast.SiteB %>% 
+  as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = int)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("True log intensity")
+
+PO <- Model$m.PO.GRF$MEDIAN_preds.PO.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PO model GRF")
+
+PO_update <- Model$m.PO.GRF$MEDIAN_preds.PO.int.GRF.SiteB_UPDATE %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PO model GRF with variance term")
+
+PA <- Model$m.PA.GRF$MEDIAN_preds.PA.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PA model GRF")
+
+PA_update <- Model$m.PA.GRF$MEDIAN_preds.PA.int.GRF.SiteB_UPDATE %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("PA model GRF with variance term")
+
+int.PO <- Model$m.int.GRF$MEDIAN_preds.PO.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PO Intercept GRF")
+
+int.PO_update <- Model$m.int.GRF$MEDIAN_preds.PO.int.GRF.SiteB_UPDATE %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PO Intercept GRF with variance term")
+
+int.PA <- Model$m.int.GRF$MEDIAN_preds.PA.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PA Intercept GRF")
+
+int.PA_update <- Model$m.int.GRF$MEDIAN_preds.PA.int.GRF.SiteB %>% 
+            as.data.frame(xy = T) %>%  
+            ggplot() + 
+            geom_tile(aes(x = x, y = y, fill = Median)) + 
+            scale_fill_viridis(guide = guide_colorbar(barwidth = 0.5), limits = range_GRF) +
+            coord_fixed() + 
+            theme_bw() + 
+            theme(axis.title.x = element_blank(),
+                  axis.title.y = element_blank(),
+                  legend.ticks = element_blank(),
+                  legend.title = element_blank()) +
+  ggtitle("Integrated model PA Intercept GRF with variance term")
+
+ ggarrange(truth, PO, PO_update, ncol = 3, nrow = 1)
+ 
+ ggarrange(truth, PA, PA_update, ncol = 3, nrow = 1)
+  
+ ggarrange(truth, int.PO, int.PO_update, ncol = 3, nrow = 1) 
+ 
+ ggarrange(truth, int.PA, int.PA_update, ncol = 3, nrow = 1)
+
+ 
+```
 
