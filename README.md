@@ -56,9 +56,9 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [8.Make_Truth.R](https://github.com/patch105/AntarcticISDM/blob/main/8.Make_Truth.R): Save the true log species intensity for comparison with predictions.
 
-[9.Predict_from_fitted.R](https://github.com/patch105/AntarcticISDM/blob/main/9.Predict_from_fitted.R): Take fitted models and predict from the training to the projection site. 
+[9.Predict_from_fitted.R](https://github.com/patch105/AntarcticISDM/blob/main/9.Predict_from_fitted.R): Take fitted models and predict from the training to the projection site (called Site B). You can also predict back to the training site (Site A).
 
-[10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site.
+[10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site. You can also compare the predicted and true log species intensity at the training site.
 
 ## Plot the outputs of a scenario (just for a quick look at outputs)
 
