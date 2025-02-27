@@ -7,7 +7,6 @@
 
 # In the spatial autocorrelation scenario, the random and fixed effect relative contributions are controlled with the GRF.var.multiplier parameter. This parameter is multiplied by the variance of the fixed effect to determine the target variance of the random effect.
 
-# The output is a list containing the latent species distribution, fixed and random effects saved separately, and the correlation between the random effect and the covariates.
 
 # Inputs: 
 
@@ -20,6 +19,11 @@
 # Type of response (only linear supported)
 
 # Whether the species distribution has spatial autocorrelation (latent.type)
+
+
+# Outputs:
+
+# A list containing the latent species distribution, fixed and random effects saved separately as rasters, and the correlation between the random effect and the covariates.
 
 
 ########################################################################

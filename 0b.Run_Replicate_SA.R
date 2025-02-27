@@ -1,4 +1,25 @@
 
+########################################################################
+############### Run a single replicates for a given scenario ##########
+########################################################################
+
+# This script sequentially calls and saves all the separate functions of the simulation (steps 1-12). 
+
+# In here is where you can adjust the priors and the mesh parameters.
+
+# Inputs:
+
+# Scenario choices
+
+# Model choices
+
+# Parameters
+
+# Implementation choices
+
+########################################################################
+
+
 Run_Replicate_Func <- function(n_cores,
                                outpath,
                                scenario_name,

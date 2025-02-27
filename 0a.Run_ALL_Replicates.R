@@ -28,7 +28,9 @@ library(viridis)
 library(terra)
 library(purrr)
 library(readr)
-
+# # Install flexsdm
+# remotes::install_github("sjevelazco/flexsdm")
+library(flexsdm, lib.loc = lib_loc)
 
 # Scenario choices --------------------------------------------------------
 
@@ -108,7 +110,7 @@ detect.prob <- 0.08
 
 # Implementation choices --------------------------------------------------
 
-n_cores <- 3 # Number of cores to use for parallel processing, only relevant for the calculation of the Shape metric for environmental dissimilarity
+n_cores <- 3 # Number of cores to use for parallel processing. The flexsdm::extra_eval function can utilise parallel processing. If available on your system, this can speed up the calculation of the Shape metric for environmental dissimilarit in the script 3.Simulate_Enviro_Extrapolation.R but it's only used there. 
 
 # Number of posterior samples to take * note that it slows things down when more
 posterior_nsamps <- 5000

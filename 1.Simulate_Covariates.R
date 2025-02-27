@@ -7,13 +7,15 @@
 
 # It uses an internal function of the package RISDM, fftGPsim2, to simulate the covariates.
 
-# The output is a list containing the two covariates (raster, df, and matrix format), the correlation between the covariates, and the coordinates of the raster cells.
-
 # Inputs: 
 
 # Domain boundaries (east_min, east_max, north_min, north_max)
 
 # Range and variance of covariates (range_cov1, range_cov2, var_cov1, var_cov2)
+
+
+# Outputs:
+# A list containing the two covariates (raster, df, and matrix format), the correlation between the covariates, and the coordinates of the raster cells.
 
 
 ########################################################################
