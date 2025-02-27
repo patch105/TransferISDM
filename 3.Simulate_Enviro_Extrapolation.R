@@ -40,7 +40,7 @@
 
 # Outputs:
 
-# A list 
+# A list that updates the extrap.reps.out input with the new grids, covariates, environmental dissimilarity, and classification of the environmental dissimilarity (low, moderate, high)
 
 
 ########################################################################

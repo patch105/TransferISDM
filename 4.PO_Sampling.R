@@ -1,6 +1,39 @@
 
+########################################################################
+########################## 4. PO sampling   ##########################
+########################################################################
 
-# 4. PO sampling ----------------------------------------------------------
+# This script simulates presence-only (PO) records at the training site (Site A). 
+
+# It does so by thinning the latent species process either randomly (if bias == F) or according to a bias field (if bias == T).
+
+# For modelling the bias with a bias covariate later, a ~0.99 correlated bias field is generated and saved as a raster (Bias.rast = log(bias_noisy)).
+
+# *** NOTE *** if you want a bias covariate of a different correlation or you make a different original bias field, you must manually change the 'noise' object below to reflect this.
+
+# Inputs: 
+
+# The output from step 3.
+
+# Is there bias in the PO sampling? bias = T or F
+
+# detect.prob is the probability of detecting a species at a site and controls how many PO records there will be (along with the intercept of the latent species distribution). If you want bias and no bias scenarios to have equivalent numbers of PO records, you should set detect.prob to be the mean of the bias field.
+
+# maxprob is the maximum probability of detection in the bias field (if bias == T)
+
+# rast_cellsA are dimensions of the Training site
+
+
+# Outputs: A list that contains the species process at the Grid A (training site), the PO records and count of them from Grid A, as well as the bias covariate Bias.rast
+
+
+## ADDITIONAL FUNCTION:
+
+# po_checking_func() 
+
+# This function is run after po_sampling_func() to check if there are any reps with no PO data in Grid A. If there are, the rep is removed from the output list and the number of removed reps is printed. The code is set up in 0.Run_Replicates.R to re-run the reps with no PO data in Grid A.
+
+########################################################################
 
 po_sampling_func <- function(reps.setup.list,
                              bias = FALSE,
@@ -21,17 +54,18 @@ po_sampling_func <- function(reps.setup.list,
         
         print("no PO")
         
+        # Get the original species process
         spp_process <- cbind(x = rep$latent.list$lg.s$x, y = rep$latent.list$lg.s$y)
         
         rand.gridA <- rep$extrap.reps.out$rand.gridA
         rand.gridB <- rep$extrap.reps.out$rand.gridB
         
-        # Trim po to only include points in Site A
+        # Trim species process to only include points in Site A
         spp_process.rand.gridA <- spp_process[
           spp_process[,1] >= xmin(ext(rand.gridA)) & spp_process[,1] <= xmax(ext(rand.gridA)) & 
             spp_process[,2] >= ymin(ext(rand.gridA)) & spp_process[,2] <= ymax(ext(rand.gridA)), ]
         
-        # If no bias, random thinning applied
+        # If no bias, random thinning applied based on detect.prob
         if(bias == FALSE) {
           
           # Thin the process by the probability
@@ -47,7 +81,7 @@ po_sampling_func <- function(reps.setup.list,
         if(bias == TRUE) {
           
           # Thin the process by the bias field
-          minprob <- maxprob/10 # keep the relative difference between maximum and minimum probabilities the same across different scenarios of maxprob (i.e. strength of bias is the same)
+          minprob <- maxprob/10 # Keep the relative difference between maximum and minimum probabilities the same across different scenarios of maxprob (i.e. strength of bias is the same)
           
           probseq <-  exp(seq(log(minprob), log(maxprob), length.out = rast_cellsA[1]))
           
@@ -75,6 +109,7 @@ po_sampling_func <- function(reps.setup.list,
           
           # Add random noise to make correlated bias variable (~0.99 correlation)
           noise <- rnorm(length(bias_vals), mean = 0, sd = 0.035 * max(bias_vals)) # Adjust 'sd' for desired correlation
+          
           bias_vals_noisy <- bias_vals + noise
           bias_vals_noisy <- pmax(pmin(bias_vals_noisy, maxprob), minprob) # Clip to valid range
           
@@ -92,11 +127,11 @@ po_sampling_func <- function(reps.setup.list,
           crs(bias_noisy) <- "epsg:3857"
           names(bias_noisy) <- "bias"
           
-          # Check correlation between original and noisy bias
+          # Check correlation between original and noisy bias (this is how you can adjust your noise object)
           correlation <- cor(bias_vals, bias_vals_noisy)
           print(paste("Correlation between original and noisy bias:", round(correlation, 4)))
           
-          # Add spatial bias info to PP data
+          # Add spatial bias info to your spp. process at grid A data
           po.rand.gridA <- cbind(spp_process.rand.gridA, bias = terra::extract(bias.true, spp_process.rand.gridA[,1:2]))
           
           # Thin the process by the bias field
@@ -174,7 +209,7 @@ po_sampling_func <- function(reps.setup.list,
 
 # CHECK if PO data in both Sites ------------------------------------------
 
-# If none, need to re-run for that rep.
+# If none, need to re-run for that replicate
 po_checking_func <- function(reps.setup.list) {
 
   # Initialise a counter for removed reps
