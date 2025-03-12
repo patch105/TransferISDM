@@ -1,4 +1,4 @@
-# AntarcticISDM
+# TransferISDM
 
 Code in support of "Transferring species distribution models to understudied systems: Does data integration help?". _In Preparation._ Charlotte R. Patterson, Xiaotian Zheng, Scott D. Foster, Justine D. Shaw & Kate J. Helmstedt.
 
