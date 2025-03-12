@@ -110,5 +110,17 @@ readr 2.1.5
 
 purrr 1.0.2
 
+RISDM 1.2.36
+
+fmesher 0.2.0
+
+INLA 24.09.14
+
+flexsdm 1.3.4
+
+Metrics 0.1.4
+
+scoringutils 1.2.2.9000
+
 
 Contact Charlotte Patterson at crpattrsn@gmail.com for queries.
