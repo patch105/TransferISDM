@@ -102,7 +102,7 @@ posterior_nsamps <- 5000
 
 # Output folder name ------------------------------------------------------
 
-outpath <- file.path(dirname(getwd()), "outpath")
+outpath <- file.path(dirname(getwd()), "output")
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
