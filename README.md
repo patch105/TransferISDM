@@ -93,7 +93,7 @@ Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling
 
 [Count the number of PO records and presence/absences in PA data across scenarios](https://github.com/patch105/AntarcticISDM/blob/main/Number_PO_PA_ALL_Scenarios.R)
 
-## Session details
+## Session information
 R version 4.4.1
 
 terra 1.7.78
