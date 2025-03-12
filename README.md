@@ -11,17 +11,16 @@ This work was supported by the Australian Research Council (ARC) SRIEAS Grant SR
 
 We simulate a virtual landscape with two covariates (Fig. 1a) that drive the distribution of a single species (Fig. 1b). A pair of sites are situated within the landscape, one the training site where model fitting occurred, and one the projection site, our remote location with no data to which we aim to transfer our model (Fig. 1b). Presence-only and presence-absence data are simulated at the training site (Fig. 1c). Integrated, PO, and PA models are fit to the survey data at the training site before models are transferred to the projection site for prediction. By altering conditions at the training site, different model transfer scenarios of environmental extrapolation and spatial autocorrelation can be explored. Predictive performance of models at the projection and training sites are assessed relative to the true simulated species distribution.
 
-See Methods of Patterson et al. for further details.
 
 ![Figure 1. A workflow plot.](https://github.com/patch105/AntarcticISDM/blob/main/Figures/FIGURE_1.png)
 
-Figure 1. (a) A visual representation of spatial model transfer, where a model is fitted to occurrence records at a training site and predicted to a projection site where there are few or no records. (b-c) Representations of the two key challenges addressed in this simulation design that are often associated with model transfer: environmental dissimilarity of the training and projection sites and unaccounted-for spatial autocorrelation of the species distribution that can operate across different autocorrelation ranges and levels of variance. From Patterson et al. 
+Figure 1. (a) A visual representation of spatial model transfer, where a model is fitted to occurrence records at a training site and predicted to a projection site where there are few or no records. (b-c) Representations of the two key challenges addressed in this simulation design that are often associated with model transfer: environmental dissimilarity of the training and projection sites and unaccounted-for spatial autocorrelation of the species distribution that can operate across different autocorrelation ranges and levels of variance. 
 
 
 
 ![Figure 2. A workflow plot.](https://github.com/patch105/AntarcticISDM/blob/main/Figures/FIGURE_2.png)
 
-Figure 2. (a) A visual representation of the simulation study design. Steps 1-3 are the basic structure of the simulation workflow which generates a landscape with a single species distribution, places training and projection sites on the landscape and samples presence-only and presence-absence records of the species at the training site. Boxes 1a and 2a are spatial transfer scenarios. Boxes 3a-b are data scenarios. (b) The modelling framework, where integrated or single-dataset models are fitted to the training site data. Boxes 4a-b are model-fitting options. (c) Fitted models are transferred to the projection site for evaluation. From Patterson et al. 
+Figure 2. (a) A visual representation of the simulation study design. Steps 1-3 are the basic structure of the simulation workflow which generates a landscape with a single species distribution, places training and projection sites on the landscape and samples presence-only and presence-absence records of the species at the training site. Boxes 1a and 2a are spatial transfer scenarios. Boxes 3a-b are data scenarios. (b) The modelling framework, where integrated or single-dataset models are fitted to the training site data. Boxes 4a-b are model-fitting options. (c) Fitted models are transferred to the projection site for evaluation.  
 
 
 ## Simulation Code Overview
