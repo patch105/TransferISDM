@@ -26,15 +26,13 @@ Figure 2. (a) A visual representation of the simulation study design. Steps 1-3 
 
 ## Simulation Code Overview
 
-At its simplest, you can run a scenario all the way through from the simulation code via running sequentially these two scripts:
+At its simplest, you can run a scenario all the way through from the simulation code via running this script:
 
-Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. All the scripts in the [Scenarios folder](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios) are just variations of this script.
-
-Plot the outputs from the scenario with the [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) script. *NOTE - your scenario name must match the scenario name in the 0a.Run_ALL_Replicates.R file.
+Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) script. Here, you name your scenario and set the scenario specifications and parameters. All the scripts in the [Scenarios folder](https://github.com/patch105/AntarcticISDM/blob/main/Scenarios) are just variations of this master script.
 
 Embedded in this script are calls to several other scripts which are outlined below. Some scripts were inspired by code from [Simmonds et al. 2020](https://github.com/NERC-CEH/IOFFsimwork).
 
-## Run a scenario
+## Set up simulation of a scenario
 
 [0a. Run ALL Replicates.R](https://github.com/patch105/AntarcticISDM/blob/main/0a.Run_ALL_Replicates.R) calls the following scripts:
 
@@ -52,9 +50,13 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [5.PA_Sampling.R](https://github.com/patch105/AntarcticISDM/blob/main/5.PA_Sampling.R): Sample the PA data at the training site via quadrat surveys.
 
+## Run models in a scenario and extract results
+
 [6.Run_Model.R](https://github.com/patch105/AntarcticISDM/blob/main/6.Run_Model.R): Set up and run the integrated, presence-only and presence-absence models. Model types are designated via the object 'mod.type' in the 0a.Run_ALL_Replicates.R script and can include or not include a bias covariate and a Gaussian random field. 
 
 [7.Extract_Model_Results.R](https://github.com/patch105/AntarcticISDM/blob/main/7.Extract_Model_Results.R): Pull out model parameter estimates. 
+
+## Evaluate models compared to the true species distribution
 
 [8.Make_Truth.R](https://github.com/patch105/AntarcticISDM/blob/main/8.Make_Truth.R): Save the true log species intensity for comparison with predictions.
 
@@ -62,17 +64,11 @@ Embedded in this script are calls to several other scripts which are outlined be
 
 [10.Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/10.Validation_True_Intensity.R): Compare the predicted and true log species intensity at the projection site. You can also compare the predicted and true log species intensity at the training site.
 
-## Plot the outputs of a scenario (just for a quick look at outputs)
+## Plot the data and predictions from a scenario (for reference when reviewing results)
 
-[0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) calls the following scripts:
+[11a.Plot_Data.R](https://github.com/patch105/AntarcticISDM/blob/main/12B.Plot_Data.R): This plots, for each replicate, the PO and PA data at the training site overlaid on the true species log intensity.
 
-[11.Plot_Validation_True_Intensity.R](https://github.com/patch105/AntarcticISDM/blob/main/11.Plot_Validation_True_Intensity.R): This creates and saves plots looking at the predictive performance of the integrated, PO, and PA models.
-
-[12.Plot_Model_Outputs.R](https://github.com/patch105/AntarcticISDM/blob/main/12.Plot_Model_Outputs.R): This creates and saves plots looking at the parameter estimates from each model.
-
-[12B.Plot_Data.R](https://github.com/patch105/AntarcticISDM/blob/main/12B.Plot_Data.R): This plots, for each replicate, the PO and PA data at the training site.
-
-[12C.Plot_Predictions.R](https://github.com/patch105/AntarcticISDM/blob/main/12C.Plot_Predictions.R): This creates and saves plots of model predictions at both the projection and training sites.
+[11b.Plot_Predictions.R](https://github.com/patch105/AntarcticISDM/blob/main/12C.Plot_Predictions.R): This creates and saves plots of model predictions at both the projection and training sites per model per replicate.
 
 ## Simulation scenarios
 
