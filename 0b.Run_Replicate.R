@@ -420,10 +420,10 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
   write_csv(true.validation.df, paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_True_Validation_Job_", job_index, ".csv"))
 
   
-  # 12B. Plot Data  ---------------------------------------------------------
+  # 11a. Plot Data  ---------------------------------------------------------
   # If you want to plot the Presence-Absence and Presence-Only data
   
-  source("12B.Plot_Data.R")
+  source("11a.Plot_Data.R")
 
   plot_data_func(reps.setup.list = reps.setup.list,
                  outpath = outpath,
@@ -431,9 +431,9 @@ write_csv(extrap.scenario.df, paste0(file.path(outpath, scenario_name), "/Scenar
                  job_index = job_index)
 
   
-  # 12C. Plot Predictions ---------------------------------------------------
+  # 11b. Plot Predictions ---------------------------------------------------
   
-  source("12C.Plot_Predictions.R")
+  source("11b.Plot_Predictions.R")
 
   plot_predictions_SiteB_func(reps.setup.list = reps.setup.list,
                               outpath = outpath,
