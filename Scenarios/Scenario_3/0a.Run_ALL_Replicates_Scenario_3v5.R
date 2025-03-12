@@ -1,29 +1,30 @@
 
-## HPC version
+# This script was run on a HPC so to keep consistency, there's a job_index variable.
+# When running on a local machine, this can be set to 1.
 
-# # extract the arguments provided in the command line
-# args <- commandArgs(trailingOnly = TRUE)
-# # The first argument is now the job index
-# job_index <- as.integer(args[1])
+job_index <- 1
 
-# Set the library for packages
-# lib_loc <- paste(getwd(),"/r_lib",sep="")
-lib_loc = .libPaths() # Do this to maintain consistency across HPC and non-HPC script
-
-# For non-hpc version
-# job_index <- 1
-
-
-library(spatstat)
+# Load packages 
 library(ggplot2)
 library(dplyr)
-library(ggpubr, lib.loc = lib_loc)
+library(ggpubr)
 library(viridis)
 library(terra)
 library(purrr)
 library(readr)
+library(sf)
+library(Metrics)
+library(scoringutils)
+library(spatstat)
 
+# RISDM requires INLA to be installed which is done with the following code:
 
+# library( devtools)
+# install.packages("INLA",repos=c(getOption("repos"),  
+#                                 INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
+
+# devtools::install_github( repo="Scott-Foster/RISDM", build_vignettes=FALSE) # Had to do force = T when I wanted to re-load
+library(RISDM)
 
 
 # Scenario choices --------------------------------------------------------
@@ -100,7 +101,7 @@ posterior_nsamps <- 5000
 
 # Output folder name ------------------------------------------------------
 
-outpath <- file.path(getwd(), "output")
+outpath <- file.path(dirname(getwd()), "outpath")
 
 # Make dir if not already there
 if(!dir.exists(file.path(outpath, scenario_name))) {
