@@ -87,22 +87,27 @@ Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling
 
 [Figure 3. and supplementary figures Scenarios 1 & 2](https://github.com/patch105/AntarcticISDM/blob/main/Plotting/PLOTTING_Scenario_1_2.R)
 
-[Figure 4. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
+[Figure 4. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/Plotting/PLOTTING_Scenario_3_4.R)
 
-[Figure 5. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
-
-[Supplementary figures Scenarios 5 & 6](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_6.R)
+[Figure 5. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/Plotting/PLOTTING_Scenario_3_4.R)
 
 [Count the number of PO records and presence/absences in PA data across scenarios](https://github.com/patch105/AntarcticISDM/blob/main/Number_PO_PA_ALL_Scenarios.R)
 
 ## Session details
 R version 4.4.1
+
 terra 1.7.78
+
 spatstat 3.0-7
+
 ggplot2 3.5.1
+
 sf 1.0-19
+
 viridis 0.6.5
+
 readr 2.1.5
+
 purrr 1.0.2
 
 
