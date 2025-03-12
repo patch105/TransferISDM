@@ -121,4 +121,4 @@ Metrics 0.1.4
 scoringutils 1.2.2.9000
 
 
-Contact Charlotte Patterson at crpattrsn@gmail.com for queries.
+
