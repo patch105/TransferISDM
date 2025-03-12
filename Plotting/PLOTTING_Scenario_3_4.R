@@ -1,14 +1,21 @@
-#lib_loc <- paste(getwd(),"/r_lib",sep="")
-lib_loc = .libPaths() 
 
-library(spatstat)
 library(ggplot2)
 library(dplyr)
-library(ggpubr, lib.loc = lib_loc)
+library(ggpubr)
 library(viridis)
-library(terra)
 library(purrr)
 library(readr)
+
+outpath <- file.path(dirname(getwd()), "output")
+
+result_path <- file.path(getwd(), "PLOTS")
+
+# Make dir if not already there
+if(!dir.exists(result_path)) {
+  
+  dir.create(result_path, recursive = TRUE)
+  
+}
 
 # Set values for fill for each model 
 fill.colours = c("m.int" = "purple", 
@@ -22,12 +29,6 @@ fill.colours = c("m.int" = "purple",
                  "m.PA" = "orange",
                  "m.PA.GRF" = "orange3")
 
-#outpath <- file.path("Z:/ISDM", "output/ARCHIVE/NOV24")
-outpath <- file.path("Z:/ISDM", "output")
-# outpath <- file.path(getwd(), "output")
-result_path <- file.path(getwd(), "output/RESULTS")
-
-
 x.discrete.label <- c("Low", "Mod", "High")  
 
 #####################################################
@@ -37,10 +38,10 @@ x.discrete.label <- c("Low", "Mod", "High")
 replicates <- 100
 
 ######################################################################
-################ SCENARIO 5 - SPATIAL AUTOCORRELATION ################
+################ SCENARIO 3 - SPATIAL AUTOCORRELATION ################
 ######################################################################
 
-scenario_name = "5"
+scenario_name = "3"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -108,7 +109,7 @@ common_jobs <- common_jobs %>%
 
 true.validation.df <- true.validation.df %>%
   filter(job_index %in% common_jobs$job_index)
-  
+
 true.validation.SiteA.df <- true.validation.SiteA.df %>%
   filter(job_index %in% common_jobs$job_index)
 
@@ -140,10 +141,10 @@ extrap.scenario.df <- extrap.scenario.df %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 ######################################################################
-################ SCENARIO 5C - SPATIAL AUTOCORRELATION C ################
+######### SCENARIO 4 - SPATIAL AUTOCORRELATION with Lower PO records ####
 ######################################################################
 
-scenario_name = "5C"
+scenario_name = "4"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -156,7 +157,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.df.list <- lapply(file_list, read.csv)
 
-true.validation.df_5C <- do.call(rbind, true.validation.df.list)
+true.validation.df_4 <- do.call(rbind, true.validation.df.list)
 
 
 # THEN list all the files with validation dataframes for Site A (for each Job)
@@ -165,7 +166,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.SiteA.df.list <- lapply(file_list, read.csv)
 
-true.validation.SiteA.df_5C <- do.call(rbind, true.validation.SiteA.df.list)
+true.validation.SiteA.df_4 <- do.call(rbind, true.validation.SiteA.df.list)
 
 
 # FINALLY list all the files with model outputs (for each job)
@@ -176,23 +177,23 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Res
 extrap.scenario.df.list <- lapply(file_list, read.csv)
 
 # Combine all dataframes in the list into one dataframe using rbind
-extrap.scenario.df_5C <- do.call(rbind, extrap.scenario.df.list)
+extrap.scenario.df_4 <- do.call(rbind, extrap.scenario.df.list)
 
 ##########################################################
 ### REMOVE REPLICATES THAT DON'T HAVE ALL THREE OUTPUTS ###
 ##########################################################
 
-validation <- true.validation.df_5C %>%
+validation <- true.validation.df_4 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-extrap <- extrap.scenario.df_5C %>%
+extrap <- extrap.scenario.df_4 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-validationA <- true.validation.SiteA.df_5C %>%
+validationA <- true.validation.SiteA.df_4 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
@@ -209,17 +210,17 @@ common_jobs <- validation %>%
 common_jobs <- common_jobs %>%
   slice(1:replicates)
 
-true.validation.df_5C <- true.validation.df_5C %>%
+true.validation.df_4 <- true.validation.df_4 %>%
   filter(job_index %in% common_jobs$job_index)
 
-true.validation.SiteA.df_5C <- true.validation.SiteA.df_5C %>%
+true.validation.SiteA.df_4 <- true.validation.SiteA.df_4 %>%
   filter(job_index %in% common_jobs$job_index)
 
-extrap.scenario.df_5C <- extrap.scenario.df_5C %>%
+extrap.scenario.df_4 <- extrap.scenario.df_4 %>%
   filter(job_index %in% common_jobs$job_index)
 
 
-true.validation.df_5C <- true.validation.df_5C %>%
+true.validation.df_4 <- true.validation.df_4 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -227,7 +228,7 @@ true.validation.df_5C <- true.validation.df_5C %>%
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
-true.validation.SiteA.df_5C <- true.validation.SiteA.df_5C %>%
+true.validation.SiteA.df_4 <- true.validation.SiteA.df_4 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -235,7 +236,7 @@ true.validation.SiteA.df_5C <- true.validation.SiteA.df_5C %>%
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
-extrap.scenario.df_5C <- extrap.scenario.df_5C %>%
+extrap.scenario.df_4 <- extrap.scenario.df_4 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -244,10 +245,10 @@ extrap.scenario.df_5C <- extrap.scenario.df_5C %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 ######################################################################
-################ SCENARIO 5v0.2 - SPATIAL AUTOCORRELATION ################
+################ SCENARIO 3v0.2 - SPATIAL AUTOCORRELATION ################
 ######################################################################
 
-scenario_name = "5v0.2"
+scenario_name = "3v0.2"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -348,10 +349,10 @@ extrap.scenario.dfv0.2 <- extrap.scenario.dfv0.2 %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 ######################################################################
-################ SCENARIO 5Cv0.2 - SPATIAL AUTOCORRELATION C ################
+################ SCENARIO 4v0.2 - SPATIAL AUTOCORRELATION C ################
 ######################################################################
 
-scenario_name = "5Cv0.2"
+scenario_name = "4v0.2"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -364,7 +365,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.df.list <- lapply(file_list, read.csv)
 
-true.validation.df_5Cv0.2 <- do.call(rbind, true.validation.df.list)
+true.validation.df_4v0.2 <- do.call(rbind, true.validation.df.list)
 
 
 # THEN list all the files with validation dataframes for Site A (for each Job)
@@ -373,7 +374,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.SiteA.df.list <- lapply(file_list, read.csv)
 
-true.validation.SiteA.df_5Cv0.2 <- do.call(rbind, true.validation.SiteA.df.list)
+true.validation.SiteA.df_4v0.2 <- do.call(rbind, true.validation.SiteA.df.list)
 
 
 # FINALLY list all the files with model outputs (for each job)
@@ -384,23 +385,23 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Res
 extrap.scenario.df.list <- lapply(file_list, read.csv)
 
 # Combine all dataframes in the list into one dataframe using rbind
-extrap.scenario.df_5Cv0.2 <- do.call(rbind, extrap.scenario.df.list)
+extrap.scenario.df_4v0.2 <- do.call(rbind, extrap.scenario.df.list)
 
 ##########################################################
 ### REMOVE REPLICATES THAT DON'T HAVE ALL THREE OUTPUTS ###
 ##########################################################
 
-validation <- true.validation.df_5Cv0.2 %>%
+validation <- true.validation.df_4v0.2 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-extrap <- extrap.scenario.df_5Cv0.2 %>%
+extrap <- extrap.scenario.df_4v0.2 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-validationA <- true.validation.SiteA.df_5Cv0.2 %>%
+validationA <- true.validation.SiteA.df_4v0.2 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
@@ -417,18 +418,18 @@ common_jobs <- validation %>%
 common_jobs <- common_jobs %>%
   slice(1:replicates)
 
-true.validation.df_5Cv0.2 <- true.validation.df_5Cv0.2 %>%
+true.validation.df_4v0.2 <- true.validation.df_4v0.2 %>%
   filter(job_index %in% common_jobs$job_index)
 
-true.validation.SiteA.df_5Cv0.2 <- true.validation.SiteA.df_5Cv0.2 %>%
+true.validation.SiteA.df_4v0.2 <- true.validation.SiteA.df_4v0.2 %>%
   filter(job_index %in% common_jobs$job_index)
 
-extrap.scenario.df_5Cv0.2 <- extrap.scenario.df_5Cv0.2 %>%
+extrap.scenario.df_4v0.2 <- extrap.scenario.df_4v0.2 %>%
   filter(job_index %in% common_jobs$job_index)
 
 
 
-true.validation.df_5Cv0.2 <- true.validation.df_5Cv0.2 %>%
+true.validation.df_4v0.2 <- true.validation.df_4v0.2 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -436,7 +437,7 @@ true.validation.df_5Cv0.2 <- true.validation.df_5Cv0.2 %>%
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
-true.validation.SiteA.df_5Cv0.2 <- true.validation.SiteA.df_5Cv0.2 %>%
+true.validation.SiteA.df_4v0.2 <- true.validation.SiteA.df_4v0.2 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -444,7 +445,7 @@ true.validation.SiteA.df_5Cv0.2 <- true.validation.SiteA.df_5Cv0.2 %>%
   mutate(mod.type3 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
-extrap.scenario.df_5Cv0.2 <- extrap.scenario.df_5Cv0.2 %>%
+extrap.scenario.df_4v0.2 <- extrap.scenario.df_4v0.2 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -453,10 +454,10 @@ extrap.scenario.df_5Cv0.2 <- extrap.scenario.df_5Cv0.2 %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 ######################################################################
-################ SCENARIO 5v5 - SPATIAL AUTOCORRELATION ################
+################ SCENARIO 3v5 - SPATIAL AUTOCORRELATION ################
 ######################################################################
 
-scenario_name = "5v5"
+scenario_name = "3v5"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -558,10 +559,10 @@ extrap.scenario.dfv5 <- extrap.scenario.dfv5 %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 ######################################################################
-################ SCENARIO 5Cv5 - SPATIAL AUTOCORRELATION C ################
+################ SCENARIO 4v5 - SPATIAL AUTOCORRELATION C ################
 ######################################################################
 
-scenario_name = "5Cv5"
+scenario_name = "4v5"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -574,7 +575,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.df.list <- lapply(file_list, read.csv)
 
-true.validation.df_5Cv5 <- do.call(rbind, true.validation.df.list)
+true.validation.df_4v5 <- do.call(rbind, true.validation.df.list)
 
 
 # THEN list all the files with validation dataframes for Site A (for each Job)
@@ -583,7 +584,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.SiteA.df.list <- lapply(file_list, read.csv)
 
-true.validation.SiteA.df_5Cv5 <- do.call(rbind, true.validation.SiteA.df.list)
+true.validation.SiteA.df_4v5 <- do.call(rbind, true.validation.SiteA.df.list)
 
 
 # FINALLY list all the files with model outputs (for each job)
@@ -594,24 +595,24 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Res
 extrap.scenario.df.list <- lapply(file_list, read.csv)
 
 # Combine all dataframes in the list into one dataframe using rbind
-extrap.scenario.df_5Cv5 <- do.call(rbind, extrap.scenario.df.list)
+extrap.scenario.df_4v5 <- do.call(rbind, extrap.scenario.df.list)
 
 
 ##########################################################
 ### REMOVE REPLICATES THAT DON'T HAVE ALL THREE OUTPUTS ###
 ##########################################################
 
-validation <- true.validation.df_5Cv5 %>%
+validation <- true.validation.df_4v5 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-extrap <- extrap.scenario.df_5Cv5 %>%
+extrap <- extrap.scenario.df_4v5 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-validationA <- true.validation.SiteA.df_5Cv5 %>%
+validationA <- true.validation.SiteA.df_4v5 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
@@ -628,18 +629,18 @@ common_jobs <- validation %>%
 common_jobs <- common_jobs %>%
   slice(1:replicates)
 
-true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>%
+true.validation.df_4v5 <- true.validation.df_4v5 %>%
   filter(job_index %in% common_jobs$job_index)
 
-true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>%
+true.validation.SiteA.df_4v5 <- true.validation.SiteA.df_4v5 %>%
   filter(job_index %in% common_jobs$job_index)
 
-extrap.scenario.df_5Cv5 <- extrap.scenario.df_5Cv5 %>%
+extrap.scenario.df_4v5 <- extrap.scenario.df_4v5 %>%
   filter(job_index %in% common_jobs$job_index)
 
 
 
-true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>%
+true.validation.df_4v5 <- true.validation.df_4v5 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -648,7 +649,7 @@ true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 
-true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>%
+true.validation.SiteA.df_4v5 <- true.validation.SiteA.df_4v5 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -657,7 +658,7 @@ true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>%
   mutate(mod.type3 = factor(mod.type3, levels = c("m.PO", "m.PO.GRF", "m.PA", "m.PA.GRF", "m.int", "m.int.GRF")))
 
 
-extrap.scenario.df_5Cv5 <- extrap.scenario.df_5Cv5 %>%
+extrap.scenario.df_4v5 <- extrap.scenario.df_4v5 %>%
   mutate(bias.type = ifelse(grepl("GRF", mod.type, fixed = T), "With Gaussian random field", "Without Gaussian random field")) %>% 
   mutate(bias.type2 = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>%
   mutate(mod.type2 = ifelse(grepl("GRF", mod.type, fixed = T), gsub(".GRF", "", mod.type), mod.type)) %>% 
@@ -695,7 +696,7 @@ final.df.bias <- final.df
 # Filter out just the models that account for bias with covariate
 final.df <- final.df %>% 
   filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
-  
+
 projection1 <- final.df %>%
   ggplot(aes(x = relative.GRF, y = RMSE.global, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -807,7 +808,7 @@ projection4 <-  final.df %>%
 
 Fig4 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Figure_4.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/Figure_4.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 ########### COEFFICIENT RECOVERY ###############
 
@@ -888,7 +889,7 @@ coef2 <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(coef1 + rremove("xlab"), coef2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficients.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/App.3.Supp.Fig.2.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 PO_int <- final.extrap.df %>%
   filter(PO_intercept != 0 ) %>% 
@@ -950,7 +951,7 @@ PA_int <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(PO_int + rremove("xlab"), PA_int + rremove("xlab") , common.legend = T,  ncol = 2, nrow = 1, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Intercepts.png"), w = 23.5, h = 15, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/App3.Supp.Fig.4.png"), w = 23.5, h = 15, units = "cm", dpi = 400, device = "png")
 
 coefSD1 <- final.extrap.df %>%
   ggplot(aes(x = relative.GRF, y = beta1.sd, fill = bias.type)) +
@@ -1006,7 +1007,7 @@ coefSD2 <- final.extrap.df %>%
 
 Supp.Fig.X <- ggarrange(coefSD1 + rremove("xlab"), coefSD2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficient_SDs.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/App.3.Supp.Fig.3.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 #######################################################
 ################ GRF HYPERPARAMETERS ##################
@@ -1066,10 +1067,6 @@ g2 <- final.extrap.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-
-Supp.Fig.X <- ggarrange(g1 + rremove("xlab"), g2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/True_vs_estimated_GRF_params.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 
 #########################################################
@@ -1179,15 +1176,6 @@ training3 <- final.SiteA.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-fig2 <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 3, legend = "bottom", labels = c("(a)", "(b)", "(c)"), align = "v")
-
-ggsave(plot = fig2, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site.png"), w = 21, h = 27, units = "cm", dpi = 400, device = "png")
-
-
-# Figure3 <- ggarrange(fig + rremove("xlab"), fig2, common.legend = TRUE, ncol = 1, nrow = 2, legend = "bottom")
-# 
-# ggsave(plot = Figure3, filename = paste0(file.path(result_path),"/Scenario_5_tests/FIGURE_3.png"), w = 21, h = 32, units = "cm", dpi = 400, device = "png")
-
 training4 <- final.SiteA.df %>%
   ggplot(aes(x = relative.GRF, y = coverage.rate, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -1216,7 +1204,7 @@ training4 <- final.SiteA.df %>%
 
 fig2b <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/App.3.Supp.Fig.1.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 ########## CORRELATION BETWEEN ESTIMATED AND TRUE FIXED & GRF #############
 
@@ -1333,14 +1321,6 @@ COR_GRF_FIXED_plot <- ggarrange(cor.GRF + rremove("xlab"), cor.FIXED + rremove("
 
 RMSE_GRF_FIXED_plot <- ggarrange(RMSE.GRF + rremove("xlab"), RMSE.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
 
-Fig.4 <- ggarrange(COR_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
-
-Fig.4b <- ggarrange(RMSE_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
-
-ggsave(plot = Fig.4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_fixed_GRF_params.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
-
-ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_tests/RMSE_random_fixed.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
-
 
 final.df %>% 
   ggplot(aes(x = Site.distance, y = RMSE.global, color = mod.type)) +
@@ -1435,8 +1415,8 @@ plot1 <- newdf %>%
     strip.background = element_rect(fill = "gray96")
   )
 
- 
-ggsave(plot = plot1, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_vs_Av_Dist_Coef.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
+
+ggsave(plot = plot1, filename = paste0(file.path(result_path),"/App.3.Supp.Fig.5.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
 
 
 
@@ -1490,7 +1470,7 @@ plot2 <- newdf %>%
     strip.background = element_rect(fill = "gray96")
   )
 
-ggsave(plot = plot2, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_vs_ProjectionRMSE.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
+ggsave(plot = plot2, filename = paste0(file.path(result_path),"/App.3.Supp.Fig.6.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
 
 plot3 <- newdfA %>% 
   filter(bias.type == "With Gaussian random field") %>% 
@@ -1525,8 +1505,6 @@ plot3 <- newdfA %>%
     strip.text = element_text(size = 14),   # Increase facet title size
     strip.background = element_rect(fill = "gray96")
   )
-
-ggsave(plot = plot3, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_vs_TrainingRMSE.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
 
 
 ############################################################
@@ -1600,9 +1578,9 @@ plot4 <- newdf %>%
     strip.text = element_text(size = 14),   # Increase facet title size
     strip.background = element_rect(fill = "gray96")
   )
-  
 
-ggsave(plot = plot4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_SiteAB_vs_ProjectionRMSE.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
+
+ggsave(plot = plot4, filename = paste0(file.path(result_path),"/App.3.Supp.Fig.7.png"), w = 21, h = 21, units = "cm", dpi = 400, device = "png")
 
 
 newdf %>% 
@@ -1873,7 +1851,7 @@ projection4 <-  final.df %>%
 
 fig2b <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_site_range_scenario.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/App.4.Supp.Fig.1.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 g1 <- final.extrap.df %>%
@@ -2045,242 +2023,7 @@ training4 <- final.SiteA.df %>%
 
 fig2b <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site_range_scenario.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
-
-
-
-cor.GRF <- final.SiteA.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = extrap.type, y = cor.GRF, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Spatial autocorrelation range", y = "Correlation random", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  #coord_cartesian(ylim = c(-300, 200)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-
-RMSE.GRF <- final.SiteA.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = extrap.type, y = RMSE.global.GRF, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Spatial autocorrelation range", y = "Mean RMSE random", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  #coord_cartesian(ylim = c(-300, 200)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-cor.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = extrap.type, y = cor.FIXED, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Spatial autocorrelation range", y = "Correlation fixed", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  #coord_cartesian(ylim = c(-300, 200)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-RMSE.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = exrap.type, y = RMSE.global.FIXED, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Spatial autocorrelation range", y = "Mean RMSE fixed", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  #coord_cartesian(ylim = c(-300, 200)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-COR_GRF_FIXED_plot <- ggarrange(cor.GRF + rremove("xlab"), cor.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
-
-RMSE_GRF_FIXED_plot <- ggarrange(RMSE.GRF + rremove("xlab"), RMSE.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
-
-Fig.4 <- ggarrange(COR_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
-
-ggsave(plot = Fig.4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_fixed_GRF_params_range_scenario.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
-
-Fig.4b <- ggarrange(RMSE_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
-
-ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_tests/RMSE_random_fixed_range_scenario.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
-
-
-# ######################################################
-# ########### LOOKING AT RANGE AND SITE DISTANCE ##########
-# ######################################################
-# 
-# projection1 <- final.df %>%
-#   ggplot(aes(x = relative.range.dist, y = RMSE.global, color = bias.type, fill = bias.type)) +
-#   geom_point(alpha = 0.4, size = 0.6) +
-#   geom_smooth(method = "loess", se = T, alpha = 0.3) +
-#   labs(x = "Range vs. Site Distance", y = "Mean RMSE projection site", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
-#   theme_bw() +
-#   facet_wrap(~mod.type2,
-#              labeller = as_labeller(c(m.int = "Integrated",
-#                                       m.PA = "Presence-absence",
-#                                       m.PO = "Presence-only"))) +
-#   theme(legend.position = "bottom",
-#         legend.key.size = unit(1.5, "line"),
-#         legend.title = element_blank(),
-#         legend.text = element_text(size = 14),
-#         panel.grid.major.x = element_blank(),
-#         panel.grid.minor.x = element_blank(),
-#         axis.title.y = element_text(size = 15),
-#         axis.title.x = element_text(size = 15),
-#         axis.text = element_text(size = 12),
-#         strip.text = element_text(size = 15),
-#         strip.background = element_rect(fill = "gray96"),
-#         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-# 
-# projection2 <- final.df %>%
-#   ggplot(aes(x = relative.range.dist, y = Mean.Int.Score, color = bias.type, fill = bias.type)) +
-#   geom_point(alpha = 0.4, size = 0.6) +
-#   geom_smooth(method = "loess", se = T, alpha = 0.3) +
-#   labs(x = "Range vs. Site Distance", y = "Mean interval score", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
-#   theme_bw() +
-#   facet_wrap(~mod.type2,
-#              labeller = as_labeller(c(m.int = "Integrated",
-#                                       m.PA = "Presence-absence",
-#                                       m.PO = "Presence-only"))) +
-#   theme(legend.position = "bottom",
-#         legend.key.size = unit(1.5, "line"),
-#         legend.title = element_blank(),
-#         legend.text = element_text(size = 14),
-#         panel.grid.major.x = element_blank(),
-#         panel.grid.minor.x = element_blank(),
-#         axis.title.y = element_text(size = 15),
-#         axis.title.x = element_text(size = 15),
-#         axis.text = element_text(size = 12),
-#         strip.text = element_text(size = 15),
-#         strip.background = element_rect(fill = "gray96"),
-#         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-# 
-# 
-# projection3 <- final.df %>%
-#   ggplot(aes(x = relative.range.dist, y = correlation, color = bias.type, fill = bias.type)) +
-#   geom_point(alpha = 0.4, size = 0.6) +
-#   geom_smooth(method = "loess", se = T, alpha = 0.3) +
-#   labs(x = "Range vs. Site Distance", y = "Correlation", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
-#   theme_bw() +
-#   facet_wrap(~mod.type2,
-#              labeller = as_labeller(c(m.int = "Integrated",
-#                                       m.PA = "Presence-absence",
-#                                       m.PO = "Presence-only"))) +
-#   theme(legend.position = "bottom",
-#         legend.key.size = unit(1.5, "line"),
-#         legend.title = element_blank(),
-#         legend.text = element_text(size = 14),
-#         panel.grid.major.x = element_blank(),
-#         panel.grid.minor.x = element_blank(),
-#         axis.title.y = element_text(size = 15),
-#         axis.title.x = element_text(size = 15),
-#         axis.text = element_text(size = 12),
-#         strip.text = element_text(size = 15),
-#         strip.background = element_rect(fill = "gray96"),
-#         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-# 
-# projection4 <- final.df %>%
-#   ggplot(aes(x = relative.range.dist, y = coverage.rate, color = bias.type, fill = bias.type)) +
-#   geom_point(alpha = 0.4, size = 0.6) +
-#   geom_smooth(method = "loess", se = T, alpha = 0.3) +
-#   labs(x = "Range vs. Site Distance", y = "Mean coverage probability", color = NULL, fill = NULL) +
-#   scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-#   coord_cartesian(ylim = c(NA, 4), xlim = c(NA, 2)) +
-#   theme_bw() +
-#   facet_wrap(~mod.type2,
-#              labeller = as_labeller(c(m.int = "Integrated",
-#                                       m.PA = "Presence-absence",
-#                                       m.PO = "Presence-only"))) +
-#   theme(legend.position = "bottom",
-#         legend.key.size = unit(1.5, "line"),
-#         legend.title = element_blank(),
-#         legend.text = element_text(size = 14),
-#         panel.grid.major.x = element_blank(),
-#         panel.grid.minor.x = element_blank(),
-#         axis.title.y = element_text(size = 15),
-#         axis.title.x = element_text(size = 15),
-#         axis.text = element_text(size = 12),
-#         strip.text = element_text(size = 15),
-#         strip.background = element_rect(fill = "gray96"),
-#         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-# 
-# ggsave(plot = range.vs.site, filename = paste0(file.path(result_path),"/Scenario_5_tests/RMSE_range_vs_site_dist.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/App.4.Supp.Fig.2.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 ##########################################################################
 ##########################################################################
@@ -2416,7 +2159,7 @@ projection4 <-  final.df.bias %>%
 
 fig2b <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_site_WITHBIAS.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/App.6.Supp.Fig.1.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 # TRAINING SITE
@@ -2548,10 +2291,10 @@ training4 <-  final.SiteA.df.bias %>%
 
 fig2b <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site_WITHBIAS.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/App.6.Supp.Fig.2.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
-############# FIGURE 4 UPDATED ###############
+###### FIGURE 4 ##########
 
 cor.GRF <- final.SiteA.df.bias %>% 
   filter(bias.type == "With Gaussian random field") %>% 
@@ -2631,11 +2374,11 @@ COR_GRF_FIXED_plot <- annotate_figure(
 ) 
 
 
-ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/Scenario_5_tests/Figure_5.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")
+ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/Figure_4.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")
 
 
 
-# SCENARIO 5C VERSION -----------------------------------------------------
+# SCENARIO 4 VERSION -----------------------------------------------------
 
 ###################################################
 ############## PLOT ALL TOGETHER #################
@@ -2643,17 +2386,17 @@ ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/Sce
 
 x.discrete.label <- c("Low", "Mod", "High")  
 
-true.validation.df_5C <- true.validation.df_5C %>% 
+true.validation.df_4 <- true.validation.df_4 %>% 
   mutate(relative.GRF = "1")
 
-true.validation.df_5Cv0.2 <- true.validation.df_5Cv0.2 %>% 
+true.validation.df_4v0.2 <- true.validation.df_4v0.2 %>% 
   mutate(relative.GRF = "0.2")
 
-true.validation.df_5Cv5 <- true.validation.df_5Cv5 %>% 
+true.validation.df_4v5 <- true.validation.df_4v5 %>% 
   mutate(relative.GRF = "5")
 
 
-final.df <- rbind(true.validation.df_5C, true.validation.df_5Cv0.2, true.validation.dfv5)
+final.df <- rbind(true.validation.df_4, true.validation.df_4v0.2, true.validation.dfv5)
 
 final.df$bias.type <- factor(final.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
 
@@ -2782,290 +2525,24 @@ projection4 <-  final.df %>%
 
 Fig4 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/Scenario_5_tests/projection_site_v5C.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/App.5.Supp.Fig.1.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
-
-
-########### COEFFICIENT RECOVERY ###############
-
-
-extrap.scenario.df_5C <- extrap.scenario.df_5C %>% 
-  mutate(relative.GRF = "1")
-
-
-extrap.scenario.df_5Cv0.2 <- extrap.scenario.df_5Cv0.2 %>% 
-  mutate(relative.GRF = "0.2")
-
-
-extrap.scenario.df_5Cv5 <- extrap.scenario.df_5Cv5 %>% 
-  mutate(relative.GRF = "5")
-
-final.extrap.df <- rbind(extrap.scenario.df_5C, extrap.scenario.df_5Cv0.2, extrap.scenario.df_5Cv5)
-
-
-final.extrap.df$bias.type <- factor(final.extrap.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
-final.extrap.df$mod.type2 <- factor(final.extrap.df$mod.type2, levels = c("m.PO", "m.PA", "m.int"))
-
-# Save a version for bias comparison
-final.extrap.df.bias <- final.extrap.df
-
-final.extrap.df <- final.extrap.df %>% 
-  filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
-
-coef1 <- final.extrap.df %>%
-  ggplot(aes(x = relative.GRF, y = beta1.mean, fill = bias.type)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = expression(beta[1]), color = NULL) +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +
-  coord_cartesian(ylim = c(-1, 1)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-coef2 <- final.extrap.df %>%
-  ggplot(aes(x = relative.GRF, y = beta2.mean, fill = bias.type)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = expression(beta[2]), color = NULL) +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +
-  coord_cartesian(ylim = c(-1, 1)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-Supp.Fig.X <- ggarrange(coef1 + rremove("xlab"), coef2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficients_5C.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
-
-PO_int <- final.extrap.df %>%
-  filter(PO_intercept != 0 ) %>% 
-  ggplot(aes(x = relative.GRF, y = PO_intercept, fill = bias.type)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = expression(beta[0]), color = NULL) +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
-  coord_cartesian(ylim = c(-6, 1)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +
-  ggtitle('PO intercept')
-
-PA_int <- final.extrap.df %>%
-  filter(PA_intercept != 0 ) %>% 
-  ggplot(aes(x = relative.GRF, y = PA_intercept, fill = bias.type)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = expression(beta[0]), color = NULL) +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  geom_hline(yintercept = beta0, linetype = "dashed", color = "red") +
-  coord_cartesian(ylim = c(-6, 1)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +
-  ggtitle('PA intercept')
-
-Supp.Fig.X <- ggarrange(PO_int + rremove("xlab"), PA_int + rremove("xlab") , common.legend = T,  ncol = 2, nrow = 1, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Intercepts_5C.png"), w = 23.5, h = 15, units = "cm", dpi = 400, device = "png")
-
-coefSD1 <- final.extrap.df %>%
-  ggplot(aes(x = relative.GRF, y = beta1.sd, fill = bias.type)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = expression(beta[1]~"SD"), color = NULL) +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  coord_cartesian(ylim = c(NA, 0.7)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-coefSD2 <- final.extrap.df %>%
-  ggplot(aes(x = relative.GRF, y = beta2.sd, fill = bias.type)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = expression(beta[2]~"SD"), color = NULL) +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  scale_color_manual(values = c("Without Gaussian random field" = "#D55E00", "With Gaussian random field" = "#0072B2")) +
-  coord_cartesian(ylim = c(0, 0.7)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-Supp.Fig.X <- ggarrange(coefSD1 + rremove("xlab"), coefSD2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/Coefficient_SDs_5C.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
-
-#######################################################
-################ GRF HYPERPARAMETERS ##################
-#######################################################
-
-
-g1 <- final.extrap.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
-  ggplot(aes(x = relative.GRF, y = scal - GRF.range.mean)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Bias of GRF range", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  coord_cartesian(ylim = c(-100, 700)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-g2 <- final.extrap.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = relative.GRF, y = GRF.variance - (GRF.sd.mean)^2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Bias of GRF variance", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  coord_cartesian(ylim = c(-3, 2)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "Presence-absence",
-                                      m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-
-Supp.Fig.X <- ggarrange(g1 + rremove("xlab"), g2 + rremove("xlab") , common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.X, filename = paste0(file.path(result_path),"/Scenario_5_tests/True_vs_estimated_GRF_params_5C.png"), w = 21, h = 17.5, units = "cm", dpi = 400, device = "png")
 
 #########################################################
 ################## TRAINING SITE #########################
 #########################################################
 
-true.validation.SiteA.df_5C <- true.validation.SiteA.df_5C %>% 
+true.validation.SiteA.df_4 <- true.validation.SiteA.df_4 %>% 
   mutate(relative.GRF = "1")
 
-true.validation.SiteA.df_5Cv0.2 <- true.validation.SiteA.df_5Cv0.2 %>% 
+true.validation.SiteA.df_4v0.2 <- true.validation.SiteA.df_4v0.2 %>% 
   mutate(relative.GRF = "0.2")
 
-true.validation.SiteA.df_5Cv5 <- true.validation.SiteA.df_5Cv5 %>% 
+true.validation.SiteA.df_4v5 <- true.validation.SiteA.df_4v5 %>% 
   mutate(relative.GRF = "5")
 
 
-final.SiteA.df <- rbind(true.validation.SiteA.df_5C, true.validation.SiteA.df_5Cv0.2, true.validation.SiteA.df_5Cv5)
+final.SiteA.df <- rbind(true.validation.SiteA.df_4, true.validation.SiteA.df_4v0.2, true.validation.SiteA.df_4v5)
 
 
 final.SiteA.df$bias.type <- factor(final.SiteA.df$bias.type, levels = c("Without Gaussian random field", "With Gaussian random field"))
@@ -3076,7 +2553,6 @@ final.SiteA.df.bias <- final.SiteA.df
 
 final.SiteA.df <- final.SiteA.df %>% 
   filter(bias.type2 == "With bias covariate" | mod.type2 == "m.PA")
-
 
 
 training1 <- final.SiteA.df %>%
@@ -3106,7 +2582,6 @@ training1 <- final.SiteA.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
 
-
 training2 <- final.SiteA.df %>%
   ggplot(aes(x = relative.GRF, y = Mean.Int.Score, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -3134,6 +2609,7 @@ training2 <- final.SiteA.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
+
 training3 <- final.SiteA.df %>%
   ggplot(aes(x = relative.GRF, y = correlation, fill = bias.type)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
@@ -3159,10 +2635,6 @@ training3 <- final.SiteA.df %>%
         strip.text = element_text(size = 15),
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-fig2 <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 3, legend = "bottom", labels = c("(a)", "(b)", "(c)"), align = "v")
-
-ggsave(plot = fig2, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site_5C.png"), w = 21, h = 27, units = "cm", dpi = 400, device = "png")
 
 
 training4 <- final.SiteA.df %>%
@@ -3193,197 +2665,89 @@ training4 <- final.SiteA.df %>%
 
 fig2b <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/Scenario_5_tests/training_site_5C.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = fig2b, filename = paste0(file.path(result_path),"/App.5.Supp.Fig.2.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 ########## CORRELATION BETWEEN ESTIMATED AND TRUE FIXED & GRF #############
 
-cor.GRF <- final.SiteA.df %>%
+
+cor.GRF <- final.SiteA.df.bias %>% 
   filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = relative.GRF, y = cor.GRF)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Correlation random", color = NULL, fill = "Model Type") +
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
+  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias covariate", "With bias covariate"))) %>%
+  ggplot(aes(x = relative.GRF, y = cor.GRF, fill = bias.type2)) +  
+  geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
+  labs(x = "Relative random effect contribution", y = "Correlation random", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  #coord_cartesian(ylim = c(-300, 200)) +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
+  coord_cartesian(ylim = c(-0.2, NA)) +
   theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
+  facet_wrap(~mod.type2, 
+             labeller = as_labeller(c(m.int = "Integrated", 
+                                      m.PA = "Presence-absence", 
+                                      m.PO = "Presence-only"))) +
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
+        legend.text = element_text(size = 13.5),  
+        panel.grid.major.x = element_blank(),   
+        panel.grid.minor.x = element_blank(),   
+        axis.title.y = element_text(size = 14), 
+        axis.title.x = element_text(size = 14),
+        axis.text = element_text(size = 12),    
+        strip.text = element_text(size = 14),   
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-RMSE.GRF <- final.SiteA.df %>%
+cor.FIXED <- final.SiteA.df.bias %>% 
   filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = relative.GRF, y = RMSE.global.GRF, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Mean RMSE random", color = NULL, fill = "Model Type") +
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
+  mutate(bias.type2 = factor(bias.type2, levels = c("Without bias covariate", "With bias covariate"))) %>%
+  ggplot(aes(x = relative.GRF, y = cor.FIXED, fill = bias.type2)) +  
+  geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
+  labs(x = "Relative random effect contribution", y = "Correlation fixed", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  #coord_cartesian(ylim = c(-300, 200)) +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
+  coord_cartesian(ylim = c(-0.2, NA)) +
   theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
+  facet_wrap(~mod.type2, 
+             labeller = as_labeller(c(m.int = "Integrated", 
+                                      m.PA = "Prsence-absence", 
+                                      m.PO = "Presence-only"))) +
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
+        legend.text = element_text(size = 13.5),  
+        panel.grid.major.x = element_blank(),   
+        panel.grid.minor.x = element_blank(),   
+        axis.title.y = element_text(size = 14), 
+        axis.title.x = element_text(size = 14),
+        axis.text = element_text(size = 12),    
+        strip.text = element_text(size = 14),   
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 
-cor.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
-  ggplot(aes(x = relative.GRF, y = cor.FIXED)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA, fill = "#0072B2") +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Correlation fixed", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  #coord_cartesian(ylim = c(-300, 200)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
+COR_GRF_FIXED_plot <- ggarrange(
+  cor.GRF + rremove("xlab"),  # Remove individual x labels
+  cor.FIXED + rremove("xlab"),
+  common.legend = TRUE,  
+  ncol = 1, nrow = 2, 
+  legend = "bottom",
+  align = "v",
+  labels = c("(a)", "(b)"),
+  heights = c(1, 1)
+)
 
-RMSE.FIXED <- final.SiteA.df %>%
-  filter(bias.type == "With Gaussian random field") %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  mutate(scal = ifelse(extrap.type == "Low", 20, ifelse(extrap.type == "Moderate", 300, 700))) %>%
-  ggplot(aes(x = relative.GRF, y = RMSE.global.FIXED, fill = mod.type2)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Mean RMSE fixed", color = NULL, fill = "Model Type") +
-  scale_x_discrete(labels = x.discrete.label) +
-  scale_fill_manual(values = fill.colours, guide = "none") +
-  #coord_cartesian(ylim = c(-300, 200)) +
-  theme_bw() +
-  facet_wrap(~mod.type2,
-             labeller = as_labeller(c(m.int = "Integrated",
-                                      m.PA = "PA",
-                                      m.PO = "PO"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text = element_text(size = 12),
-        strip.text = element_text(size = 15),
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
-
-COR_GRF_FIXED_plot <- ggarrange(cor.GRF + rremove("xlab"), cor.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
-
-RMSE_GRF_FIXED_plot <- ggarrange(RMSE.GRF + rremove("xlab"), RMSE.FIXED + rremove("xlab"), common.legend = T,  ncol = 2, nrow = 1)
-
-Fig.4 <- ggarrange(COR_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
-
-Fig.4b <- ggarrange(RMSE_GRF_FIXED_plot, g1 + rremove("xlab"), g2, ncol = 1, nrow = 3, labels = c("(a)", "(b)", "(c)"))
-
-ggsave(plot = Fig.4, filename = paste0(file.path(result_path),"/Scenario_5_tests/Correlation_random_fixed_GRF_params_5C.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
-
-ggsave(plot = Fig.4b, filename = paste0(file.path(result_path),"/Scenario_5_tests/RMSE_random_fixed_5C.png"), w = 21, h = 24, units = "cm", dpi = 400, device = "png")
+COR_GRF_FIXED_plot <- annotate_figure(
+  COR_GRF_FIXED_plot, 
+  bottom = text_grob("Relative random effect contribution", size = 14, vjust = 0.5)  # Adjust vertical position
+) 
 
 
-#######################
-
-# Pull out some key values for results ------------------------------------
-
-#######################
-
-### Figure 5. results
-
-# Calculate difference in projection coverage rate ISDM to PA per replicate
-# calculate difference in RMSE training site & coverage rate training between ISDM and PA (mean)
-# Calculate difference in RMSE training site & coverage rate training between ISDM with GRF and PA with/without GRF (mean)
-
-# Mean correlation of PO and integrated models GRF, mean correlation of PA model GRF
-
-
-
-summary_table <- true.validation.df %>% 
-  filter(mod.type2 %in% c("m.int", "m.PA")) %>% 
-  group_by(job_index, extrap.type) %>% 
-  summarise(
-    m_PA_cov.rate = coverage.rate[mod.type == "m.PA"],
-    m_int_RMSE = RMSE.global[mod.type == "m.int"],
-    m_int_bias_RMSE = RMSE.global[mod.type == "m.int.bias"],
-    diff_PA_minus_int = m_PA_RMSE - m_int_RMSE,
-    diff_PA_mins_int_bias = m_PA_RMSE - m_int_bias_RMSE,
-    ratio.int = m_PA_RMSE/  m_int_RMSE,
-    ratio.int.bias = m_PA_RMSE/m_int_bias_RMSE,
-    .groups = "drop"
-  ) 
-
-
-test <- true.validation.df %>% 
-  filter(mod.type2 %in% c("m.int", "m.PA")) %>% 
-  filter(job_index == 1)
-
-median(summary_table$perc_improvement_m_int_vs_m_PA)
-median(summary_table$perc_improvement_m_int_bias_vs_m_PA)
-mean(summary_table$diff_int_PA)
-mean(summary_table$diff_int_bias_PA)
-
-
-mean(summary_table$av_diff)
-
-print(paste0("RMSE is on average ", mean(summary_table$ratio.int), " higher in PA than integrated models"))
-
-print(paste0("RMSE is on average ", mean(summary_table$ratio.int.bias), " higher in PA than integrated models"))
-
-
-
-summary_table.bias <- true.validation.df %>% 
-  filter(mod.type2 %in% c("m.int", "m.PO")) %>% 
-  group_by(job_index, extrap.type) %>% 
-  summarise(
-    m_PO_RMSE = RMSE.global[mod.type == "m.PO"],
-    m_PO_bias_RMSE = RMSE.global[mod.type == "m.PO.bias"],
-    m_int_RMSE = RMSE.global[mod.type == "m.int"],
-    m_int_bias_RMSE = RMSE.global[mod.type == "m.int.bias"],
-    diff_PO_wbias_cov = m_PO_RMSE - m_PO_bias_RMSE,
-    diff_int_wbias_cov = m_int_RMSE - m_int_bias_RMSE,
-    .groups = "drop"
-  ) 
-
-print(paste0("RMSE increased by ", mean(summary_table.bias$diff_PO_wbias_cov), " on average when bias cov not present"))
-
-print(paste0("RMSE increased by ", mean(summary_table.bias$diff_int_wbias_cov), " on average when bias cov not present"))
-
+ggsave(plot = COR_GRF_FIXED_plot, filename = paste0(file.path(result_path),"/App.5.Supp.Fig.3.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")
 
 

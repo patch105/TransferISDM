@@ -933,49 +933,49 @@ intercepts_2 <- ggarrange(PO_INT_2, PA_INT_2, common.legend = T,  ncol = 2, nrow
 
 Fig.3 <- RMSE_2_Fig3
 
-ggsave(plot = Fig.3, filename = paste0(file.path(result_path),"/Scenario_1_tests/FIGURE_3.png"), w = 23.5, h = 12.5, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Fig.3, filename = paste0(file.path(result_path),"/FIGURE_3.png"), w = 23.5, h = 12.5, units = "cm", dpi = 400, device = "png")
 
 Supp.Fig.1 <- ggarrange(RMSE_2 + rremove("xlab"), RMSE_2C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.1, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_1.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.1, filename = paste0(file.path(result_path),"/Supp_FIGURE_1.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 Supp.Fig.2 <- ggarrange(Int.score_1 + rremove("xlab"), Int.score_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.2, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_2.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.2, filename = paste0(file.path(result_path),"/Supp_FIGURE_2.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 Supp.Fig.3 <- ggarrange(CORR_1 + rremove("xlab"), CORR_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Supp_FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 Supp.Fig.4 <- ggarrange(cov.rate + rremove("xlab"), cov.rate_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_4.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Supp_FIGURE_4.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 ## Training site
 
 Supp.Fig.5 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_5.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Supp_FIGURE_5.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT PLOT combined 1 and 1 C
 
 Supp.Fig.6 <- ggarrange(beta_1 + rremove("xlab"), beta_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_6.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp_FIGURE_6.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT SD PLOT combined 1 and 1 C
 
 Supp.Fig.7 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_7.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp_FIGURE_7.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 ###### INTERCEPTS #######
 
 Supp.Fig.8 <- ggarrange(intercepts + rremove("xlab"), intercepts_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_8.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Supp_FIGURE_8.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
 
 
 ######### REALISED ENVIRO. EXTRAPOLATION ###########
@@ -1048,73 +1048,6 @@ R2Ca <- true.validation.df_2 %>%
 
 Supp.Fig.9 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.9, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_9.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
-
-
-#######################
-
-# Pull out some key values for results ------------------------------------
-
-#######################
-
-### Figure 1. 
-
-# Calculate difference in projection RMSE between integrated and PA models per replicate
-
-summary_table <- true.validation.df %>% 
-  filter(mod.type2 %in% c("m.int", "m.PA")) %>% 
-  group_by(job_index, extrap.type) %>% 
-  summarise(
-    m_PA_RMSE = RMSE.global[mod.type == "m.PA"],
-    m_int_RMSE = RMSE.global[mod.type == "m.int"],
-    m_int_bias_RMSE = RMSE.global[mod.type == "m.int.bias"],
-    diff_PA_minus_int = m_PA_RMSE - m_int_RMSE,
-    diff_PA_mins_int_bias = m_PA_RMSE - m_int_bias_RMSE,
-    ratio.int = m_PA_RMSE/  m_int_RMSE,
-    ratio.int.bias = m_PA_RMSE/m_int_bias_RMSE,
-    av_diff = diff_PA_minus_int + diff_PA_mins_int_bias/2,
-    perc_improvement_m_int_vs_m_PA = ((m_PA_RMSE - m_int_RMSE) / m_PA_RMSE) * 100,
-    perc_improvement_m_int_bias_vs_m_PA = ((m_PA_RMSE - m_int_bias_RMSE) / m_PA_RMSE) * 100,
-    .groups = "drop"
-  ) 
-
-
-test <- true.validation.df %>% 
-  filter(mod.type2 %in% c("m.int", "m.PA")) %>% 
-  filter(job_index == 1)
-
-median(summary_table$perc_improvement_m_int_vs_m_PA)
-median(summary_table$perc_improvement_m_int_bias_vs_m_PA)
-mean(summary_table$diff_int_PA)
-mean(summary_table$diff_int_bias_PA)
-
-
-mean(summary_table$av_diff)
-
-print(paste0("RMSE is on average ", mean(summary_table$ratio.int), " higher in PA than integrated models"))
-
-print(paste0("RMSE is on average ", mean(summary_table$ratio.int.bias), " higher in PA than integrated models"))
-
-
-
-summary_table.bias <- true.validation.df %>% 
-  filter(mod.type2 %in% c("m.int", "m.PO")) %>% 
-  group_by(job_index, extrap.type) %>% 
-  summarise(
-    m_PO_RMSE = RMSE.global[mod.type == "m.PO"],
-    m_PO_bias_RMSE = RMSE.global[mod.type == "m.PO.bias"],
-    m_int_RMSE = RMSE.global[mod.type == "m.int"],
-    m_int_bias_RMSE = RMSE.global[mod.type == "m.int.bias"],
-    diff_PO_wbias_cov = m_PO_RMSE - m_PO_bias_RMSE,
-    diff_int_wbias_cov = m_int_RMSE - m_int_bias_RMSE,
-    .groups = "drop"
-  ) 
-
-print(paste0("RMSE increased by ", mean(summary_table.bias$diff_PO_wbias_cov), " on average when bias cov not present"))
-
-print(paste0("RMSE increased by ", mean(summary_table.bias$diff_int_wbias_cov), " on average when bias cov not present"))
-
-
-
+ggsave(plot = Supp.Fig.9, filename = paste0(file.path(result_path),"/Supp_FIGURE_9.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 
