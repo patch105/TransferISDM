@@ -32,7 +32,7 @@ Run a scenario with the [0a. Run ALL Replicates.R](https://github.com/patch105/A
 
 Plot the outputs from the scenario with the [0.Summarise_Plot_ALL_Jobs.R](https://github.com/patch105/AntarcticISDM/blob/main/0.Summarise_Plot_ALL_Jobs.R) script. *NOTE - your scenario name must match the scenario name in the 0a.Run_ALL_Replicates.R file.
 
-Embedded in this script are calls to several other scripts which are outlined below. Some scripts were inspired by code from [Simmonds et al. 2020 code](https://github.com/NERC-CEH/IOFFsimwork).
+Embedded in this script are calls to several other scripts which are outlined below. Some scripts were inspired by code from [Simmonds et al. 2020](https://github.com/NERC-CEH/IOFFsimwork).
 
 ## Run a scenario
 
