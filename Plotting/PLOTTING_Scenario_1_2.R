@@ -1,34 +1,21 @@
 
-
-#lib_loc <- paste(getwd(),"/r_lib",sep="")
-lib_loc = .libPaths() 
-
-library(spatstat)
 library(ggplot2)
 library(dplyr)
-library(ggpubr, lib.loc = lib_loc)
+library(ggpubr)
 library(viridis)
-library(terra)
 library(purrr)
 library(readr)
 
-# Set values for fill for each model 
-fill.colours = c("m.int" = "purple", 
-                 "m.int.GRF" = "purple4",
-                 "m.int.bias" = "pink",
-                 "m.int.GRF.bias" = "pink4",
-                 "m.PO" = "skyblue",
-                 "m.PO.GRF" = "skyblue4",
-                 "m.PO.bias" = "green3",
-                 "m.PO.GRF.bias" = "green4",
-                 "m.PA" = "orange",
-                 "m.PA.GRF" = "orange3")
+outpath <- file.path(dirname(getwd()), "output")
 
-#outpath <- file.path("Z:/ISDM", "output/ARCHIVE/NOV24")
-outpath <- file.path("Z:/ISDM", "output")
-# outpath <- file.path(getwd(), "output")
-result_path <- file.path(getwd(), "output/RESULTS")
+result_path <- file.path(getwd(), "PLOTS")
 
+# Make dir if not already there
+if(!dir.exists(result_path)) {
+  
+  dir.create(result_path, recursive = TRUE)
+  
+}
 
 #####################################################
 ####### CHOOSE NUMBER OF REPLICATES TO KEEP ########
@@ -38,7 +25,7 @@ replicates <- 300
 
 
 ############################################################################
-# Figure 1. Scenario 1. ---------------------------------------------------
+# Scenario 1. ---------------------------------------------------
 # Environmental extrap with bias
 ############################################################################
 
@@ -507,11 +494,11 @@ intercepts <- ggarrange(PO_INT, PA_INT, common.legend = T,  ncol = 2, nrow = 1, 
 
 
 ############################################################################
-# Figure 6. Scenario 1C. ---------------------------------------------------
-# Environmental extrap with bias & PO detection prob 0.005
+# Scenario 2. ---------------------------------------------------
+# Environmental extrap with bias & lower PO record numbers
 ############################################################################
 
-scenario_name = "1C"
+scenario_name = "2"
 
 load(file = paste0(file.path(outpath, scenario_name), "/Scenario_", scenario_name, "_Input_Params.RData"))
 
@@ -524,7 +511,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.df.list <- lapply(file_list, read.csv)
 
-true.validation.df_1C <- do.call(rbind, true.validation.df.list)
+true.validation.df_2 <- do.call(rbind, true.validation.df.list)
 
 
 # THEN list all the files with validation dataframes for Site A (for each Job)
@@ -533,7 +520,7 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Tru
 
 true.validation.SiteA.df.list <- lapply(file_list, read.csv)
 
-true.validation.SiteA.df_1C <- do.call(rbind, true.validation.SiteA.df.list)
+true.validation.SiteA.df_2 <- do.call(rbind, true.validation.SiteA.df.list)
 
 
 # FINALLY list all the files with model outputs (for each job)
@@ -544,24 +531,24 @@ file_list <- list.files(path = file.path(outpath, scenario_name), pattern = "Res
 extrap.scenario.df.list <- lapply(file_list, read.csv)
 
 # Combine all dataframes in the list into one dataframe using rbind
-extrap.scenario.df_1C <- do.call(rbind, extrap.scenario.df.list)
+extrap.scenario.df_2 <- do.call(rbind, extrap.scenario.df.list)
 
 
 ##########################################################
 ### REMOVE REPLICATES THAT DON'T HAVE ALL THREE OUTPUTS ###
 ##########################################################
 
-validation <- true.validation.df_1C %>%
+validation <- true.validation.df_2 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-extrap <- extrap.scenario.df_1C %>%
+extrap <- extrap.scenario.df_2 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
 
-validationA <- true.validation.SiteA.df_1C %>%
+validationA <- true.validation.SiteA.df_2 %>%
   group_by(job_index) %>% 
   summarise(n = n()) %>% 
   select(job_index)
@@ -578,13 +565,13 @@ common_jobs <- validation %>%
 common_jobs <- common_jobs %>%
   slice(1:replicates)
 
-true.validation.df_1C <- true.validation.df_1C %>%
+true.validation.df_2 <- true.validation.df_2 %>%
   filter(job_index %in% common_jobs$job_index)
 
-true.validation.SiteA.df_1C <- true.validation.SiteA.df_1C %>%
+true.validation.SiteA.df_2 <- true.validation.SiteA.df_2 %>%
   filter(job_index %in% common_jobs$job_index)
 
-extrap.scenario.df_1C <- extrap.scenario.df_1C %>%
+extrap.scenario.df_2 <- extrap.scenario.df_2 %>%
   filter(job_index %in% common_jobs$job_index)
 
 
@@ -609,14 +596,14 @@ if(scenario.type == "Spatial.Auto") {
 
 # Make the figure
 
-true.validation.df_1C <- true.validation.df_1C %>%
+true.validation.df_2 <- true.validation.df_2 %>%
   mutate(bias.type = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
 ## NON-COLOURED VERSION
-RMSE_2C <- true.validation.df_1C %>% 
+RMSE_2C <- true.validation.df_2 %>% 
   ggplot(aes(x = mean.extrap, y = RMSE.global, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
@@ -638,7 +625,7 @@ RMSE_2C <- true.validation.df_1C %>%
   ggtitle('Low PO record numbers')
 
 # NON-COLOURED VERSION
-Int.score_1C <- true.validation.df_1C %>% 
+Int.score_2 <- true.validation.df_2 %>% 
   ggplot(aes(x = mean.extrap, y = Mean.Int.Score, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
@@ -661,7 +648,7 @@ Int.score_1C <- true.validation.df_1C %>%
 
 
 # NON-COLOURED VERSION
-CORR_1C <- true.validation.df_1C %>% 
+CORR_2 <- true.validation.df_2 %>% 
   ggplot(aes(x = mean.extrap, y = correlation, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
@@ -683,7 +670,7 @@ CORR_1C <- true.validation.df_1C %>%
   ggtitle('Low PO record numbers')
 
 # # COVERAGE RATE
-cov.rate_1C <- true.validation.df_1C %>%
+cov.rate_2 <- true.validation.df_2 %>%
   ggplot(aes(x = mean.extrap, y = coverage.rate, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
@@ -706,13 +693,13 @@ cov.rate_1C <- true.validation.df_1C %>%
 
 ############## SITE A ##################
 
-true.validation.SiteA.df_1C <- true.validation.SiteA.df_1C %>%
+true.validation.SiteA.df_2 <- true.validation.SiteA.df_2 %>%
   mutate(bias.type = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
-RMSE_A_1C <- true.validation.SiteA.df_1C %>% 
+RMSE_A_2 <- true.validation.SiteA.df_2 %>% 
   ggplot(aes(x = bias.type, y = RMSE.global, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +      # Add a boxplot without outliers
   labs(x = NULL, y = "Mean RMSE training site", color = NULL) +
@@ -743,13 +730,13 @@ RMSE_A_1C <- true.validation.SiteA.df_1C %>%
 
 ###### COEFFICIENTS #######
 
-extrap.scenario.df_1C  <- extrap.scenario.df_1C %>% 
+extrap.scenario.df_2  <- extrap.scenario.df_2 %>% 
   mutate(bias.type = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>% 
   mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
-b1_1C <- extrap.scenario.df_1C %>% 
+b1_2 <- extrap.scenario.df_2 %>% 
   ggplot(aes(x = bias.type, y = beta1.mean, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +  # Add the horizontal dashed line
@@ -780,7 +767,7 @@ b1_1C <- extrap.scenario.df_1C %>%
   ggtitle('Low PO record numbers')
 
 
-b2_1C <- extrap.scenario.df_1C %>% 
+b2_2 <- extrap.scenario.df_2 %>% 
   ggplot(aes(x = bias.type, y = beta2.mean, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +  # Add the horizontal dashed line
@@ -809,14 +796,14 @@ b2_1C <- extrap.scenario.df_1C %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-beta_1C <- ggarrange(b1_1C + rremove("xlab"), b2_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom")
+beta_2 <- ggarrange(b1_2 + rremove("xlab"), b2_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom")
 
 
 ##########################################
 ##### COEFFICIENT STANDARD DEVIATION #####
 ##########################################
 
-b1SD_1C <- extrap.scenario.df_1C %>% 
+b1SD_2 <- extrap.scenario.df_2 %>% 
   ggplot(aes(x = bias.type, y = beta1.sd, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   labs(x = NULL, y = expression(beta[1]~"SD"), color = NULL) +
@@ -845,7 +832,7 @@ b1SD_1C <- extrap.scenario.df_1C %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +
   ggtitle('Low PO record numbers')
 
-b2SD_1C <- extrap.scenario.df_1C %>% 
+b2SD_2 <- extrap.scenario.df_2 %>% 
   ggplot(aes(x = bias.type, y = beta2.sd, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   labs(x = NULL, y = expression(beta[2]~"SD"), color = NULL) +
@@ -874,10 +861,10 @@ b2SD_1C <- extrap.scenario.df_1C %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +
   ggtitle('Low PO record numbers')
 
-betaSD_1C <- ggarrange(b1SD_1C + rremove("xlab"), b2SD_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom")
+betaSD_2 <- ggarrange(b1SD_2 + rremove("xlab"), b2SD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom")
 
 #### INTERCEPTS ####
-PO_INT_1C <- extrap.scenario.df_1C  %>% 
+PO_INT_2 <- extrap.scenario.df_2  %>% 
   filter(!is.na(PO_intercept)) %>% 
   ggplot(aes(x = bias.type, y = PO_intercept, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Boxplot with no outliers
@@ -907,7 +894,7 @@ PO_INT_1C <- extrap.scenario.df_1C  %>%
         strip.background = element_rect(fill = "gray96")) +
   ggtitle('PO Intercept')
 
-PA_INT_1C <- extrap.scenario.df_1C  %>% 
+PA_INT_2 <- extrap.scenario.df_2  %>% 
   filter(!is.na(PA_intercept)) %>% 
   ggplot(aes(x = bias.type, y = PA_intercept, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Boxplot with no outliers
@@ -938,7 +925,7 @@ PA_INT_1C <- extrap.scenario.df_1C  %>%
   ggtitle('PA Intercept')
 
 
-intercepts_1C <- ggarrange(PO_INT_1C, PA_INT_1C, common.legend = T,  ncol = 2, nrow = 1, legend = "bottom")
+intercepts_2 <- ggarrange(PO_INT_2, PA_INT_2, common.legend = T,  ncol = 2, nrow = 1, legend = "bottom")
 
 ###########################################
 ### FIGURES: COMBINED 1 AND 1 C PLOTS ####
@@ -952,41 +939,41 @@ Supp.Fig.1 <- ggarrange(RMSE_2 + rremove("xlab"), RMSE_2C, common.legend = T,  n
 
 ggsave(plot = Supp.Fig.1, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_1.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
-Supp.Fig.2 <- ggarrange(Int.score_1 + rremove("xlab"), Int.score_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.2 <- ggarrange(Int.score_1 + rremove("xlab"), Int.score_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.2, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_2.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
-Supp.Fig.3 <- ggarrange(CORR_1 + rremove("xlab"), CORR_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.3 <- ggarrange(CORR_1 + rremove("xlab"), CORR_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
-Supp.Fig.4 <- ggarrange(cov.rate + rremove("xlab"), cov.rate_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.4 <- ggarrange(cov.rate + rremove("xlab"), cov.rate_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_4.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 ## Training site
 
-Supp.Fig.5 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.5 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_5.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT PLOT combined 1 and 1 C
 
-Supp.Fig.6 <- ggarrange(beta_1 + rremove("xlab"), beta_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.6 <- ggarrange(beta_1 + rremove("xlab"), beta_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_6.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT SD PLOT combined 1 and 1 C
 
-Supp.Fig.7 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.7 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_7.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 ###### INTERCEPTS #######
 
-Supp.Fig.8 <- ggarrange(intercepts + rremove("xlab"), intercepts_1C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.8 <- ggarrange(intercepts + rremove("xlab"), intercepts_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
 ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Scenario_1_tests/Supp_FIGURE_8.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
 
@@ -994,7 +981,7 @@ ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Scenario_1_
 ######### REALISED ENVIRO. EXTRAPOLATION ###########
 
 #### Realised extrap per mod type ###
-                                
+
 
 true.validation.df$extrap.type <- factor(true.validation.df$extrap.type, levels = c("Low", "Moderate", "High"))
 
@@ -1026,9 +1013,9 @@ R2a <- true.validation.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right)
   ggtitle('High PO record numbers')
 
-true.validation.df_1C$extrap.type <- factor(true.validation.df_1C$extrap.type, levels = c("Low", "Moderate", "High"))
+true.validation.df_2$extrap.type <- factor(true.validation.df_2$extrap.type, levels = c("Low", "Moderate", "High"))
 
-R2Ca <- true.validation.df_1C %>% 
+R2Ca <- true.validation.df_2 %>% 
   filter(mod.type %in% c("m.int", "m.PA", "m.PO")) %>% 
   mutate(realised.extrap = ifelse(mod.type == "m.int", meanPAPO.extrap, 
                                   ifelse(mod.type == "m.PA", meanPA.extrap, meanPO.extrap))) %>%
