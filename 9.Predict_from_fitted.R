@@ -1,13 +1,36 @@
 
+########################################################################
+########################## 9. Predict from fitted #####################
+########################################################################
 
-# 9. Predict from fitted --------------------------------------------------
+# This script takes all fitted models and predicts the species intensity at the projection site (Site B) and the training site (Site A)
+
+# Prediction are made with the RISDM predict() function by taking draws from the posterior distribution of the model parameters and any spatial random effect
+
+# If the model includes a Gaussian random field, this will be included in the prediction at the training site, but not the projection site
+
+# If the model includes a bias covariate, this will not be included in any predictions
+
+# The model must include either a PO or PA intercept. In the ISDM the model uses the PA intercept
+
+# For spatial models, the prediction to the training site will also be made with just the random or fixed component of the model 
+
+# Inputs:
+
+# Output from step 8
+
+# posterior_nsamps which is the number of posterior samples to take
+
+# Output:
+
+# A list with the same structure as the input, but with the predictions added to the models dataframe
+
+
+########################################################################
+
 
 predict_from_fitted_SiteB_func <- function(reps.setup.list,
                                            posterior_nsamps) {
-  
-  #### PREDICT for every extrap type, for every rep, for every model type
-  # Save prediction to the model list
-  ####
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -26,7 +49,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
       
       Model <- reps.setup.list[[name]][[rep]]$models$Model
       
-      # Load covariate
+      # Load covariates at projection site (Site B)
       cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteB.rast
       
       # Add a dummy bias variable to keep RISDM happy
@@ -46,7 +69,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
                                                S = posterior_nsamps, 
                                                intercept.terms = "PO_Intercept",
                                                type = "link",
-                                               includeRandom = F)
+                                               includeRandom = F) # No GRF
           
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod
@@ -59,7 +82,7 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
                                                S = posterior_nsamps, 
                                                intercept.terms = "PA_Intercept",
                                                type = "link",
-                                               includeRandom = F)
+                                               includeRandom = F) # No GRF
           
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod
@@ -77,17 +100,14 @@ predict_from_fitted_SiteB_func <- function(reps.setup.list,
   
 }
 
-# OPTIONAL - RUN THE PREDICTION FOR SITE A --------------------------------
+# RUN THE PREDICTION FOR Training SITE A --------------------------------
 
 predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                            pred.GRF = FALSE,
                                            pred.fixed = FALSE,
                                            mod.type = "no-GRF",
                                            posterior_nsamps) {
-  
-  #### PREDICT for every extrap type, for every rep, for every model type
-  # Save prediction to the model list
-  ####
+
   
   # Get the names of the extrap types for indexing
   extrap_names <- names(reps.setup.list)
@@ -106,13 +126,13 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
       
       Model <- reps.setup.list[[name]][[rep]]$models$Model
       
-      # Load covariate
+      # Load covariates at training Site B
       cov.rep <- reps.setup.list[[name]][[rep]]$extrap.reps.out$covs.SiteA.rast
       
       # Add a dummy bias variable to keep RISDM happy
       cov.rep$bias <- 1
       
-      for (i in seq_along(Model)) { # NEED TO ADD BACK IN nrow(models_df) ONCE HAVE PA WORKING
+      for (i in seq_along(Model)) { 
         
         mod <- models_df[[i, "Model"]]
         
@@ -132,7 +152,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                  S = posterior_nsamps, 
                                                  intercept.terms = "PO_Intercept",
                                                  type = "link",
-                                                 includeRandom = T)
+                                                 includeRandom = T) # Add GRF
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod
@@ -145,7 +165,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                  S = posterior_nsamps, 
                                                  intercept.terms = "PA_Intercept",
                                                  type = "link",
-                                                 includeRandom = T)
+                                                 includeRandom = T) # Add GRF
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod
@@ -167,7 +187,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                  S = posterior_nsamps, 
                                                  intercept.terms = "PO_Intercept",
                                                  type = "link",
-                                                 includeRandom = F)
+                                                 includeRandom = F) # No GRF
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod
@@ -180,7 +200,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                  S = posterior_nsamps, 
                                                  intercept.terms = "PA_Intercept",
                                                  type = "link",
-                                                 includeRandom = F)
+                                                 includeRandom = F) # No GRF
             
             # Save the updated model back to the dataframe
             models_df[[i, "Model"]] <- mod
@@ -204,7 +224,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                               intercept.terms = NULL,
                                               type = "link",
                                               includeRandom = T,
-                                              includeFixed = F)
+                                              includeFixed = F) # No fixed effect
           
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod
@@ -225,7 +245,7 @@ predict_from_fitted_SiteA_func <- function(reps.setup.list,
                                                 intercept.terms = NULL,
                                                 type = "link",
                                                 includeRandom = F,
-                                                includeFixed = T)
+                                                includeFixed = T) # Only fixed effect
           
           # Save the updated model back to the dataframe
           models_df[[i, "Model"]] <- mod

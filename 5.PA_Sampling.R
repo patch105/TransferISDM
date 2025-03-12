@@ -1,6 +1,32 @@
 
 
-# 5. PA Sampling ----------------------------------------------------------
+########################################################################
+########################## 5. PA sampling   ##########################
+########################################################################
+
+# This script simulates presence-absence (PA) records at the training site (Site A). 
+
+# It does so by:
+# Randomly placing a 50x50 grid within the Site A domain 
+# Assigning 10x10 strata within this grid
+# Placing a random 1x1 quadrat in each stratum
+# Checking whether the 1x1 quadrat overlaps with a species presence from the true species distribution process
+# Assigning each quadrat as a presence or absence
+
+# It also calculates the 'realised' environmental extrapolation for the PA and PO data. This is done by estimating the Shape value for the PA and PO records.
+
+# Inputs: 
+
+# The output from step 4. 
+
+# n_cores: The number of cores for the Shape metric calculation. The flexsdm::extra_eval function can utilise parallel processing. If available, this can speed up the calculation of the Shape metric for environmental dissimilarity.Specify the number of cores to use here.
+
+# Outputs:
+
+# A list that contains the PA records for eac replicate, as well as summaries of the number of presences and absences and the realised extrapolation of the records
+
+
+########################################################################
 
 pa_sampling_func <- function(reps.setup.list,
                              n_cores) {
@@ -11,17 +37,12 @@ pa_sampling_func <- function(reps.setup.list,
     
     imap(extrap.type, function(rep, rep_index) {
       
-      print(paste("Processing extrap.type:", extrap.name))
-      
-      print(paste("Processing rep:", rep_index))
-      
+      # Obtain the Site A (training site) grid
       rand.gridA <- rep$extrap.reps.out$rand.gridA
 
+      # Obtain the species process for Site A
       spp_process.rand.gridA <- rep$spp_process.rand.gridA
       
-      #-------------------------------------------------------------------------------
-      # Site A
-      #-------------------------------------------------------------------------------
       
       #### 1. SELECTING A RANDOM GRID FOR SITE A
       
@@ -42,7 +63,7 @@ pa_sampling_func <- function(reps.setup.list,
       # Set the limit for x and y coord so box is completely inside the domain
       rand.limA <- c(xmax - rast_sizeA[1], ymax - rast_sizeA[2])
       
-      # Create random coordinate index for (bottom left?) corner of subgrid within grid domain
+      # Create random coordinate index for (bottom left) corner of subgrid within grid domain
       # Do this by generating a random number and finding the nearest eastings/northings value
       # Then use this index on x0 to get the coordinate
       # Had to round because there was a problem if xmin and rand.limA[1] were slightly different by a tiny decimal place
@@ -64,7 +85,7 @@ pa_sampling_func <- function(reps.setup.list,
       
       ##### 2. SAMPLING PA DATA FROM RANDOM GRID A
       
-      # Get the domain of region a
+      # Get the domain of random grid A
       dom_a_bbox <- c(east_min = xmin(PA.rand.gridA), east_max = xmax(PA.rand.gridA), north_min = ymin(PA.rand.gridA), north_max = ymax(PA.rand.gridA))
       
       # Choose a grid size number of rows (for PA sampling)
@@ -97,8 +118,8 @@ pa_sampling_func <- function(reps.setup.list,
       ref_grid <- pa_a
       values(ref_grid) <- 1:ncell(ref_grid)  # Assign unique values (1 to 100) to each cell
       
-      # Resample the reference grid to the resolution of the 50x30 raster
-      # This doesn't change the resolution of the 50x30 raster but assigns the corresponding values from the 10x10 cells
+      # Resample the reference grid to the resolution of the 50x50 raster
+      # This doesn't change the resolution of the 50x50 raster but assigns the corresponding values from the 10x10 cells
       alignment_layer <- resample(ref_grid, PA.rand.gridA, method="near")
       
       names(alignment_layer) <- "strata"
@@ -162,18 +183,7 @@ pa_sampling_func <- function(reps.setup.list,
         
       }
       
-
-        
-        
-      
-      # Debugging output for pa_a_df
-      print("pa_a_df column names:")
-      print(colnames(pa_a_df))
-      print(head(pa_a_df))
-      print("Number of presences in PA grid A:")
-      sum(pa_a_df$presence==1)
-      
-      # pa - region a
+      # PA - region a
       pa_a_df <- pa_a_df %>% 
         mutate(area = 1)
       
@@ -216,7 +226,7 @@ pa_sampling_func <- function(reps.setup.list,
         mutate(Presence = 1) %>% 
         .[,c("cov1", "cov2", "Presence")]
       
-      # Covariates for site B
+      # Covariates for site B (projection)
       
       covs.SiteB <- rep$extrap.reps.out$covs.SiteB
       
@@ -282,54 +292,5 @@ pa_sampling_func <- function(reps.setup.list,
 }
 
 
-
-# # CHECK IF PO DATA IN PA SITE A GRID --------------------------------------
-# 
-# po_pa_checking_func <- function(reps.setup.list) {
-#   
-#   # Initialise a counter for removed reps
-#   removed_counts_pa <- c(Low = 0, Moderate = 0, High = 0)
-#   
-#   # Iterate through each Extrap type
-#   for (extrap.type in c("Low", "Moderate", "High")) {
-#     
-#     # Get the corresponding sub-list (Low, Moderate, or High)
-#     reps_list <- reps.setup.list[[extrap.type]]
-#     
-#     remove_index <- c()
-#     
-#     # Iterate through each rep within the sub-list
-#     for (i in seq_along(reps_list)) {
-#       
-#       # Check if PO_grid in the rep has no PO data or if there's any PO data in the PA sampling grid A
-#       if (length(reps_list[[i]]$PO_GridA) < 2 | reps_list[[i]]$n_presence_gridA == 0) {
-#         
-#         # Save index
-#         remove_index <- c(remove_index, i)
-#         
-#       }
-#     }
-#     
-#     # Remove the reps with 0 length PO_GridA or PO_GridB
-#     if (length(remove_index) > 0) {
-#       
-#       reps_list <- reps_list[-remove_index]
-#       
-#       # Count the number of removed reps for this extrap.type
-#       removed_counts_pa[extrap.type] <- length(remove_index)
-#     }
-#     
-#     # Assign the updated list back to the original structure
-#     reps.setup.list[[extrap.type]] <- reps_list
-#   }
-#   
-#   # Print the number of removed reps for each extrap.type
-#   for (extrap.type in names(removed_counts_pa)) {
-#     cat(removed_counts_pa[extrap.type], "reps removed from", extrap.type, "\n")
-#   }
-#   
-#   return(list(reps.setup.list = reps.setup.list, removed_counts_pa = removed_counts_pa)) 
-#   
-# }
 
 

@@ -1,14 +1,28 @@
-## TO DO -WANT TO HAVE SO I CAN TURN ON AND OFF MODELS WITH A CHARACTER LIST (e.g. c("Integrated", "PO", "PA"))
+########################################################################
+########################## 6. Run Model   ############################
+########################################################################
+
+# This script runs presence-only (PO), presence-absence (PA) and PO-PA integrated models fitted to simulation species occurrences.
+
+# Models are fit at Site A (the training site). Depending on what mod.type has been specified, the models can include a bias covariate and a Gaussian random field.
+
+# Inputs:
+
+# Output from step 5
+
+# Priors for coefficients, intercepts, and Gaussian random field hyperparameters
+# These are set in the 0b.Run_Replicate.R script
+
+# Mesh parameters, set in the  0b.Run_Replicate.R script
+
+# mod.type which determines whether to fit spatial, non-spatial, bias or no-bias models
+
+# Output:
+
+# A list with the model results added to a sub-list per model type
 
 
-# 6. Run Model ------------------------------------------------------------
-
-# library(devtools)
-# devtools::install_github( repo="Scott-Foster/RISDM", build_vignettes=FALSE) # Had to do force = T when I wanted to re-load
-                          
-library(sf, lib.loc=lib_loc)
-# library(INLA)
-# INLA:::inla.binary.install(os="CentOS Linux-7")
+########################################################################
 
 run_model_func <- function(prior.mean,
                            int.sd,
@@ -31,7 +45,7 @@ run_model_func <- function(prior.mean,
   
   # Model specification -----------------------------------------------------
   
-  # Priors
+  # Priors for non-spatial and spatial (GRF) models
   my.control <- list(coord.names = c("x", "y"),
                      prior.mean = prior.mean,
                      int.sd = int.sd, # Intercept standard deviation
@@ -118,9 +132,9 @@ run_model_func <- function(prior.mean,
                             mesh = mesh.default,
                             responseNames = NULL,
                             sampleAreaNames = NULL,
-                            distributionFormula = distributionFormula, # Linear w one cov
+                            distributionFormula = distributionFormula, 
                             biasFormula = ~1, # Intercept only
-                            artefactFormulas = NULL,
+                            artefactFormulas = NULL, # Not applicable to PO
                             control = my.control)     
         
         # Presence-Absence Model Fitting - no GRF ---------------------------------
@@ -130,8 +144,8 @@ run_model_func <- function(prior.mean,
                             mesh = mesh.default,
                             responseNames = c(PA = "presence"),
                             sampleAreaNames = c(PA = "area"),
-                            distributionFormula = distributionFormula, # Linear w one cov
-                            biasFormula = NULL, #Not applicable to PA
+                            distributionFormula = distributionFormula, 
+                            biasFormula = NULL, # Not applicable to PA
                             artefactFormulas = list(PA = ~1), # Intercept only
                             control = my.control)
         
@@ -148,7 +162,7 @@ run_model_func <- function(prior.mean,
                                  mesh = mesh.default,
                                  responseNames = c(PO = NULL, PA = "presence"),
                                  sampleAreaNames = c(PO = NULL, PA = "area"),
-                                 distributionFormula = distributionFormula, # Linear w one cov
+                                 distributionFormula = distributionFormula, 
                                  biasFormula = ~1, #Intercept only
                                  artefactFormulas = list(PA = ~1), # Intercept only
                                  control = my.control.GRF)
@@ -161,9 +175,9 @@ run_model_func <- function(prior.mean,
                                 mesh = mesh.default,
                                 responseNames = NULL,
                                 sampleAreaNames = NULL,
-                                distributionFormula = distributionFormula, # Linear w one cov
+                                distributionFormula = distributionFormula, 
                                 biasFormula = ~1, #Intercept only
-                                artefactFormulas = NULL,
+                                artefactFormulas = NULL, # Not applicable to PO
                                 control = my.control.GRF)
         
         # Presence-Absence Model Fitting - with GRF ---------------------------------
@@ -173,8 +187,8 @@ run_model_func <- function(prior.mean,
                                 mesh = mesh.default,
                                 responseNames = c(PA = "presence"),
                                 sampleAreaNames = c(PA = "area"),
-                                distributionFormula = distributionFormula, # Linear w one cov
-                                biasFormula = NULL, #Intercept only
+                                distributionFormula = distributionFormula, 
+                                biasFormula = NULL, # Not applicable to PA
                                 artefactFormulas = list(PA = ~1), # Intercept only
                                 control = my.control.GRF)
         
@@ -203,9 +217,9 @@ run_model_func <- function(prior.mean,
                                 mesh = mesh.default,
                                 responseNames = NULL,
                                 sampleAreaNames = NULL,
-                                distributionFormula = distributionFormula, # Linear w one cov
+                                distributionFormula = distributionFormula, 
                                 biasFormula = ~1 + bias, 
-                                artefactFormulas = NULL,
+                                artefactFormulas = NULL, # Not applicable to PO
                                 control = my.control)     
         
         
@@ -221,7 +235,7 @@ run_model_func <- function(prior.mean,
                                      mesh = mesh.default,
                                      responseNames = c(PO = NULL, PA = "presence"),
                                      sampleAreaNames = c(PO = NULL, PA = "area"),
-                                     distributionFormula = distributionFormula, # Linear w one cov
+                                     distributionFormula = distributionFormula, 
                                      biasFormula = ~1 + bias, 
                                      artefactFormulas = list(PA = ~1), # Intercept only
                                      control = my.control.GRF)
@@ -234,9 +248,9 @@ run_model_func <- function(prior.mean,
                                     mesh = mesh.default,
                                     responseNames = NULL,
                                     sampleAreaNames = NULL,
-                                    distributionFormula = distributionFormula, # Linear w one cov
+                                    distributionFormula = distributionFormula, 
                                     biasFormula = ~1 + bias, 
-                                    artefactFormulas = NULL,
+                                    artefactFormulas = NULL, # Not applicable to PO
                                     control = my.control.GRF)
         
       }
@@ -245,7 +259,7 @@ run_model_func <- function(prior.mean,
 
       Mod.type <- names(Model)
       
-      Summary <- lapply(Model, summary) # Summarise all model objects
+      Summary <- lapply(Model, summary)
     
       # Create a data frame for this replicate
       return(list(models = tibble(Mod.type = Mod.type,
