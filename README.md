@@ -85,13 +85,11 @@ Scenario name | Environmental dissimilarity | Spatial autocorrelation | Sampling
 
 ## Code for plotting figures from manuscript
 
-[Figure 3. and supplementary tables for all scenarios](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_ALL_Scenarios.R)
+[Figure 3. and supplementary figures Scenarios 1 & 2](https://github.com/patch105/AntarcticISDM/blob/main/Plotting/PLOTTING_Scenario_1_2.R)
 
-[Figure 4. and supplementary figures Scenarios 1 & 2](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_1.R)
+[Figure 4. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
 
 [Figure 5. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
-
-[Figure 6. and supplementary figures Scenarios 3 & 4](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_5.R)
 
 [Supplementary figures Scenarios 5 & 6](https://github.com/patch105/AntarcticISDM/blob/main/PLOTTING_Scenario_6.R)
 
