@@ -19,7 +19,7 @@ Testing_Bias_Scenarios.R
 RESULTS_FIGURES.R
 RESULTS_FIGURES_FINAL.R
 RESULTS_FIGURES_FINAL_SCENARIO2.R
-RESULTS_FIGURES_FINAL_SCENARIO5_w_out_bisa_cov.R
+RESULTS_FIGURES_FINAL_SCENARIO5_w_out_bias_cov.R
 Testing_Fixedvs.Random.rmarkdown
 Testing_spat_autocorrelation_scenarios.rmarkdown
 Testing_spat_autocorrelation_scenarios_files/
@@ -28,5 +28,4 @@ PLOTTING_ALL_Scenarios.R
 PLOTTING_Scenario_1.R
 PLOTTING_Scenario_6.R
 PLOTTING_Scenario_5.R
-
 .docx
