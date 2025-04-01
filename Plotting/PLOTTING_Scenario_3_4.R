@@ -6,9 +6,9 @@ library(viridis)
 library(purrr)
 library(readr)
 
-outpath <- file.path(dirname(getwd()), "output")
+outpath <- file.path(getwd(), "output")
 
-result_path <- file.path(getwd(), "PLOTS")
+result_path <- file.path(getwd(), "output/PLOTS")
 
 # Make dir if not already there
 if(!dir.exists(result_path)) {

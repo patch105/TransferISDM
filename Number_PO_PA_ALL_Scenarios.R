@@ -10,7 +10,7 @@ library(purrr)
 library(readr)
 
 
-outpath <- file.path(dirname(getwd()), "output")
+outpath <- file.path(getwd(), "output")
 
 result_path <- file.path(getwd(), "output/RESULTS")
 
