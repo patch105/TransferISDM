@@ -1,4 +1,3 @@
-#lib_loc <- paste(getwd(),"/r_lib",sep="")
 lib_loc = .libPaths() 
 
 library(spatstat)
@@ -10,11 +9,17 @@ library(terra)
 library(purrr)
 library(readr)
 
-#outpath <- file.path("Z:/ISDM", "output/ARCHIVE/NOV24")
-outpath <- file.path("Z:/ISDM", "output")
-# outpath <- file.path(getwd(), "output")
+
+outpath <- file.path(dirname(getwd()), "output")
+
 result_path <- file.path(getwd(), "output/RESULTS")
 
+# Make dir if not already there
+if(!dir.exists(result__path)) {
+  
+  dir.create(result_path, recursive = TRUE)
+  
+}
 
 #############################
 
