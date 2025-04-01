@@ -128,22 +128,26 @@ if(scenario.type == "Spatial.Auto") {
 
 # Make the figure
 
+
 true.validation.df <- true.validation.df %>%
-  mutate(bias.type = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>% 
-  mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
+  mutate(bias.type = ifelse(grepl("PA", mod.type, fixed = TRUE), NA_character_,
+                            ifelse(grepl("bias", mod.type, fixed = TRUE) & mod.type != "m.PA", "With bias covariate", "Without bias covariate"))) %>%
+  mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = TRUE), gsub(".bias", "", mod.type), mod.type)) %>%
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int")),
+         bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
 
-# NON-COLOURED VERSION (for supp)
+# Version for supp. materials
 RMSE_2 <- true.validation.df %>% 
   ggplot(aes(x = mean.extrap, y = RMSE.global, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
   labs(x = x.label, y = "Mean RMSE projection site") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  #coord_cartesian(ylim = c(NA, 4.25)) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
+  coord_cartesian(ylim = c(NA, 4.25)) +
   theme_bw() +
   facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
   theme(legend.position = "bottom",
@@ -164,9 +168,11 @@ RMSE_2_Fig3 <- true.validation.df %>%
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
   labs(x = x.label, y = "Mean RMSE projection site") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  #coord_cartesian(ylim = c(NA, 4.25)) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
+  coord_cartesian(ylim = c(NA, 4)) +
   theme_bw() +
   facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
   theme(legend.position = "bottom",
@@ -179,7 +185,7 @@ RMSE_2_Fig3 <- true.validation.df %>%
         axis.text = element_text(size = 12),    # Increase axis text
         strip.text = element_text(size = 15),   # Increase facet title size
         strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
+        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 
 # INTERVAL SCORE
@@ -204,51 +210,6 @@ Int.score_1 <- true.validation.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
   ggtitle('High PO record numbers')
 
-
-# CORRELATION ESTIMATED VS. TRUE
-CORR_1 <- true.validation.df %>% 
-  ggplot(aes(x = mean.extrap, y = correlation, color = bias.type)) +
-  geom_point(alpha = 0.05, size = 1.2) +
-  geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
-  labs(x = x.label, y = "Correlation") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  coord_cartesian(ylim = c(0.25, NA)) +
-  theme_bw() +
-  facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),  # Increase legend text size
-        axis.title = element_text(size = 15),   # Increase axis titles
-        axis.text = element_text(size = 12),    # Increase axis text
-        strip.text = element_text(size = 15),   # Increase facet title size
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
-  ggtitle('High PO record numbers')
-
-
-# # COVERAGE RATE
-cov.rate <- true.validation.df %>%
-  ggplot(aes(x = mean.extrap, y = coverage.rate, color = bias.type)) +
-  geom_point(alpha = 0.05, size = 1.2) +
-  geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
-  labs(x = x.label, y = "Mean coverage probability") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  #coord_cartesian(ylim = c(NA, 3.5)) +
-  theme_bw() +
-  facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),  # Increase legend text size
-        axis.title = element_text(size = 15),   # Increase axis titles
-        axis.text = element_text(size = 12),    # Increase axis text
-        strip.text = element_text(size = 15),   # Increase facet title size
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
-  ggtitle('High PO record numbers')
 
 ######## SITE A #################
 
@@ -306,7 +267,7 @@ b1_1 <- extrap.scenario.df %>%
   labs(x = NULL, y = expression(beta[1]), color = NULL) +
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
-  coord_cartesian(ylim = c(-1, 1)) +
+  coord_cartesian(ylim = c(-0.5, 0.5)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
              labeller = as_labeller(c(m.int = "Integrated", 
@@ -336,7 +297,7 @@ b2_1 <- extrap.scenario.df %>%
   labs(x = NULL, y = expression(beta[2]), color = NULL) +
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
-  coord_cartesian(ylim = c(-1, 1)) +
+  coord_cartesian(ylim = c(-0.5, 0.5)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
              labeller = as_labeller(c(m.int = "Integrated", 
@@ -596,20 +557,23 @@ if(scenario.type == "Spatial.Auto") {
 
 # Make the figure
 
-true.validation.df_2 <- true.validation.df_2 %>%
-  mutate(bias.type = ifelse(grepl("bias", mod.type, fixed = T), "With bias covariate", "Without bias covariate")) %>% 
-  mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = T), gsub(".bias", "", mod.type), mod.type)) %>% 
-  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
+true.validation.df_1C <- true.validation.df_1C %>%
+  mutate(bias.type = ifelse(grepl("PA", mod.type, fixed = TRUE), NA_character_,
+                            ifelse(grepl("bias", mod.type, fixed = TRUE) & mod.type != "m.PA", "With bias covariate", "Without bias covariate"))) %>%
+  mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = TRUE), gsub(".bias", "", mod.type), mod.type)) %>%
+  mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int")),
+         bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
-## NON-COLOURED VERSION
-RMSE_2C <- true.validation.df_2 %>% 
+## Version for supp. material
+RMSE_2C <- true.validation.df_1C %>% 
   ggplot(aes(x = mean.extrap, y = RMSE.global, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
   labs(x = x.label, y = "Mean RMSE projection site", fill = "Model Type", color = "Model Type") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
   coord_cartesian(ylim = c(NA, 4.25)) +
   theme_bw() +
   facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
@@ -624,14 +588,16 @@ RMSE_2C <- true.validation.df_2 %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
   ggtitle('Low PO record numbers')
 
-# NON-COLOURED VERSION
-Int.score_2 <- true.validation.df_2 %>% 
+# Interval score
+Int.score_1C <- true.validation.df_1C %>% 
   ggplot(aes(x = mean.extrap, y = Mean.Int.Score, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
   labs(x = x.label, y = "Mean interval score") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
   coord_cartesian(ylim = c(NA, 3.5)) +
   theme_bw() +
   facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
@@ -669,27 +635,6 @@ CORR_2 <- true.validation.df_2 %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
   ggtitle('Low PO record numbers')
 
-# # COVERAGE RATE
-cov.rate_2 <- true.validation.df_2 %>%
-  ggplot(aes(x = mean.extrap, y = coverage.rate, color = bias.type)) +
-  geom_point(alpha = 0.05, size = 1.2) +
-  geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
-  labs(x = x.label, y = "Mean coverage probability") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  #coord_cartesian(ylim = c(NA, 3.5)) +
-  theme_bw() +
-  facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),  # Increase legend text size
-        axis.title = element_text(size = 15),   # Increase axis titles
-        axis.text = element_text(size = 12),    # Increase axis text
-        strip.text = element_text(size = 15),   # Increase facet title size
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
-  ggtitle('Low PO record numbers')
 
 ############## SITE A ##################
 
@@ -736,14 +681,14 @@ extrap.scenario.df_2  <- extrap.scenario.df_2 %>%
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
-b1_2 <- extrap.scenario.df_2 %>% 
+b1_1C <- extrap.scenario.df_1C %>% 
   ggplot(aes(x = bias.type, y = beta1.mean, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +  # Add the horizontal dashed line
   labs(x = NULL, y = expression(beta[1]), color = NULL) +
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
-  coord_cartesian(ylim = c(-1, 1)) +
+  coord_cartesian(ylim = c(-0.5, 0.5)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
              labeller = as_labeller(c(m.int = "Integrated", 
@@ -767,14 +712,14 @@ b1_2 <- extrap.scenario.df_2 %>%
   ggtitle('Low PO record numbers')
 
 
-b2_2 <- extrap.scenario.df_2 %>% 
+b2_1C <- extrap.scenario.df_1C %>% 
   ggplot(aes(x = bias.type, y = beta2.mean, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +  # Add the horizontal dashed line
   labs(x = NULL, y = expression(beta[2]), color = NULL) +
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) + 
-  coord_cartesian(ylim = c(-1, 1)) +
+  coord_cartesian(ylim = c(-0.5, 0.5)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
              labeller = as_labeller(c(m.int = "Integrated", 
@@ -943,45 +888,36 @@ Supp.Fig.2 <- ggarrange(Int.score_1 + rremove("xlab"), Int.score_2, common.legen
 
 ggsave(plot = Supp.Fig.2, filename = paste0(file.path(result_path),"/Supp_FIGURE_2.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
-Supp.Fig.3 <- ggarrange(CORR_1 + rremove("xlab"), CORR_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Supp_FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
-
-Supp.Fig.4 <- ggarrange(cov.rate + rremove("xlab"), cov.rate_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
-
-ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Supp_FIGURE_4.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
-
 ## Training site
 
-Supp.Fig.5 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.3 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Supp_FIGURE_5.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Supp_FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT PLOT combined 1 and 1 C
 
-Supp.Fig.6 <- ggarrange(beta_1 + rremove("xlab"), beta_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.4 <- ggarrange(beta_1 + rremove("xlab"), beta_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp_FIGURE_6.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Supp_FIGURE_4.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT SD PLOT combined 1 and 1 C
 
-Supp.Fig.7 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.5 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp_FIGURE_7.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Supp_FIGURE_5.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 ###### INTERCEPTS #######
 
-Supp.Fig.8 <- ggarrange(intercepts + rremove("xlab"), intercepts_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.6 <- ggarrange(intercepts + rremove("xlab"), intercepts_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Supp_FIGURE_8.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp_FIGURE_6.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
 
 
 ######### REALISED ENVIRO. EXTRAPOLATION ###########
 
 #### Realised extrap per mod type ###
-
 
 true.validation.df$extrap.type <- factor(true.validation.df$extrap.type, levels = c("Low", "Moderate", "High"))
 
@@ -1046,8 +982,8 @@ R2Ca <- true.validation.df_2 %>%
 
 #########################################################################
 
-Supp.Fig.9 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.7 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.9, filename = paste0(file.path(result_path),"/Supp_FIGURE_9.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp_FIGURE_7.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 
