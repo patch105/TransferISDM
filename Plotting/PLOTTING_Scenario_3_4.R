@@ -864,20 +864,19 @@ cor.GRF <- final.SiteA.df.bias %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-cor.FIXED <- final.SiteA.df.bias %>% 
+RMSE.GRF <- final.SiteA.df.bias %>% 
   filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
   mutate(bias.type2 = factor(bias.type2, levels = c("Without bias covariate", "With bias covariate"))) %>%
-  ggplot(aes(x = relative.GRF, y = cor.FIXED, fill = bias.type2)) +  
+  ggplot(aes(x = relative.GRF, y = RMSE.global.GRF, fill = bias.type2)) +  
   geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
+  labs(x = "Relative random effect contribution", y = "RMSE", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
                     breaks = c("Without bias covariate", "With bias covariate")) +
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
-                     breaks = c("Without bias covariate", "With bias covariate")) +
-  coord_cartesian(ylim = c(-0.2, 1)) +
+                     breaks = c("Without bias covariate", "With bias covariate")) + 
+  coord_cartesian(ylim = c(NA, 1.6)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
              labeller = as_labeller(c(m.int = "Integrated", 
@@ -897,9 +896,9 @@ cor.FIXED <- final.SiteA.df.bias %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 
-COR_GRF_FIXED_plot <- ggarrange(
+COR_RMSE_GRF_plot <- ggarrange(
   cor.GRF + rremove("xlab"),  # Remove individual x labels
-  cor.FIXED + rremove("xlab"),
+  RMSE.GRF + rremove("xlab"),
   common.legend = TRUE,  
   ncol = 1, nrow = 2, 
   legend = "bottom",
@@ -908,8 +907,8 @@ COR_GRF_FIXED_plot <- ggarrange(
   heights = c(1, 1)
 )
 
-COR_GRF_FIXED_plot <- annotate_figure(
-  COR_GRF_FIXED_plot, 
+COR_RMSE_GRF_plot <- annotate_figure(
+  COR_RMSE_GRF_plot, 
   bottom = text_grob("Relative random effect contribution", size = 14, vjust = 0.5)  # Adjust vertical position
 ) 
 
@@ -1694,7 +1693,7 @@ cor.GRF <- final.SiteA.df.bias %>%
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
                     breaks = c("Without bias covariate", "With bias covariate")) +
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
-                     breaks = c("Without bias covariate", "With bias covariate")) +
+                     breaks = c("Without bias covariate", "With bias covariate")) + 
   coord_cartesian(ylim = c(-0.2, 1)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
@@ -1714,20 +1713,19 @@ cor.GRF <- final.SiteA.df.bias %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
-cor.FIXED <- final.SiteA.df.bias %>% 
+RMSE.GRF <- final.SiteA.df.bias %>% 
   filter(bias.type == "With Gaussian random field") %>% 
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>%
   mutate(bias.type2 = factor(bias.type2, levels = c("Without bias covariate", "With bias covariate"))) %>%
-  ggplot(aes(x = relative.GRF, y = cor.FIXED, fill = bias.type2)) +  
+  ggplot(aes(x = relative.GRF, y = RMSE.global.GRF, fill = bias.type2)) +  
   geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA, aes(fill = bias.type2)) +      # Add a boxplot without outliers
-  labs(x = "Relative random effect contribution", y = "Correlation", color = NULL) +
+  labs(x = "Relative random effect contribution", y = "RMSE", color = NULL) +
   scale_x_discrete(labels = x.discrete.label) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.3)) +
   scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
                     breaks = c("Without bias covariate", "With bias covariate")) +
   scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
-                     breaks = c("Without bias covariate", "With bias covariate")) +
-  coord_cartesian(ylim = c(-0.2, 1)) +
+                     breaks = c("Without bias covariate", "With bias covariate")) + 
+  coord_cartesian(ylim = c(NA, 1.6)) +
   theme_bw() +
   facet_wrap(~mod.type2, 
              labeller = as_labeller(c(m.int = "Integrated", 
@@ -1747,9 +1745,9 @@ cor.FIXED <- final.SiteA.df.bias %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic"))
 
 
-COR_GRF_FIXED_plot <- ggarrange(
+COR_RMSE_GRF_plot <- ggarrange(
   cor.GRF + rremove("xlab"),  # Remove individual x labels
-  cor.FIXED + rremove("xlab"),
+  RMSE.GRF + rremove("xlab"),
   common.legend = TRUE,  
   ncol = 1, nrow = 2, 
   legend = "bottom",
@@ -1758,8 +1756,8 @@ COR_GRF_FIXED_plot <- ggarrange(
   heights = c(1, 1)
 )
 
-COR_GRF_FIXED_plot <- annotate_figure(
-  COR_GRF_FIXED_plot, 
+COR_RMSE_GRF_plot <- annotate_figure(
+  COR_RMSE_GRF_plot, 
   bottom = text_grob("Relative random effect contribution", size = 14, vjust = 0.5)  # Adjust vertical position
 ) 
 
