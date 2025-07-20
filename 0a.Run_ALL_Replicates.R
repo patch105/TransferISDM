@@ -38,7 +38,7 @@ library(flexsdm, lib.loc = lib_loc)
 scenario_name = "Scenario_X"
 
 # Select scenario type: "Enviro.Extrap" or "Spatial.Auto"
-scenario.type = "Spatial.Auto"
+scenario.type = "Enviro.Extrap"
 
 # Replicates per scenario level
 nreps <- 1 
@@ -47,7 +47,7 @@ nreps <- 1
 #"lgcp" for spatial autocorrelation or "ipp" for no spatial-autocorrelation
 #NOTE - the scenario can be scenario.type == "Enviro.Extrap" and latent.type == "lgcp" - the scenario will be environmental dissimilarity with spatial autocorrelation 
 
-latent.type = "lgcp" 
+latent.type = "ipp" 
 
 # Bias in PO sampling?
 bias <- FALSE
@@ -61,13 +61,13 @@ bias <- FALSE
 # "spatial means with Gaussian random field
 # .bias means model with a bias covariate 
 
-mod.type = c("no-GRF", "no-GRF.bias")
+mod.type = c("no-GRF")
 
 
 # If doing a spatial model, choose whether to make a separate prediction of the GRF and the Fixed effect for evaluation 
 
-pred.GRF <- TRUE
-pred.fixed <- TRUE
+pred.GRF <- FALSE
+pred.fixed <- FALSE
 
 
 # Parameters --------------------------------------------------------------
