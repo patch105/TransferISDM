@@ -60,6 +60,23 @@ validation_SiteB_func <- function(reps.setup.list,
       # And Euclidean site distance
       Site.distance <- reps.setup.list[[name]][[rep]]$extrap.reps.out$Site.distance
       
+      # Extract enviro. and geographic coverage information
+      
+      cov1_SiteA_range <- reps.setup.list[[name]][[rep]]$cov1_SiteA_range
+      cov2_SiteA_range <- reps.setup.list[[name]][[rep]]$cov2_SiteA_range
+      
+      PA_cov1_range <- reps.setup.list[[name]][[rep]]$PA_cov1_range
+      PA_cov2_range <- reps.setup.list[[name]][[rep]]$PA_cov2_range
+      PO_cov1_range <- reps.setup.list[[name]][[rep]]$PO_cov1_range
+      PO_cov2_range <- reps.setup.list[[name]][[rep]]$PO_cov2_range
+      PAPO_cov1_range <- reps.setup.list[[name]][[rep]]$PAPO_cov1_range
+      PAPO_cov2_range <- reps.setup.list[[name]][[rep]]$PAPO_cov2_range
+      
+      PA_geo_coverage <- reps.setup.list[[name]][[rep]]$PA_geo_coverage
+      PO_geo_coverage <- reps.setup.list[[name]][[rep]]$PO_geo_coverage
+      PAPO_geo_coverage <- reps.setup.list[[name]][[rep]]$PAPO_geo_coverage
+      
+      
       # Fixed and GRF variance
       if(latent.type == "lgcp") {
         
@@ -97,7 +114,7 @@ validation_SiteB_func <- function(reps.setup.list,
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteB)))
         
         RMSE.global <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteB), 
-                              predicted = as.vector(median.int.pred))
+                                     predicted = as.vector(median.int.pred))
         
         
         ### Calculating the Interval Score ###
@@ -133,6 +150,17 @@ validation_SiteB_func <- function(reps.setup.list,
           medianPO.extrap = medianPO,
           meanPAPO.extrap = meanPAPO,
           medianPAPO.extrap = medianPAPO,
+          cov1_SiteA_range = cov1_SiteA_range,
+          cov2_SiteA_range = cov2_SiteA_range,
+          PA_cov1_range = PA_cov1_range,
+          PA_cov2_range = PA_cov2_range,
+          PO_cov1_range = PO_cov1_range,
+          PO_cov2_range = PO_cov2_range,
+          PAPO_cov1_range = PAPO_cov1_range,
+          PAPO_cov2_range = PAPO_cov2_range,
+          PA_geo_coverage = PA_geo_coverage,
+          PO_geo_coverage = PO_geo_coverage,
+          PAPO_geo_coverage = PAPO_geo_coverage,
           Site.distance = Site.distance,
           GRF.var.multiplier = GRF.var.multiplier,
           fixed.variance = fixed.variance,
@@ -259,7 +287,7 @@ validation_SiteA_func <- function(reps.setup.list,
         MAE <- mean(abs(as.vector(median.int.pred - true_log_int.rast.SiteA)))
         
         RMSE.global <- Metrics::rmse(actual = as.vector(true_log_int.rast.SiteA), 
-                              predicted = as.vector(median.int.pred))
+                                     predicted = as.vector(median.int.pred))
         
         ### Calculating the Interval Score ###
         
@@ -295,13 +323,13 @@ validation_SiteA_func <- function(reps.setup.list,
                                method = "spearman")
           
           RMSE.global.GRF <- Metrics::rmse(actual = as.vector(GRF.rast.SiteA), 
-                                    predicted = as.vector(median.GRF.pred))
+                                           predicted = as.vector(median.GRF.pred))
           
           interval_score.GRF <- scoringutils:::interval_score(observed = as.vector(GRF.rast.SiteA),
-                                                             lower = as.vector(lower.GRF.pred), 
-                                                             upper = as.vector(upper.GRF.pred),
-                                                             interval_range = 95,
-                                                             weigh = TRUE)
+                                                              lower = as.vector(lower.GRF.pred), 
+                                                              upper = as.vector(upper.GRF.pred),
+                                                              interval_range = 95,
+                                                              weigh = TRUE)
           
           Mean.Int.Score.GRF <- mean(interval_score.GRF)
           
@@ -312,12 +340,12 @@ validation_SiteA_func <- function(reps.setup.list,
           
         } else { 
           
-        cor.GRF = NA 
-        cor.GRFA.GRFB = NA
-        RMSE.global.GRF = NA
-        Mean.Int.Score.GRF = NA
-        coverage.rate.GRF = NA
-        
+          cor.GRF = NA 
+          cor.GRFA.GRFB = NA
+          RMSE.global.GRF = NA
+          Mean.Int.Score.GRF = NA
+          coverage.rate.GRF = NA
+          
         }
         
         
@@ -331,18 +359,18 @@ validation_SiteA_func <- function(reps.setup.list,
                            method = "spearman")
           
           RMSE.global.FIXED <- Metrics::rmse(actual = as.vector(fixed.rast.SiteA), 
-                                      predicted = as.vector(median.FIXED.pred))
+                                             predicted = as.vector(median.FIXED.pred))
           
           interval_score.FIXED <- scoringutils:::interval_score(observed = as.vector(fixed.rast.SiteA),
-                                                              lower = as.vector(lower.FIXED.pred), 
-                                                              upper = as.vector(upper.FIXED.pred),
-                                                              interval_range = 95,
-                                                              weigh = TRUE)
+                                                                lower = as.vector(lower.FIXED.pred), 
+                                                                upper = as.vector(upper.FIXED.pred),
+                                                                interval_range = 95,
+                                                                weigh = TRUE)
           
           Mean.Int.Score.FIXED <- mean(interval_score.FIXED)
           
           coverage.true.FIXED <- ifelse(as.vector(fixed.rast.SiteA) >= as.vector(lower.FIXED.pred) 
-                                      & as.vector(fixed.rast.SiteA) <= as.vector(upper.FIXED.pred), 1, 0)
+                                        & as.vector(fixed.rast.SiteA) <= as.vector(upper.FIXED.pred), 1, 0)
           
           coverage.rate.FIXED <- sum(coverage.true.FIXED) / ncell(fixed.rast.SiteA)
           
@@ -355,7 +383,7 @@ validation_SiteA_func <- function(reps.setup.list,
           Mean.Int.Score.FIXED = NA
           coverage.rate.FIXED = NA
           
-          }
+        }
         
         # Save results to list
         
@@ -389,7 +417,7 @@ validation_SiteA_func <- function(reps.setup.list,
         )
         
       }
-      }
+    }
     
   }
   

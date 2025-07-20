@@ -226,6 +226,10 @@ pa_sampling_func <- function(reps.setup.list,
         mutate(Presence = 1) %>% 
         .[,c("cov1", "cov2", "Presence")]
       
+      # Covariates for site A (training)
+      
+      covs.SiteA <- rep$extrap.reps.out$covs.SiteA
+      
       # Covariates for site B (projection)
       
       covs.SiteB <- rep$extrap.reps.out$covs.SiteB
@@ -233,6 +237,46 @@ pa_sampling_func <- function(reps.setup.list,
       projection <- covs.SiteB %>% 
         .[,c("cov1", "cov2")]
       
+      
+      # Environmental coverage --------------------------------------------------
+
+      # Underlying range of environment 
+      cov1_SiteA_range <- max(covs.SiteA$cov1) - min(covs.SiteA$cov1)
+      cov2_SiteA_range <- max(covs.SiteA$cov2) - min(covs.SiteA$cov2)
+      
+      PA_cov1_range <- max(covsPA$cov1) - min(covsPA$cov1)
+      PA_cov2_range <- max(covsPA$cov2) - min(covsPA$cov2)
+      
+      PO_cov1_range <- max(covsPO$cov1) - min(covsPO$cov1)
+      PO_cov2_range <- max(covsPO$cov2) - min(covsPO$cov2)
+      
+      PAPO_cov1_range <- max(covsPAPO$cov1) - min(covsPAPO$cov1)
+      PAPO_cov2_range <- max(covsPAPO$cov2) - min(covsPAPO$cov2)
+
+      
+      # Geographic coverage -----------------------------------------------------
+
+      # Align coordinates for PO_GridA with rand.gridA
+      PO_aligned <- terra::extract(rand.gridA, vect(PO_GridA, geom = c("x", "y")), xy = TRUE) %>%
+        dplyr::select(x, y) %>%
+        dplyr::distinct()
+      
+      # Align coordinates for pa_a_df with rand.gridA
+      PA_aligned <- terra::extract(rand.gridA, vect(pa_a_df, geom = c("x", "y")), xy = TRUE) %>%
+        dplyr::select(x, y) %>%
+        dplyr::distinct()
+      
+      # Find unique rows of x y coordinates for PO_GridA
+      number_PO_unique <- nrow(PO_aligned)
+      number_PA_unique <- nrow(PA_aligned)
+      
+      number_PAPO_unique <- rbind(PO_aligned, PA_aligned) %>%
+        dplyr::distinct() %>%
+        nrow()
+      
+      PO_geo_coverage <- number_PO_unique / ncell(cov1)
+      PA_geo_coverage <- number_PA_unique / ncell(cov1)
+      PAPO_geo_coverage <- number_PAPO_unique / ncell(cov1)
       
       # Shape approach ----------------------------------------------------------
       
@@ -277,7 +321,19 @@ pa_sampling_func <- function(reps.setup.list,
                   n_presence_gridA = sum(pa_a_df$presence == 1),
                   n_absence_gridA = sum(pa_a_df$presence == 0),
                   PA.rand.gridA = PA.rand.gridA, # Need these last two for plotting
-                  summary.realised.extrap = summary.realised.extrap)) 
+                  summary.realised.extrap = summary.realised.extrap,
+                  cov1_SiteA_range = cov1_SiteA_range,
+                  cov2_SiteA_range = cov2_SiteA_range,
+                  PA_cov1_range = PA_cov1_range,
+                  PA_cov2_range = PA_cov2_range,
+                  PO_cov1_range = PO_cov1_range,
+                  PO_cov2_range = PO_cov2_range,
+                  PAPO_cov1_range = PAPO_cov1_range,
+                  PAPO_cov2_range = PAPO_cov2_range,
+                  PA_geo_coverage = PA_geo_coverage,
+                  PO_geo_coverage = PO_geo_coverage,
+                  PAPO_geo_coverage = PAPO_geo_coverage
+                  )) 
       
     })
     
