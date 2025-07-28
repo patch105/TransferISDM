@@ -6,9 +6,13 @@ library(viridis)
 library(purrr)
 library(readr)
 
-outpath <- file.path(getwd(), "output")
+# outpath <- file.path(getwd(), "output")
+# 
+# result_path <- file.path(getwd(), "output/PLOTS")
 
-result_path <- file.path(getwd(), "output/PLOTS")
+outpath <- file.path("Z:/ISDM", "output")
+
+result_path <- file.path(getwd(), "output/RESULTS")
 
 # Make dir if not already there
 if(!dir.exists(result_path)) {
@@ -125,8 +129,9 @@ if(scenario.type == "Spatial.Auto") {
   
 }
 
-
-# Make the figure
+##########################################################
+########## PLOTS #######################
+########################################################
 
 
 true.validation.df <- true.validation.df %>%
@@ -137,7 +142,6 @@ true.validation.df <- true.validation.df %>%
          bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
 
-# Version for supp. materials
 RMSE_2 <- true.validation.df %>% 
   ggplot(aes(x = mean.extrap, y = RMSE.global, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
@@ -159,33 +163,7 @@ RMSE_2 <- true.validation.df %>%
         strip.text = element_text(size = 15),   # Increase facet title size
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
-  ggtitle('High PO record numbers')
-
-# For FIG. 3
-
-RMSE_2_Fig3 <- true.validation.df %>% 
-  ggplot(aes(x = mean.extrap, y = RMSE.global, color = bias.type)) +
-  geom_point(alpha = 0.05, size = 1.2) +
-  geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
-  labs(x = x.label, y = "Mean RMSE projection site") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
-                    breaks = c("Without bias covariate", "With bias covariate")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
-                     breaks = c("Without bias covariate", "With bias covariate")) +
-  coord_cartesian(ylim = c(NA, 4)) +
-  theme_bw() +
-  facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
-  theme(legend.position = "bottom",
-        legend.key.size = unit(1.5, "line"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),  # Increase legend text size
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.title = element_text(size = 15),   # Increase axis titles
-        axis.text = element_text(size = 12),    # Increase axis text
-        strip.text = element_text(size = 15),   # Increase facet title size
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic"))
+  ggtitle('Higher PO record numbers')
 
 
 # INTERVAL SCORE
@@ -194,8 +172,10 @@ Int.score_1 <- true.validation.df %>%
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
   labs(x = x.label, y = "Mean interval score") +
-  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
-  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4")) +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
   coord_cartesian(ylim = c(NA, 3.5)) +
   theme_bw() +
   facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
@@ -210,6 +190,55 @@ Int.score_1 <- true.validation.df %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
   ggtitle('High PO record numbers')
 
+
+# CORRELATION ESTIMATED VS. TRUE
+CORR_1 <- true.validation.df %>% 
+  ggplot(aes(x = mean.extrap, y = correlation, color = bias.type)) +
+  geom_point(alpha = 0.05, size = 1.2) +
+  geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
+  labs(x = x.label, y = "Correlation") +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
+  coord_cartesian(ylim = c(0.25, NA)) +
+  theme_bw() +
+  facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
+  theme(legend.position = "bottom",
+        legend.key.size = unit(1.5, "line"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14),  # Increase legend text size
+        axis.title = element_text(size = 15),   # Increase axis titles
+        axis.text = element_text(size = 12),    # Increase axis text
+        strip.text = element_text(size = 15),   # Increase facet title size
+        strip.background = element_rect(fill = "gray96"),
+        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
+  ggtitle('High PO record numbers')
+
+
+# # COVERAGE RATE
+cov.rate <- true.validation.df %>%
+  ggplot(aes(x = mean.extrap, y = coverage.rate, color = bias.type)) +
+  geom_point(alpha = 0.05, size = 1.2) +
+  geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
+  labs(x = x.label, y = "Mean coverage probability") +
+  scale_fill_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                    breaks = c("Without bias covariate", "With bias covariate")) +
+  scale_color_manual(values = c("Without bias covariate" = "green4", "With bias covariate" = "purple4", "grey70"),
+                     breaks = c("Without bias covariate", "With bias covariate")) +
+  #coord_cartesian(ylim = c(NA, 3.5)) +
+  theme_bw() +
+  facet_grid(cols = vars(mod.type2), labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only"))) +
+  theme(legend.position = "bottom",
+        legend.key.size = unit(1.5, "line"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14),  # Increase legend text size
+        axis.title = element_text(size = 15),   # Increase axis titles
+        axis.text = element_text(size = 12),    # Increase axis text
+        strip.text = element_text(size = 15),   # Increase facet title size
+        strip.background = element_rect(fill = "gray96"),
+        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right
+  ggtitle('High PO record numbers')
 
 ######## SITE A #################
 
@@ -557,15 +586,14 @@ if(scenario.type == "Spatial.Auto") {
 
 # Make the figure
 
-true.validation.df_1C <- true.validation.df_1C %>%
+true.validation.df_2 <- true.validation.df_2 %>%
   mutate(bias.type = ifelse(grepl("PA", mod.type, fixed = TRUE), NA_character_,
                             ifelse(grepl("bias", mod.type, fixed = TRUE) & mod.type != "m.PA", "With bias covariate", "Without bias covariate"))) %>%
   mutate(mod.type2 = ifelse(grepl("bias", mod.type, fixed = TRUE), gsub(".bias", "", mod.type), mod.type)) %>%
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int")),
          bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
-## Version for supp. material
-RMSE_2C <- true.validation.df_1C %>% 
+RMSE_2C <- true.validation.df_2 %>% 
   ggplot(aes(x = mean.extrap, y = RMSE.global, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
@@ -589,7 +617,7 @@ RMSE_2C <- true.validation.df_1C %>%
   ggtitle('Low PO record numbers')
 
 # Interval score
-Int.score_1C <- true.validation.df_1C %>% 
+Int.score_2 <- true.validation.df_2 %>% 
   ggplot(aes(x = mean.extrap, y = Mean.Int.Score, color = bias.type)) +
   geom_point(alpha = 0.05, size = 1.2) +
   geom_smooth(method = "loess", se = T, aes(fill = bias.type, color = bias.type), alpha = 0.3) +
@@ -681,7 +709,7 @@ extrap.scenario.df_2  <- extrap.scenario.df_2 %>%
   mutate(mod.type2 = factor(mod.type2, levels = c("m.PO", "m.PA", "m.int"))) %>% 
   mutate(bias.type = factor(bias.type, levels = c("Without bias covariate", "With bias covariate")))
 
-b1_1C <- extrap.scenario.df_1C %>% 
+b1_2 <- extrap.scenario.df_2 %>% 
   ggplot(aes(x = bias.type, y = beta1.mean, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   geom_hline(yintercept = beta1, linetype = "dashed", color = "red") +  # Add the horizontal dashed line
@@ -712,7 +740,7 @@ b1_1C <- extrap.scenario.df_1C %>%
   ggtitle('Low PO record numbers')
 
 
-b2_1C <- extrap.scenario.df_1C %>% 
+b2_2 <- extrap.scenario.df_2 %>% 
   ggplot(aes(x = bias.type, y = beta2.mean, fill = bias.type)) +  
   geom_boxplot(alpha = 0.6, width = 0.25, outlier.shape = NA) +  # Add a boxplot without outliers
   geom_hline(yintercept = beta2, linetype = "dashed", color = "red") +  # Add the horizontal dashed line
@@ -873,117 +901,127 @@ PA_INT_2 <- extrap.scenario.df_2  %>%
 intercepts_2 <- ggarrange(PO_INT_2, PA_INT_2, common.legend = T,  ncol = 2, nrow = 1, legend = "bottom")
 
 ###########################################
-### FIGURES: COMBINED 1 AND 1 C PLOTS ####
+### FIGURES: COMBINED 1 AND 2 PLOTS ####
 ##########################################
 
-Fig.3 <- RMSE_2_Fig3
 
-ggsave(plot = Fig.3, filename = paste0(file.path(result_path),"/FIGURE_3.png"), w = 23.5, h = 12.5, units = "cm", dpi = 400, device = "png")
+Fig.3 <- ggarrange(RMSE_2 + rremove("xlab"), RMSE_2C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-Supp.Fig.1 <- ggarrange(RMSE_2 + rremove("xlab"), RMSE_2C, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+ggsave(plot = Fig.3, filename = paste0(file.path(result_path),"/FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
-ggsave(plot = Supp.Fig.1, filename = paste0(file.path(result_path),"/Supp_FIGURE_1.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+Supp.Fig.1 <- ggarrange(RMSE_2 + rremove("xlab"), Int.score_1 + rremove("xlab"), CORR_1 + rremove("xlab"), cov.rate, common.legend = T,  ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"))
 
-Supp.Fig.2 <- ggarrange(Int.score_1 + rremove("xlab"), Int.score_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+ggsave(plot = Supp.Fig.1, filename = paste0(file.path(result_path),"/Supp.Fig.1.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
-ggsave(plot = Supp.Fig.2, filename = paste0(file.path(result_path),"/Supp_FIGURE_2.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 ## Training site
 
-Supp.Fig.3 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.2 <- ggarrange(RMSE_A_1 + rremove("xlab"), RMSE_A_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Supp_FIGURE_3.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.2, filename = paste0(file.path(result_path),"/Supp.Fig.2.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT PLOT combined 1 and 1 C
 
-Supp.Fig.4 <- ggarrange(beta_1 + rremove("xlab"), beta_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.3 <- ggarrange(beta_1 + rremove("xlab"), beta_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Supp_FIGURE_4.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.3, filename = paste0(file.path(result_path),"/Supp.Fig.3.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 ##### COEFFICIENT SD PLOT combined 1 and 1 C
 
-Supp.Fig.5 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.4 <- ggarrange(betaSD_1 + rremove("xlab"), betaSD_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Supp_FIGURE_5.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.4, filename = paste0(file.path(result_path),"/Supp.Fig.4.png"), w = 20, h = 30, units = "cm", dpi = 400, device = "png")
 
 ###### INTERCEPTS #######
 
-Supp.Fig.6 <- ggarrange(intercepts + rremove("xlab"), intercepts_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.5 <- ggarrange(intercepts + rremove("xlab"), intercepts_2, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp_FIGURE_6.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.5, filename = paste0(file.path(result_path),"/Supp.Fig.5.png"), w = 23, h = 17, units = "cm", dpi = 400, device = "png")
 
 
-######### REALISED ENVIRO. EXTRAPOLATION ###########
+######### REALISED ENVIRO. DISSIMILARITY #########
 
-#### Realised extrap per mod type ###
 
 true.validation.df$extrap.type <- factor(true.validation.df$extrap.type, levels = c("Low", "Moderate", "High"))
 
-R2a <- true.validation.df %>% 
+true.validation.df2 <- true.validation.df %>% 
+  mutate(mod.name = ifelse(mod.type2 == "m.PA", "Presence-absence", 
+                           ifelse(mod.type2 == "m.PO", "Presence-only", "Integrated")))
+
+true.validation.df2$mod.name <- factor(true.validation.df2$mod.name, levels = c("Presence-only", "Presence-absence", "Integrated"))
+
+R2a <- true.validation.df2 %>% 
   filter(mod.type %in% c("m.int", "m.PA", "m.PO")) %>% 
   mutate(realised.extrap = ifelse(mod.type == "m.int", meanPAPO.extrap, 
                                   ifelse(mod.type == "m.PA", meanPA.extrap, meanPO.extrap))) %>%
   mutate(mod.type = factor(mod.type, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = extrap.type, y = realised.extrap)) +
-  geom_boxplot(width = 0.25, outlier.shape = NA, fill = "#0072B2") +  # Boxplot with no outliers
+  ggplot(aes(x = extrap.type, y = realised.extrap, fill = mod.name)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  scale_fill_manual(values = c("Presence-only" = "skyblue", "Presence-absence" = "orange", "Integrated" = "purple")) +
+  scale_color_manual(values = c("Presence-only" = "skyblue", "Presence-absence" = "orange", "Integrated" = "purple")) +
   labs(y = "Realised enviro. dissimilarity", x = "Projection site to training site environmental dissimilarity") +
-  coord_cartesian(ylim = c(NA, 400)) +
+  coord_cartesian(ylim = c(NA, 380)) +
   theme_bw() +
-  facet_wrap(~mod.type, labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only")), scales = "free_x") +  # Wrap facets and use free_x to adjust x-axis
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),  # Increase legend text size
+        legend.text = element_text(size = 10),  # Increase legend text size
         # axis.title.x = element_blank(),         # Remove x-axis title
         # axis.text.x = element_blank(),          # Remove x-axis text
         # axis.ticks.x = element_blank(),         # Remove x-axis ticks
         panel.grid.major.x = element_blank(),   # Remove major grid lines
         panel.grid.minor.x = element_blank(),   # Remove minor grid lines
-        axis.title.y = element_text(size = 15), # Keep y-axis title
-        axis.title.x = element_text(size = 15), # Keep y-axis title
-        axis.text = element_text(size = 12),    # Increase axis text
-        strip.text = element_text(size = 15),   # Increase facet title size
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right)
-  ggtitle('High PO record numbers')
+        axis.title.y = element_text(size = 10), # Keep y-axis title
+        axis.title.x = element_text(size = 11), # Keep y-axis title
+        axis.text = element_text(size = 8),    # Increase axis text
+        plot.title = element_text(hjust = 1, size = 11, face = "italic")) +  # Move title to the right)
+  ggtitle('Higher PO record numbers')
 
 true.validation.df_2$extrap.type <- factor(true.validation.df_2$extrap.type, levels = c("Low", "Moderate", "High"))
+
+
+true.validation.df_2 <- true.validation.df_2 %>% 
+  mutate(mod.name = ifelse(mod.type2 == "m.PA", "Presence-absence", 
+                           ifelse(mod.type2 == "m.PO", "Presence-only", "Integrated")))
+
+true.validation.df_2$mod.name <- factor(true.validation.df_2$mod.name, levels = c("Presence-only", "Presence-absence", "Integrated"))
+
 
 R2Ca <- true.validation.df_2 %>% 
   filter(mod.type %in% c("m.int", "m.PA", "m.PO")) %>% 
   mutate(realised.extrap = ifelse(mod.type == "m.int", meanPAPO.extrap, 
                                   ifelse(mod.type == "m.PA", meanPA.extrap, meanPO.extrap))) %>%
   mutate(mod.type = factor(mod.type, levels = c("m.PO", "m.PA", "m.int"))) %>% 
-  ggplot(aes(x = extrap.type, y = realised.extrap)) +
-  geom_boxplot(width = 0.25, outlier.shape = NA, fill = "#0072B2") +  # Boxplot with no outliers
+  ggplot(aes(x = extrap.type, y = realised.extrap, fill = mod.name)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  scale_fill_manual(values = c("Presence-only" = "skyblue", "Presence-absence" = "orange", "Integrated" = "purple")) +
+  scale_color_manual(values = c("Presence-only" = "skyblue", "Presence-absence" = "orange", "Integrated" = "purple")) +
   labs(y = "Realised enviro. dissimilarity", x = "Projection site to training site environmental dissimilarity") +
-  coord_cartesian(ylim = c(NA, 400)) +
+  coord_cartesian(ylim = c(NA, 380)) +
   theme_bw() +
-  facet_wrap(~mod.type, labeller = as_labeller(c(m.int = "Integrated", m.PA = "Presence-absence", m.PO = "Presence-only")), scales = "free_x") +  # Wrap facets and use free_x to adjust x-axis
   theme(legend.position = "bottom",
         legend.key.size = unit(1.5, "line"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 14),  # Increase legend text size
+        legend.text = element_text(size = 10),  # Increase legend text size
         # axis.title.x = element_blank(),         # Remove x-axis title
         # axis.text.x = element_blank(),          # Remove x-axis text
         # axis.ticks.x = element_blank(),         # Remove x-axis ticks
         panel.grid.major.x = element_blank(),   # Remove major grid lines
         panel.grid.minor.x = element_blank(),   # Remove minor grid lines
-        axis.title.y = element_text(size = 15), # Keep y-axis title
-        axis.title.x = element_text(size = 15), # Keep y-axis title
-        axis.text = element_text(size = 12),    # Increase axis text
-        strip.text = element_text(size = 15),   # Increase facet title size
-        strip.background = element_rect(fill = "gray96"),
-        plot.title = element_text(hjust = 1, size = 15, face = "italic")) +  # Move title to the right)
-  ggtitle('High PO record numbers')
+        axis.title.y = element_text(size = 10), # Keep y-axis title
+        axis.title.x = element_text(size = 11), # Keep y-axis title
+        axis.text = element_text(size = 8),    # Increase axis text
+        plot.title = element_text(hjust = 1, size = 11, face = "italic")) +  # Move title to the right)
+  ggtitle('Lower PO record numbers')
 
 
 #########################################################################
 
-Supp.Fig.7 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.12 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp_FIGURE_7.png"), w = 23.5, h = 20, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.12, filename = paste0(file.path(result_path),"/Supp.Fig.12.png"), w = 12, h = 13, units = "cm", dpi = 400, device = "png")
+
 
 
