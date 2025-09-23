@@ -982,7 +982,7 @@ R2a <- true.validation.df2 %>%
 true.validation.df_2$extrap.type <- factor(true.validation.df_2$extrap.type, levels = c("Low", "Moderate", "High"))
 
 
-true.validation.df_2 <- true.validation.df_2 %>% 
+true.validation.df_2 <- true.validation.df_1C %>% 
   mutate(mod.name = ifelse(mod.type2 == "m.PA", "Presence-absence", 
                            ifelse(mod.type2 == "m.PO", "Presence-only", "Integrated")))
 
@@ -1017,11 +1017,12 @@ R2Ca <- true.validation.df_2 %>%
   ggtitle('Lower PO record numbers')
 
 
+
 #########################################################################
 
-Supp.Fig.12 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
+Supp.Fig.6 <- ggarrange(R2a + rremove("xlab"), R2Ca, common.legend = T,  ncol = 1, nrow = 2, legend = "bottom", labels = c("(a)", "(b)"))
 
-ggsave(plot = Supp.Fig.12, filename = paste0(file.path(result_path),"/Supp.Fig.12.png"), w = 12, h = 13, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp.Fig.6.png"), w = 12, h = 13, units = "cm", dpi = 400, device = "png")
 
 
 
