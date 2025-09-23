@@ -813,7 +813,7 @@ ggsave(plot = Fig4, filename = paste0(file.path(result_path),"/Figure_4.png"), w
 
 
 
-# Supplementary Figure 7  -------------------------------------------------
+# Supplementary Figure 8  -------------------------------------------------
 
 # Figure 4 but mean interval score on original scale
 
@@ -841,9 +841,9 @@ projection2 <-  final.df2 %>%
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
 
-Supp.Fig.7 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Supp.Fig.8 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp.Fig.7.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Supp.Fig.8.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 ######################################################
@@ -851,7 +851,7 @@ ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp.Fig.7.
 ######################################################
 
 
-# Supplementary Figure 6 --------------------------------------------------
+# Supplementary Figure 7 --------------------------------------------------
 
 x.discrete.label <- c(as.character(scal))
 
@@ -957,9 +957,9 @@ projection4 <- final.df2 %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-Supp.Fig.6 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Supp.Fig.7 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp.Fig.6.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.7, filename = paste0(file.path(result_path),"/Supp.Fig.7.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 
@@ -970,7 +970,7 @@ ggsave(plot = Supp.Fig.6, filename = paste0(file.path(result_path),"/Supp.Fig.6.
 ##########################################################################
 
 
-# Supplementary Figure 9 --------------------------------------------------
+# Supplementary Figure 10 --------------------------------------------------
 
 
 final.df.bias <- final.df.bias %>%
@@ -1085,9 +1085,9 @@ projection4 <- final.df.bias2 %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-Supp.Fig.9 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Supp.Fig.10 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Supp.Fig.9, filename = paste0(file.path(result_path),"/Supp.Fig.9.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.10, filename = paste0(file.path(result_path),"/Supp.Fig.10.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 #########################################################
@@ -1205,7 +1205,7 @@ ggsave(plot = COR_RMSE_GRF_plot, filename = paste0(file.path(result_path),"/Figu
 
 
 
-# Supplementary Figure 10 -------------------------------------------------
+# Supplementary Figure 11 -------------------------------------------------
 
 # Figure 4 but training site
 final.SiteA.df <- final.SiteA.df %>% 
@@ -1312,9 +1312,9 @@ training4 <- final.SiteA.df %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-Supp.Fig.10 <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Supp.Fig.11 <- ggarrange(training1 + rremove("xlab"), training2 + rremove("xlab"), training4 + rremove("xlab"), training3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Supp.Fig.10, filename = paste0(file.path(result_path),"/Supp.Fig.10.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.11, filename = paste0(file.path(result_path),"/Supp.Fig.11.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 #################################################
@@ -1347,7 +1347,7 @@ final.df$mod.type2 <- factor(final.df$mod.type2, levels = c("m.PO", "m.PA", "m.i
 final.df.bias <- final.df
 
 
-################## SUPP. FIGURE 8 #####################
+################## SUPP. FIGURE 9 #####################
 # Figure 4 but Lower PO record numbers
 
 
@@ -1458,13 +1458,13 @@ projection4 <- final.df2 %>%
         strip.background = element_rect(fill = "gray96"),
         plot.title = element_text(hjust = 1, size = 15, face = "italic")) 
 
-Supp.Fig.8 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
+Supp.Fig.9 <- ggarrange(projection1 + rremove("xlab"), projection2 + rremove("xlab"), projection4 + rremove("xlab"), projection3, common.legend = TRUE, ncol = 1, nrow = 4, legend = "bottom", labels = c("(a)", "(b)", "(c)", "(d)"), align = "v")
 
-ggsave(plot = Supp.Fig.8, filename = paste0(file.path(result_path),"/Supp.Fig.8.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
+ggsave(plot = Supp.Fig.9, filename = paste0(file.path(result_path),"/Supp.Fig.9.png"), w = 21, h = 30, units = "cm", dpi = 400, device = "png")
 
 
 #########################################
-###### Supplementary Figure 11 ##########
+###### Supplementary Figure 12 ##########
 #########################################
 
 
@@ -1568,13 +1568,13 @@ COR_RMSE_GRF_plot <- ggarrange(
   heights = c(1, 1)
 )
 
-Supp.Fig.11 <- annotate_figure(
+Supp.Fig.12 <- annotate_figure(
   COR_RMSE_GRF_plot, 
   bottom = text_grob("Relative random effect contribution", size = 14, vjust = 0.5)  # Adjust vertical position
 ) 
 
 
-ggsave(plot = COR_RMSE_GRF_plot, filename = paste0(file.path(result_path),"/Supp.Fig.11.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")  
+ggsave(plot = COR_RMSE_GRF_plot, filename = paste0(file.path(result_path),"/Supp.Fig.12.png"), w = 21, h = 16, units = "cm", dpi = 400, device = "png")  
 
 
 
