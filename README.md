@@ -1,6 +1,10 @@
 # TransferISDM
 
-Code in support of "Transferring species distribution models to understudied systems: Does data integration help?". Patterson, C.R., Zheng, X., Foster, S.D. & Helmstedt, K.J. Methods in Ecology & Evolution.
+Code in support of "Transferring species distribution models to understudied systems: Does data integration help?". 
+
+Patterson, C.R., Zheng, X., Foster, S.D. & Helmstedt, K.J. 2025. _Methods in Ecology and Evolution_.
+
+
 
 ## Project overview
 Integrated species distribution models (ISDMs) have the potential to provide better predictions than models fitted to single data types, but this has never been tested in scenarios of spatial transfer. Here, we test the performance of integrated, presence-only, and presence-absence models in simulated model transfer scenarios that emulate common causes of spatial model transfer failure: environmental dissimilarity and spatial autocorrelation. We also examine how two aspects of data quality - bias and presence-only detection probability - influence the outcomes of these model transfer scenarios. 
