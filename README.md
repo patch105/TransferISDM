@@ -2,7 +2,7 @@
 
 Code in support of "Transferring species distribution models to understudied systems: Does data integration help?". 
 
-Patterson, C.R., Zheng, X., Foster, S.D. & Helmstedt, K.J. 2025. _Methods in Ecology and Evolution_.
+Patterson, C.R., Zheng, X., Foster, S.D. & Helmstedt, K.J. (2025). _Methods in Ecology and Evolution_.
 
 
 
